@@ -1,0 +1,52 @@
+Reduce dimension:
+
+Supposing 
+east_c= [C11 C12 C13] east_e=[E11 E12 E13] 
+        [C21 C22 C23]        [E21 E22 E23]
+        [C31 C32 C33]        [E31 E32 E33]
+
+we have, 
+C=[C11 C12 C13 C21 C22 C23 C31 C32 C33]'
+E=[E11 E12 E13 E21 E22 E23 E31 E32 E33]'
+
+Since,
+E11= 1/4*C11+1/4*C12        +1/4*C21+1/4*C22
+E12=         1/4*C12+1/4*C13        +1/4*C22+1/4*C23
+E13=        -1/4*C12+1/4*C13        -1/4*C22+3/4*C23
+E21=                         1/4*C21+1/4*C22        +1/4*C31+1/4*C32
+E22=                                 1/4*C22+1/4*C23        +1/4*C32+1/4*C33
+E23=                                -1/4*C22+1/4*C23        -1/4*C32+3/4*C33
+E31=                        -1/4*C21-1/4*C22        +1/4*C31+3/4*C32    
+E32=                                -1/4*C22-1/4*C23        +1/4*C32+3/4*C33
+E33=                -2/4*C13                +2/4*C23-2/4*C31+2/4*C32
+
+
+Supposing E=A*C, we have 
+A = 1/4*[1  1  0  1  1  0  0  0  0]
+        [0  1  1  0  1  1  0  0  0]
+        [0 -1  1  0 -1  3  0  0  0]
+        [0  0  0  1  1  0  1  1  0]
+        [0  0  0  0  1  1  0  1  1]
+        [0 -1  1  0 -1  3  0  0  0]
+
+for j=1:jm-1
+	for i=1:im-1
+    	east_e(i,j)=(east_c(i,j)+east_c(i+1,j)+east_c(i,j+1)+east_c(i+1,j+1))/4.e0;
+        north_e(i,j)=(north_c(i,j)+north_c(i+1,j)+north_c(i,j+1)+north_c(i+1,j+1))/4.e0;
+    end
+end
+%     Extrapolate ends:
+for i=1:im-1
+    east_e(i,jm)=((east_c(i,jm)+east_c(i+1,jm))*3.e0-east_c(i,jm-1)-east_c(i+1,jm-1))/4.e0;
+    north_e(i,jm)=((north_c(i,jm)+north_c(i+1,jm))*3.e0-north_c(i,jm-1)-north_c(i+1,jm-1))/4.e0;
+end
+%
+for j=1:jm-1
+	east_e(im,j)=((east_c(im,j)+east_c(im,j+1))*3.e0-east_c(im-1,j)-east_c(im-1,j+1))/4.e0;
+    north_e(im,j)=((north_c(im,j)+north_c(im,j+1))*3.e0-north_c(im-1,j)-north_c(im-1,j+1))/4.e0;
+end
+%
+east_e(im,jm)=east_e(im-1,jm)+east_e(im,jm-1)-(east_e(im-2,jm)+east_e(im,jm-2))/2.e0;
+north_e(im,jm)=north_e(im-1,jm)+north_e(im,jm-1)-(north_e(im-2,jm)+north_e(im,jm-2))/2.e0;
+
+

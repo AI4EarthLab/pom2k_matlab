@@ -127,7 +127,7 @@ north_c=dy*R1;
 %     The following works properly for any grid:
 %
 %     Elevation points:
-%
+% 
 for j=1:jm-1
 	for i=1:im-1
     	east_e(i,j)=(east_c(i,j)+east_c(i+1,j)+east_c(i,j+1)+east_c(i+1,j+1))/4.e0;
