@@ -285,6 +285,8 @@ if(iproblem == 1)
         uabw,uabe,ele,elw,tbe,tbw,sbe,sbw,tbn,tbs,sbn,sbs,...
         e_atmos,aam,im,jm,kb,imm1,jmm1,kbm1,slmax,zz,tbias,sbias,grav,rhoref);
     
+    
+    
 elseif(iproblem == 2)
    [dx,dy,cor,...
         east_c,north_c,east_e,north_e,east_u,north_u,east_v,north_v,...
@@ -298,7 +300,8 @@ elseif(iproblem == 2)
         aam2d,rho,rmean,rfe,rfw,rfn,rfs,...
         uabw,uabe,ele,elw,tbe,tbw,sbe,sbw,tbn,tbs,sbn,sbs,...
         e_atmos,aam,im,jm,kb,imm1,jmm1,kbm1,slmax,zz,tbias,sbias,grav,rhoref,rot,tatm,satm,vfluxf);
-     
+    
+    
 elseif(iproblem ==3)
     [dx,dy,cor,...
     east_c,north_c,east_e,north_e,east_u,north_u,east_v,north_v,...
@@ -318,6 +321,10 @@ else
     return
 end
 
+
+
+
+
 %     Inertial period for temporal filter:
 period=(2.0*pi)/abs(cor(floor(im/2),floor(jm/2)))/86400.0;
 
@@ -328,6 +335,7 @@ time=0.0;
 %     NOTE that lateral thermodynamic boundary conditions are often set
 %     equal to the initial conditions and are held constant thereafter.
 %    Users can of course create variable boundary conditions.
+
 
 ua=uab;
 va=vab;
