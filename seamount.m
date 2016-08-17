@@ -184,7 +184,7 @@ A1=zeros(im+1,jm+1);
 
 A1(1:im,1:jm)=east_c;
 
-B1=L*A1*R/4.0;
+B1=0.25*L*A1*R;
 
 B1(im,jm) = sum(sum(T.*B1,1),2);
 
@@ -195,7 +195,7 @@ A2=zeros(im+1,jm+1);
 
 A2(1:im,1:jm)=north_c;
 
-B2=L*A2*R/4.0;
+B2=0.25*L*A2*R;
 
 B2(im,jm) = sum(sum(T.*B2,1),2);
 
@@ -274,25 +274,30 @@ north_v1=B6;
 rot=zeros(im,jm);
 
 %     Define depth:
-for i=1:im
-    for j=1:jm
-        h(i,j)=4500.e0*(1.e0-delh...
-                            *exp(-((east_c(i,j)...
-                                    -east_c((im+1)/2,j))^2 ...
-                                    +(north_c(i,j)...
-                                     -north_c(i,(jm+1)/2))^2)...
-                                     /ra^2));
-		if(h(i,j) < 1.e0) 
-               h(i,j)=1.e0;
-        end
-	end 
-end 
+
+% % % for i=1:im
+% % %     for j=1:jm
+% % %         h(i,j)=4500.e0*(1.e0-delh*exp(-((east_c(i,j)-east_c((im+1)/2,j))^2 ...
+% % %                                     +(north_c(i,j)-north_c(i,(jm+1)/2))^2)/ra^2));
+% % % 		if(h(i,j) < 1.e0) 
+% % %                h(i,j)=1.e0;
+% % %         end
+% % % 	end 
+% % % end 
+
+W1= east_c  - repmat( east_c ((im+1)/2,:) , im, 1 );
+W2= north_c - repmat( north_c(:,(jm+1)/2), 1 , jm);
+
+h=4500.0*(1.e0-delh*exp((-W1.^2 - W2.^2)/ra^2));
+h(h<1.0) = 1.0;
 
 %     Close the north and south boundaries to form a channel:
-for i=1:im
-    h(i,1)=1.e0;
-    h(i,jm)=1.e0;
-end 
+% % % for i=1:im
+% % %     h(i,1)=1.0;
+% % %     h(i,jm)=1.0;
+% % % end 
+h(:,1)=1.0;
+h(:,jm)=1.0;
 
 %     Calculate areas and masks:
 [art,aru,arv,fsm,dum,dvm]=areas_masks(art,aru,arv,fsm,dum,dvm,...
