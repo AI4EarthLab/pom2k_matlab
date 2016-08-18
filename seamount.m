@@ -91,7 +91,7 @@ cor(1:im,1:jm)=1.e-4;
 %     works properly for a rectangular grid with east and north aligned
 %     with i and j, respectively:
 %
-fprintf('Test east_c and north_C with matrix style\n');
+
 % % % tic;
 % % % for j=1:jm
 % % %     east_c(1,j)=0.e0;
@@ -118,10 +118,11 @@ fprintf('Test east_c and north_C with matrix style\n');
 %     [1 1 1 1 1 0 0]        
 %     [1 1 1 1 1 1 0]        
 %tic;
-L1=tril(ones(im,im)) - eye(im,im);
-R1=triu(ones(jm,jm)) - eye(jm,jm);
-east_c=L1*dx;
-north_c=dy*R1;
+L0=tril(ones(im,im)) - eye(im,im);
+R0=triu(ones(jm,jm)) - eye(jm,jm);
+east_c=L0*dx;
+north_c=dy*R0;
+
 %toc;
 
 %     The following works properly for any grid:
@@ -254,7 +255,7 @@ A5(1:im,1:jm)=east_c;
 
 B5=L*A5/2.0;
 
-east_v1=B5;
+east_v=B5;
 
 % Compute north_v with matrix style
 A6=zeros(im+1,jm);
@@ -263,7 +264,7 @@ A6(1:im,1:jm)=north_c;
 
 B6=L*A6/2.0;
 
-north_v1=B6;
+north_v=B6;
 
 %     rot is the angle (radians, anticlockwise) of the i-axis relative
 %     to east, averaged to a cell centre:
@@ -349,6 +350,7 @@ aam2d=aam(:,:,1);
 
 [rho]=dens(sb,tb,rho,im,jm,kbm1,tbias,sbias,grav,rhoref,zz,h,fsm);
 
+
 %     Generated horizontally averaged density field (in this
 %     application, the initial condition for density is a function
 %     of z (the vertical cartesian coordinate) -- when this is not
@@ -376,19 +378,19 @@ rfw=1.e0;
 rfn=1.e0;
 rfs=1.e0;
 
-% % % for j=2:jmm1
-% % % 	uabw(j)=uab(2,j);
-% % %     uabe(j)=uab(imm1,j);
-% % % %    Set geostrophically conditioned elevations at the boundaries:
-% % %     ele(j)=ele(j-1)-cor(imm1,j)*uab(imm1,j)/grav*dy(imm1,j-1);
-% % %     elw(j)=elw(j-1)-cor(2,j)*uab(2,j)/grav*dy(2,j-1);
-% % % end
-
-uabw(2:jmm1)=uab(2,2:jmm1);
-uabe(2:jmm1)=uab(imm1,2:jmm1);
+for j=2:jmm1
+	uabw(j)=uab(2,j);
+    uabe(j)=uab(imm1,j);
 %    Set geostrophically conditioned elevations at the boundaries:
-ele(2:jmm1)=ele(1:jmm1-1)-cor(imm1,2:jmm1).*uab(imm1,2:jmm1)/grav.*dy(imm1,1:jmm1-1);
-elw(2:jmm1)=elw(1:jmm1-1)-cor(2,2:jmm1).*uab(2,2:jmm1)/grav.*dy(2,1:jmm1-1);
+    ele(j)=ele(j-1)-cor(imm1,j)*uab(imm1,j)/grav*dy(imm1,j-1);
+    elw(j)=elw(j-1)-cor(2,j)*uab(2,j)/grav*dy(2,j-1);
+end
+
+% % % uabw(2:jmm1)=uab(2,2:jmm1);
+% % % uabe(2:jmm1)=uab(imm1,2:jmm1);
+% % % %    Set geostrophically conditioned elevations at the boundaries:
+% % % ele(2:jmm1)=ele(1:jmm1-1)-cor(imm1,2:jmm1).*uab(imm1,2:jmm1)/grav.*dy(imm1,1:jmm1-1);
+% % % elw(2:jmm1)=elw(1:jmm1-1)-cor(2,2:jmm1).*uab(2,2:jmm1)/grav.*dy(2,1:jmm1-1);
 
 
 %     Adjust boundary elevations so that they are zero in the middle
@@ -403,6 +405,7 @@ elw(2:jmm1)=elw(1:jmm1-1)-cor(2,2:jmm1).*uab(2,2:jmm1)/grav.*dy(2,1:jmm1-1);
 
 ele(2:jmm1)=(ele(2:jmm1)-ele(jmm1/2)).*fsm(im,2:jmm1);
 elw(2:jmm1)=(elw(2:jmm1)-elw(jmm1/2)).*fsm(2, 2:jmm1);
+
 
 
 %     Set thermodynamic boundary conditions (for the seamount

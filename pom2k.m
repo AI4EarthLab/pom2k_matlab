@@ -1,3 +1,4 @@
+clear all;
 
 im=7;
 jm=5;
@@ -215,6 +216,7 @@ ko = zeros(100);
 %     End of input of constants
 %***********************************************************************
 
+
 %     Calculate some constants:
 dti=dte*isplit;
 
@@ -229,7 +231,7 @@ ispi=1.0/isplit;
 isp2i=1.0/(2.0*isplit);
 
 
-dz=zeros(1,kb)         ;dzz=zeros(1,kb)        ;z=zeros(1,kb)          ;zz=zeros(1,kb);
+dz=zeros(1,kb)       ;dzz=zeros(1,kb)      ;z=zeros(1,kb)        ;zz=zeros(1,kb);
 
 aam2d=zeros(im,jm)   ;advua=zeros(im,jm)   ;advva=zeros(im,jm)   ;adx2d=zeros(im,jm)   ;
 ady2d=zeros(im,jm)   ;art=zeros(im,jm)     ;aru=zeros(im,jm)     ;arv=zeros(im,jm)     ;
@@ -266,9 +268,12 @@ uabe=zeros(jm)       ;uabw=zeros(jm)       ;ube=zeros(jm,kb)     ;ubw=zeros(jm,k
 vabn=zeros(im)       ;vabs=zeros(im)       ;vbn=zeros(im,kb)     ;vbs=zeros(im,kb);
 
 
+
 if(iproblem ~= 3)
     [kdz,z,zz,dz,dzz]=depth(z,zz,dz,dzz,kb,kl1,kl2);
 end
+
+
 
 if(iproblem == 1)
     
@@ -284,6 +289,7 @@ if(iproblem == 1)
         aam2d,rho,rmean,rfe,rfw,rfn,rfs,...
         uabw,uabe,ele,elw,tbe,tbw,sbe,sbw,tbn,tbs,sbn,sbs,...
         e_atmos,aam,im,jm,kb,imm1,jmm1,kbm1,slmax,zz,tbias,sbias,grav,rhoref);
+
     
 elseif(iproblem == 2)
    [dx,dy,cor,...
@@ -338,42 +344,57 @@ d=h + el;
 dt=h + et;
 w(:,:,1)=vfluxf;
 
+% % % for k=1:kb
+% % %     for j=1:jm
+% % %         for i=1:im
+% % %             l(i,j,k)=0.1*dt(i,j);
+% % %             q2b(i,j,k)=small;
+% % %             q2lb(i,j,k)=l(i,j,k)*q2b(i,j,k);
+% % %             kh(i,j,k)=l(i,j,k)*sqrt(q2b(i,j,k));
+% % %             km(i,j,k)=kh(i,j,k);
+% % %             kq(i,j,k)=kh(i,j,k);
+% % %             aam(i,j,k)=aam_init;
+% % %         end
+% % %     end
+% % % end
+
 for k=1:kb
-    for j=1:jm
-        for i=1:im
-            l(i,j,k)=0.1*dt(i,j);
-            q2b(i,j,k)=small;
-            q2lb(i,j,k)=l(i,j,k)*q2b(i,j,k);
-            kh(i,j,k)=l(i,j,k)*sqrt(q2b(i,j,k));
-            km(i,j,k)=kh(i,j,k);
-            kq(i,j,k)=kh(i,j,k);
-            aam(i,j,k)=aam_init;
-        end
-    end
+    l(:,:,k)    = 0.1*dt(:,:);
+    q2b(:,:,k)  = small;
+    q2lb(:,:,k) = l(:,:,k).*q2b(:,:,k);
+    kh(:,:,k)   = l(:,:,k).*sqrt(q2b(:,:,k));
+    km(:,:,k)   = kh(:,:,k);
+    kq(:,:,k)   = kh(:,:,k);
+    aam(:,:,k)  = aam_init;
 end
 
+% % % for k=1:kbm1
+% % %     for i=1:im
+% % %         for j=1:jm
+% % %             q2(i,j,k)=q2b(i,j,k);
+% % %             q2l(i,j,k)=q2lb(i,j,k);
+% % %             t(i,j,k)=tb(i,j,k);
+% % %             s(i,j,k)=sb(i,j,k);
+% % %             u(i,j,k)=ub(i,j,k);
+% % %             v(i,j,k)=vb(i,j,k);
+% % %         end
+% % %     end
+% % % end
 
 for k=1:kbm1
-    for i=1:im
-        for j=1:jm
-            q2(i,j,k)=q2b(i,j,k);
-            q2l(i,j,k)=q2lb(i,j,k);
-            t(i,j,k)=tb(i,j,k);
-            s(i,j,k)=sb(i,j,k);
-            u(i,j,k)=ub(i,j,k);
-            v(i,j,k)=vb(i,j,k);
-        end
-    end
+    q2(:,:,k) =q2b(:,:,k);
+    q2l(:,:,k)=q2lb(:,:,k);
+    t(:,:,k)  =tb(:,:,k);
+    s(:,:,k)  =sb(:,:,k);
+    u(:,:,k)  =ub(:,:,k);
+    v(:,:,k)  =vb(:,:,k);
 end
 
-
-[rho]=dens(s,t,rho,...
-    im,jm,kbm1,tbias,sbias,grav,rhoref,zz,h,fsm);
+[rho]=dens(s,t,rho,im,jm,kbm1,tbias,sbias,grav,rhoref,zz,h,fsm);
 
 [rho,drhox,drhoy] = baropg(rho,drhox,drhoy,...
     im,jm,imm1,jmm1,kb,kbm1,grav,...
     zz,dt,dum,dvm,ramp,rmean,dx,dy);
-
 
 
 
