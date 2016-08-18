@@ -367,7 +367,7 @@ for k=1:kbm1
 end
 
 
-[s,t,rho]=dens(s,t,rho,...
+[rho]=dens(s,t,rho,...
     im,jm,kbm1,tbias,sbias,grav,rhoref,zz,h,fsm);
 
 [rho,drhox,drhoy] = baropg(rho,drhox,drhoy,...
@@ -990,7 +990,7 @@ for  iint=1:iend
                 %
                 %
                 %
-                [s,t,rho]=dens(s,t,rho,...
+                [rho]=dens(s,t,rho,...
                     im,jm,kbm1,tbias,sbias,grav,rhoref,zz,h,fsm);
                 
                 %

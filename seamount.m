@@ -203,8 +203,8 @@ north_e=B2;
 
 %     u-points:
 % % % for j=1:jm-1
-% % % 	for i=1:im
-% % %     	east_u(i,j)=(east_c(i,j)+east_c(i,j+1))/2.e0;
+% % %     for i=1:im
+% % %     	  east_u(i,j)=(east_c(i,j)+east_c(i,j+1))/2.e0;
 % % %         north_u(i,j)=(north_c(i,j)+north_c(i,j+1))/2.e0;
 % % %     end
 % % % end
@@ -285,7 +285,7 @@ rot=zeros(im,jm);
 % % % 	end 
 % % % end 
 
-W1= east_c  - repmat( east_c ((im+1)/2,:) , im, 1 );
+W1= east_c  - repmat( east_c ((im+1)/2,:), im, 1 );
 W2= north_c - repmat( north_c(:,(jm+1)/2), 1 , jm);
 
 h=4500.0*(1.e0-delh*exp((-W1.^2 - W2.^2)/ra^2));
@@ -296,13 +296,11 @@ h(h<1.0) = 1.0;
 % % %     h(i,1)=1.0;
 % % %     h(i,jm)=1.0;
 % % % end 
-h(:,1)=1.0;
+h(:,1) =1.0;
 h(:,jm)=1.0;
 
 %     Calculate areas and masks:
-[art,aru,arv,fsm,dum,dvm]=areas_masks(art,aru,arv,fsm,dum,dvm,...
-        im,jm,dx,dy,h);
-
+[art,aru,arv,fsm,dum,dvm]=areas_masks(im,jm,dx,dy,h);
 
 %     Adjust bottom topography so that cell to cell variations
 %     in h for not exceed parameter slmax:
@@ -311,18 +309,24 @@ if(slmax < 1.e0)
 end
 
 %     Set initial conditions:
-
+% % % for k=1:kbm1
+% % % 	for j=1:jm
+% % %     	for i=1:im
+% % %             tb(i,j,k)=5.0+15.e0*exp(zz(k)*h(i,j)/1000.e0)-tbias;
+% % %             sb(i,j,k)=35.0-sbias;
+% % %             tclim(i,j,k)=tb(i,j,k);
+% % %             sclim(i,j,k)=sb(i,j,k);
+% % %             ub(i,j,k)=vel*dum(i,j);
+% % %     	end
+% % %    end
+% % % end 
 
 for k=1:kbm1
-	for j=1:jm
-    	for i=1:im
-            tb(i,j,k)=5.e0+15.e0*exp(zz(k)*h(i,j)/1000.e0)-tbias;
-            sb(i,j,k)=35.0-sbias;
-            tclim(i,j,k)=tb(i,j,k);
-            sclim(i,j,k)=sb(i,j,k);
-            ub(i,j,k)=vel*dum(i,j);
-    	end
-   end
+    tb(:,:,k)=5.0+15.0*exp(zz(k)*h(:,:)/1000.0)-tbias;
+    sb(:,:,k)=35.0-sbias;
+    tclim(:,:,k)=tb(:,:,k);
+    sclim(:,:,k)=sb(:,:,k);
+    ub(:,:,k)=vel*dum(:,:);
 end 
 
 %     Initialise uab and vab as necessary
@@ -343,7 +347,7 @@ etb=-e_atmos;
 dt=h-e_atmos;
 aam2d=aam(:,:,1);
 
-[sb,tb,rho]=dens(sb,tb,rho,im,jm,kbm1,tbias,sbias,grav,rhoref,zz,h,fsm);
+[rho]=dens(sb,tb,rho,im,jm,kbm1,tbias,sbias,grav,rhoref,zz,h,fsm);
 
 %     Generated horizontally averaged density field (in this
 %     application, the initial condition for density is a function
@@ -351,13 +355,18 @@ aam2d=aam(:,:,1);
 %     so, make sure that rmean has been area averaged BEFORE transfer
 %     to sigma coordinates):
 
+% % % for k=1:kbm1
+% % %    for j=1:jm
+% % %        for i=1:im
+% % %           rmean(i,j,k) = rho(i,j,k);
+% % %        end
+% % %    end
+% % % end
+
 for k=1:kbm1
-   for j=1:jm
-       for i=1:im
-          rmean(i,j,k) = rho(i,j,k);
-       end
-   end
+    rmean(:,:,k) = rho(:,:,k);
 end
+
 %     Set lateral boundary conditions, for use in subroutine bcond
 %     (in the seamount problem, the east and west boundaries are open,
 %     while the south and north boundaries are closed through the
@@ -367,44 +376,64 @@ rfw=1.e0;
 rfn=1.e0;
 rfs=1.e0;
 
-for j=2:jmm1
-	uabw(j)=uab(2,j);
-    uabe(j)=uab(imm1,j);
+% % % for j=2:jmm1
+% % % 	uabw(j)=uab(2,j);
+% % %     uabe(j)=uab(imm1,j);
+% % % %    Set geostrophically conditioned elevations at the boundaries:
+% % %     ele(j)=ele(j-1)-cor(imm1,j)*uab(imm1,j)/grav*dy(imm1,j-1);
+% % %     elw(j)=elw(j-1)-cor(2,j)*uab(2,j)/grav*dy(2,j-1);
+% % % end
+
+uabw(2:jmm1)=uab(2,2:jmm1);
+uabe(2:jmm1)=uab(imm1,2:jmm1);
 %    Set geostrophically conditioned elevations at the boundaries:
-    ele(j)=ele(j-1)-cor(imm1,j)*uab(imm1,j)/grav*dy(imm1,j-1);
-    elw(j)=elw(j-1)-cor(2,j)*uab(2,j)/grav*dy(2,j-1);
-end
+ele(2:jmm1)=ele(1:jmm1-1)-cor(imm1,2:jmm1).*uab(imm1,2:jmm1)/grav.*dy(imm1,1:jmm1-1);
+elw(2:jmm1)=elw(1:jmm1-1)-cor(2,2:jmm1).*uab(2,2:jmm1)/grav.*dy(2,1:jmm1-1);
+
 
 %     Adjust boundary elevations so that they are zero in the middle
 %     of the channel:
-elejmid=ele(jmm1/2);
-elwjmid=elw(jmm1/2);
+% % % elejmid=ele(jmm1/2);
+% % % elwjmid=elw(jmm1/2);
+% % % 
+% % % for j=2:jmm1
+% % %     ele(j)=(ele(j)-elejmid)*fsm(im,j);
+% % %     elw(j)=(elw(j)-elwjmid)*fsm(2,j);
+% % % end
 
-for j=2:jmm1
-    ele(j)=(ele(j)-elejmid)*fsm(im,j);
-    elw(j)=(elw(j)-elwjmid)*fsm(2,j);
-end
-  
+ele(2:jmm1)=(ele(2:jmm1)-ele(jmm1/2)).*fsm(im,2:jmm1);
+elw(2:jmm1)=(elw(2:jmm1)-elw(jmm1/2)).*fsm(2, 2:jmm1);
+
+
 %     Set thermodynamic boundary conditions (for the seamount
 %     problem, and other possible applications, lateral thermodynamic
 %     boundary conditions are set equal to the initial conditions and
 %     are held constant thereafter - users may, of course, create
 %     variable boundary conditions):
-for k=1:kbm1
-	for j=1:jm
-   		tbe(j,k)=tb(im,j,k);
-        tbw(j,k)=tb(1,j,k);
-        sbe(j,k)=sb(im,j,k);
-        sbw(j,k)=sb(1,j,k);
-	end
- 
-	for i=1:im
-        tbn(i,k)=tb(i,jm,k);
-        tbs(i,k)=tb(i,1,k);
-        sbn(i,k)=sb(i,jm,k);
-        sbs(i,k)=sb(i,1,k);
-  	end
-end
-return 
-end
+% % % for k=1:kbm1
+% % % 	for j=1:jm
+% % %    		tbe(j,k)=tb(im,j,k);
+% % %         tbw(j,k)=tb(1,j,k);
+% % %         sbe(j,k)=sb(im,j,k);
+% % %         sbw(j,k)=sb(1,j,k);
+% % % 	end
+% % %  
+% % % 	for i=1:im
+% % %         tbn(i,k)=tb(i,jm,k);
+% % %         tbs(i,k)=tb(i,1,k);
+% % %         sbn(i,k)=sb(i,jm,k);
+% % %         sbs(i,k)=sb(i,1,k);
+% % %   	end
+% % % end
 
+for k=1:kbm1
+    tbe(:,k)=tb(im,:,k);
+    tbw(:,k)=tb(1 ,:,k);
+    sbe(:,k)=sb(im,:,k);
+    sbw(:,k)=sb(1 ,:,k);
+
+    tbn(:,k)=tb(:,jm,k);
+    tbs(:,k)=tb(:,1 ,k);
+    sbn(:,k)=sb(:,jm,k);
+    sbs(:,k)=sb(:,1 ,k);
+end

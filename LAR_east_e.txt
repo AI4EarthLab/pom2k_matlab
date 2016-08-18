@@ -1,6 +1,6 @@
 How to compute east_e with matrix style?
 
-(1)Define A matrix (i.e., east_c in our example, the size of east_c is 7*5)
+(1)Define east_c matrix (i.e., east_c in our example, the size of east_c is 7*5)
 east_c= [A11 A12 A13 A14 A15]
         [A21 A22 A23 A24 A25]
         [A31 A32 A33 A34 A35]
