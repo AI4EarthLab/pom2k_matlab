@@ -248,7 +248,7 @@ tps=zeros(im,jm)     ;tsurf=zeros(im,jm)   ;ua=zeros(im,jm)      ;vfluxf=zeros(i
 uab=zeros(im,jm)     ;uaf=zeros(im,jm)     ;utb=zeros(im,jm)     ;utf=zeros(im,jm)     ;
 va=zeros(im,jm)      ;vab=zeros(im,jm)     ;vaf=zeros(im,jm)     ;
 vtb=zeros(im,jm)     ;vtf=zeros(im,jm)     ;wssurf=zeros(im,jm)  ;wtsurf=zeros(im,jm)  ;
-wubot=zeros(im,jm)   ;wusurf=zeros(im,jm)  ;wvbot=zeros(im,jm)   ;wvsurf=zeros(im,jm) ;
+wubot=zeros(im,jm)   ;wusurf=zeros(im,jm)  ;wvbot=zeros(im,jm)   ;wvsurf=zeros(im,jm)  ;
 
 
 aam=zeros(im,jm,kb)  ;advx=zeros(im,jm,kb) ;advy=zeros(im,jm,kb) ;a=zeros(im,jm,kb)    ;
@@ -261,11 +261,11 @@ tclim=zeros(im,jm,kb);t=zeros(im,jm,kb)    ;ub=zeros(im,jm,kb)   ;uf=zeros(im,jm
 u=zeros(im,jm,kb)    ;vb=zeros(im,jm,kb)   ;vf=zeros(im,jm,kb)   ;v=zeros(im,jm,kb)    ;
 w=zeros(im,jm,kb)    ;zflux=zeros(im,jm,kb);
 
-ele=zeros(jm)        ;eln=zeros(im)        ;els=zeros(im)        ;elw=zeros(jm)        ;
+ele=zeros(1,jm)      ;eln=zeros(1,im)      ;els=zeros(1,im)      ;elw=zeros(1,jm)      ;
 sbe=zeros(jm,kb)     ;sbn=zeros(im,kb)     ;sbs=zeros(im,kb)     ;sbw=zeros(jm,kb)     ;
 tbe=zeros(jm,kb)     ;tbn=zeros(im,kb)     ;tbs=zeros(im,kb)     ;tbw=zeros(jm,kb)     ;
-uabe=zeros(jm)       ;uabw=zeros(jm)       ;ube=zeros(jm,kb)     ;ubw=zeros(jm,kb)     ;
-vabn=zeros(im)       ;vabs=zeros(im)       ;vbn=zeros(im,kb)     ;vbs=zeros(im,kb);
+uabe=zeros(1,jm)     ;uabw=zeros(1,jm)     ;ube=zeros(jm,kb)     ;ubw=zeros(jm,kb)     ;
+vabn=zeros(1,im)     ;vabs=zeros(1,im)     ;vbn=zeros(im,kb)     ;vbs=zeros(im,kb)     ;
 
 
 
@@ -397,39 +397,54 @@ end
     zz,dt,dum,dvm,ramp,rmean,dx,dy);
 
 
+% % % for k=1:kbm1
+% % %     for j=1:jm
+% % %         for i=1:im
+% % %             drx2d(i,j)=drx2d(i,j)+drhox(i,j,k)*dz(k);
+% % %             dry2d(i,j)=dry2d(i,j)+drhoy(i,j,k)*dz(k);
+% % %         end
+% % %     end
+% % % end
 
 for k=1:kbm1
-    for j=1:jm
-        for i=1:im
-            drx2d(i,j)=drx2d(i,j)+drhox(i,j,k)*dz(k);
-            dry2d(i,j)=dry2d(i,j)+drhoy(i,j,k)*dz(k);
-        end
-    end
+    drx2d=drx2d+drhox(:,:,k)*dz(k);
+    dry2d=dry2d+drhoy(:,:,k)*dz(k);
 end
-%
+
+
 %     Calculate bottom friction coefficient:
 %
-for j=1:jm
-    for i=1:im
-        cbc(i,j)=(kappa/log((1.e0+zz(kbm1))*h(i,j)/z0b))^2;
-        cbc(i,j)=max(cbcmin,cbc(i,j));
-        %
-        %     If the following is invoked, then it is probable that the wrong
-        %     choice of z0b or vertical spacing has been made:
-        %
-        cbc(i,j)=min(cbcmax,cbc(i,j));
-    end
-end
+% % % for j=1:jm
+% % %     for i=1:im
+% % %         cbc(i,j)=(kappa/log((1.e0+zz(kbm1))*h(i,j)/z0b))^2;
+% % %         cbc(i,j)=max(cbcmin,cbc(i,j));
+% % %         %
+% % %         %     If the following is invoked, then it is probable that the wrong
+% % %         %     choice of z0b or vertical spacing has been made:
+% % %         %
+% % %         cbc(i,j)=min(cbcmax,cbc(i,j));
+% % %     end
+% % % end
+
+cbc=(kappa./log((1.0+zz(kbm1))*h/z0b)).^2;
+cbc=max(cbcmin,cbc);
+%
+%     If the following is invoked, then it is probable that the wrong
+%     choice of z0b or vertical spacing has been made:
+%
+cbc=min(cbcmax,cbc);
 
 %
 %     Calculate external (2-D) CFL time step:
 %
-for j=1:jm
-    for i=1:im
-        tps(i,j)=0.5e0/sqrt(1.e0/dx(i,j)^2+1.e0/dy(i,j)^2)...
-            /sqrt(grav*(h(i,j)+small))*fsm(i,j);
-    end
-end
+% % % for j=1:jm
+% % %     for i=1:im
+% % %         tps(i,j)=0.5e0/sqrt(1.e0/dx(i,j)^2+1.e0/dy(i,j)^2)/sqrt(grav*(h(i,j)+small))*fsm(i,j);
+% % %     end
+% % % end
+
+tps=0.5./sqrt(1.0./dx.^2+1.0./dy.^2) ./ sqrt(grav*(h+small)) .* fsm;
+
 d = h+el;
 dt = h+et;
 time = time0;
@@ -440,7 +455,7 @@ time = time0;
 %==========================================
 
 for  iint=1:iend
-    time=dti*iint*1.0/86400+time0;
+    time=dti*iint*1.0/86400.0+time0;
     if(lramp~=0)
         ramp = time/period;
         if(ramp>1.0)

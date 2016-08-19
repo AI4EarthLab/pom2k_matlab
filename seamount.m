@@ -378,20 +378,24 @@ rfw=1.e0;
 rfn=1.e0;
 rfs=1.e0;
 
-for j=2:jmm1
-	uabw(j)=uab(2,j);
-    uabe(j)=uab(imm1,j);
-%    Set geostrophically conditioned elevations at the boundaries:
-    ele(j)=ele(j-1)-cor(imm1,j)*uab(imm1,j)/grav*dy(imm1,j-1);
-    elw(j)=elw(j-1)-cor(2,j)*uab(2,j)/grav*dy(2,j-1);
-end
+% % % for j=2:jmm1
+% % %     uabw(j)=uab(2,j);
+% % %     uabe(j)=uab(imm1,j);
+% % %     % Set geostrophically conditioned elevations at the boundaries:
+% % %     ele(j)=ele(j-1)-cor(imm1,j)*uab(imm1,j)/grav*dy(imm1,j-1);
+% % %     elw(j)=elw(j-1)-cor(2,j)*uab(2,j)/grav*dy(2,j-1);
+% % % end
 
-% % % uabw(2:jmm1)=uab(2,2:jmm1);
-% % % uabe(2:jmm1)=uab(imm1,2:jmm1);
-% % % %    Set geostrophically conditioned elevations at the boundaries:
-% % % ele(2:jmm1)=ele(1:jmm1-1)-cor(imm1,2:jmm1).*uab(imm1,2:jmm1)/grav.*dy(imm1,1:jmm1-1);
-% % % elw(2:jmm1)=elw(1:jmm1-1)-cor(2,2:jmm1).*uab(2,2:jmm1)/grav.*dy(2,1:jmm1-1);
-
+uabw(2:jmm1)=uab(2,2:jmm1);
+uabe(2:jmm1)=uab(imm1,2:jmm1);
+% Compute ele and elw with matrix style. 
+% The size of R7 is jm*jm.
+%  R7=[0 1 1 1 0]
+%     [0 0 1 1 0] 
+%     [0 0 0 1 0]
+R7=[zeros(jmm1-1,1) triu(ones(jmm1-1,jmm1-1)) zeros(jmm1-1,1)];
+ele= (-cor(imm1,2:jmm1).*uab(imm1,2:jmm1)./grav.*dy(imm1,1:jmm1-1)) * R7;
+elw= (-cor(2,2:jmm1).*uab(2,2:jmm1)./grav.*dy(2,1:jmm1-1)) * R7;
 
 %     Adjust boundary elevations so that they are zero in the middle
 %     of the channel:
