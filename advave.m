@@ -71,7 +71,7 @@ for j=2:jmm1
     end
 end
 %
-%     u-advection and diffusion:
+%     v-advection and diffusion:
 
 advva=zeros(im,jm);
 %

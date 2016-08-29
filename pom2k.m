@@ -397,6 +397,7 @@ end
     zz,dt,dum,dvm,ramp,rmean,dx,dy);
 
 
+
 % % % for k=1:kbm1
 % % %     for j=1:jm
 % % %         for i=1:im
@@ -448,6 +449,7 @@ tps=0.5./sqrt(1.0./dx.^2+1.0./dy.^2) ./ sqrt(grav*(h+small)) .* fsm;
 d = h+el;
 dt = h+et;
 time = time0;
+
 
 %==========================================
 %           begin internal (3-D) mode
@@ -547,15 +549,13 @@ for  iint=1:iend
     %       ( hor visc = horcon*dx*dy*sqrt((du/dx)**2+(dv/dy)**2
     %                                     +.5*(du/dy+dv/dx)**2) )
     %
+
     if(mode~=2)
-        [a,c,ee,advx,advy]=...
-            advct(a,c,ee,advx,advy,...
-            u,v,dx,dy,dt,aam,ub,vb,aru,arv,im,jm,kb,imm1,jmm1,kbm1);
-        
+        [advx,advy]=advct(u,v,dx,dy,dt,aam,ub,vb,aru,arv,im,jm,kb,imm1,jmm1,kbm1);
+%       [advx,advy]=new_advct(u,v,dx,dy,dt,aam,ub,vb,aru,arv,im,jm,kb,imm1,jmm1,kbm1);        
         [rho,drhox,drhoy] = baropg(rho,drhox,drhoy,...
             im,jm,imm1,jmm1,kb,kbm1,grav,...
-            zz,dt,dum,dvm,ramp,rmean,dx,dy);
-        
+            zz,dt,dum,dvm,ramp,rmean,dx,dy);   
         
         for k=1:kbm1
             for j=2:jmm1

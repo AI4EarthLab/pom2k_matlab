@@ -91,23 +91,23 @@
 %
 % initialize fields that are not calculated on all boundaries
 % but are later used there
-    for i=1:im
+      for i=1:im
         ee(i,jm,1)=0.;
         gg(i,jm,1)=0.;
         l0(i,jm)=0.;
-    end
-    for j=1:jm
+      end
+      for j=1:jm
         ee(im,j,1)=0.;
         gg(im,j,1)=0.;
         l0(im,j)=0.;
-    end
-    for i=1:im
-        for j=1:jm
-            for k=2:kbm1
-                kn(i,j,k)=0.;
-            end
-        end
-    end
+      end
+      for i=1:im
+      for j=1:jm
+       for k=2:kbm1
+        kn(i,j,k)=0.;
+       end
+      end
+      end
 %
    
       for j=1:jmm1

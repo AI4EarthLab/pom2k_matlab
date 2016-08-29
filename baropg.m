@@ -110,8 +110,8 @@ end
 % % % for k=1:kb
 % % %     for j=2:jmm1
 % % %         for i=2:imm1
-% % %             drhox1(i,j,k)=ramp*drhox(i,j,k);
-% % %             drhoy1(i,j,k)=ramp*drhoy(i,j,k);
+% % %             drhox(i,j,k)=ramp*drhox(i,j,k);
+% % %             drhoy(i,j,k)=ramp*drhoy(i,j,k);
 % % %         end
 % % %     end
 % % % end

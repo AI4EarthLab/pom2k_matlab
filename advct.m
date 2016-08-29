@@ -1,6 +1,4 @@
-function [xflux,yflux,curv,advx,advy]=...
-    advct(xflux,yflux,curv,advx,advy,...
-    u,v,dx,dy,dt,aam,ub,vb,aru,arv,im,jm,kb,imm1,jmm1,kbm1)
+function [advx,advy]= advct(u,v,dx,dy,dt,aam,ub,vb,aru,arv,im,jm,kb,imm1,jmm1,kbm1)
 % **********************************************************************
 % *                                                                    *
 % * FUNCTION    :  Calculates the horizontal portions of momentum      *
@@ -29,25 +27,12 @@ for k=1:kbm1
     end
 end
 
-OPAX=OP_AX(im,jm);
-OPAY=OP_AY(im,jm);
-OPDX=OP_DX(im,jm);
-OPDY=OP_DY(im,jm);
-OPDAX=OPDX*OPAX;
-OPDAY=OPAY*OPDY;
-% % % 
-% % % for k=1:kbm1
-% % %     curv(:,:,k)=(v(:,:,k)*OPAY) .* (OPDAX*dy)  - (OPAX*u(:,:,k)) .* (dx*OPDAY) ./ (dx .* dy);
-% % % end
-% % % curv(1, :, :)=0;
-% % % curv(im,:, :)=0;
-% % % curv(:, jm,:)=0;
-% % % curv(:, jm,:)=0;
 %
 %     Calculate x-component of velocity advection:
 %
 %     Calculate horizontal advective fluxes:
 %
+
 for k=1:kbm1
     for j=1:jm
         for i=2:imm1
@@ -58,33 +43,6 @@ for k=1:kbm1
     end
 end
 
-A1=zeros(im,jm,kb);
-A2=zeros(im,jm,kb);
-A3=zeros(im,jm,kb);
-B1=zeros(im,jm,kb);
-B2=zeros(im,jm,kb);
-B3=zeros(im,jm,kb);
-for k=1:kbm1
-    for j=1:jm
-        for i=2:imm1
-            A1(i,j,k)=0.25*((dt(i+1,j)+dt(i,j))*u(i+1,j,k)+(dt(i,j)+dt(i-1,j))*u(i,j,k)) ;
-            A2(i,j,k)=0.5*(u(i+1,j,k)+u(i,j,k));
-            xflux(i,j,k)=.125e0*((dt(i+1,j)+dt(i,j))*u(i+1,j,k)     ...
-                +(dt(i,j)+dt(i-1,j))*u(i,j,k))     ...
-                *(u(i+1,j,k)+u(i,j,k));
-        end
-    end
-end
-
-
-xflux1=zeros(im,jm,kb);
-for k=1:kbm1
-    B1(:,:,k)= ( OPAX*( (OPAX*dt) .* u(:,:,k) ) );
-    B2(:,:,k)= ( OPAX*u(:,:,k) );
-    xflux1(:,:,k) = ( OPAX*( (OPAX*dt) .* u(:,:,k) ) ) .* ( OPAX*u(:,:,k) );
-end
-
-%
 for k=1:kbm1
     for j=2:jm
         for i=2:im
@@ -94,6 +52,8 @@ for k=1:kbm1
         end
     end
 end
+
+
 %
 %    Add horizontal diffusive fluxes:
 %
@@ -120,9 +80,11 @@ for k=1:kbm1
         end
     end
 end
+
 %
 %     for horizontal advection:
 %
+
 for k=1:kbm1
     for j=2:jmm1
         for i=2:imm1
@@ -131,7 +93,7 @@ for k=1:kbm1
         end
     end
 end
-%
+
 for k=1:kbm1
     for j=2:jmm1
         for i=3:imm1
@@ -144,6 +106,7 @@ for k=1:kbm1
         end
     end
 end
+
 %
 %-----------------------------------------------------------------------
 %
@@ -164,7 +127,7 @@ for k=1:kbm1
         end
     end
 end
-%
+
 for k=1:kbm1
     for j=2:jmm1
         for i=1:im
@@ -174,6 +137,7 @@ for k=1:kbm1
         end
     end
 end
+
 %
 %    Add horizontal diffusive fluxes:
 %
@@ -200,9 +164,11 @@ for k=1:kbm1
         end
     end
 end
+
 %
 %     for horizontal advection:
 %
+
 for k=1:kbm1
     for j=2:jmm1
         for i=2:imm1
@@ -211,7 +177,7 @@ for k=1:kbm1
         end
     end
 end
-%
+
 for k=1:kbm1
     for j=3:jmm1
         for i=2:imm1
@@ -224,8 +190,3 @@ for k=1:kbm1
         end
     end
 end
-%
-return
-%
-end
-%
