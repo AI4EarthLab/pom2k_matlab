@@ -15,7 +15,7 @@ advx=zeros(im,jm,kb);
 xflux=zeros(im,jm,kb);
 yflux=zeros(im,jm,kb);
 
-[AXF, AXB, AYF, AYB, DXF, DXB, DYF, DYB]=operator(im,jm);
+[AXF, AXB, AYF, AYB, DXF, DXB, DYF, DYB]=new_operator(im,jm);
 DXBAXF= DXB * AXF;
 DYBAYF= AYF * DYB;   %\delta_y avg(F)^x
 

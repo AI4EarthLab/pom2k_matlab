@@ -1,5 +1,6 @@
-function [kdz,z,zz,dz,dzz]=depth(z,zz,dz,dzz,kb,kl1,kl2)
+function [z,zz,dz,dzz]=depth()
 
+load('grid.mat');
 
 kdz=[1,1,2,4,8,16,32,64,128,256,512,1024];
 
@@ -40,6 +41,7 @@ end
 
 dz(kb)=0.e0;
 dzz(kb)=0.e0;
+
 
 
 

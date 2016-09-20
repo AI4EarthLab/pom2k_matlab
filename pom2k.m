@@ -2,7 +2,7 @@ clear all;
 
 im=7;
 jm=5;
-kb=5;
+kb=6;
 % im=65;
 % jm=49;
 % kb=21;
@@ -12,6 +12,15 @@ jmm1=jm-1;
 jmm2=jm-2;
 kbm1=kb-1;
 kbm2=kb-2;
+
+%     Integers defining the number of logarithmic layers at the
+%     surface and bottom (used by subroutine depth). The number of
+%     logarithmic layers are kl1-2 at the surface and kb-kl2-1
+%     at the bottom. For no log portions, set kl1=2 and kl2=kb-1:
+kl1=6;
+kl2=kb-2;
+
+save('grid.mat','im','jm','kb','imm1','imm2','jmm1','jmm2','kbm1','kbm2','kl1','kl2');
 
 alpha          =0.0;dte            =0.0;dti            =0.0;dti2           =0.0;
 grav           =0.0;hmax           =0.0;kappa          =0.0;pi             =0.0;
@@ -153,13 +162,6 @@ vmaxl=100.0;
 slmax=2.0;
 
 
-%     Integers defining the number of logarithmic layers at the
-%     surface and bottom (used by subroutine depth). The number of
-%     logarithmic layers are kl1-2 at the surface and kb-kl2-1
-%     at the bottom. For no log portions, set kl1=2 and kl2=kb-1:
-kl1=6;
-kl2=kb-2;
-
 %     Water type, used in subroutine proft.
 %       ntp    Jerlov water type
 %        1            i
@@ -230,8 +232,11 @@ iswtch=floor(swtch*24.0*3600.0/dti+0.5);
 ispi=1.0/isplit;
 isp2i=1.0/(2.0*isplit);
 
-
-dz=zeros(1,kb)       ;dzz=zeros(1,kb)      ;z=zeros(1,kb)        ;zz=zeros(1,kb);
+save('para.mat','small','pi','netcdf_file','iproblem','mode','nadv','nitera',...
+     'sw','nread','dte','isplit','days','prtd1','prtd2','swtch','iskp','jskp',...
+     'lramp','rhoref','tbias','sbias','grav','kappa','z0b','cbcmin','cbcmax',...
+     'horcon','tprni','umol','hmax','vmaxl','slmax','ntp','nbct','nbcs','ispadv',...
+     'smoth','alpha','ramp','dti','dte2','dti2','iend','iprint','iswtch','ispi','isp2i');
 
 aam2d=zeros(im,jm)   ;advua=zeros(im,jm)   ;advva=zeros(im,jm)   ;adx2d=zeros(im,jm)   ;
 ady2d=zeros(im,jm)   ;art=zeros(im,jm)     ;aru=zeros(im,jm)     ;arv=zeros(im,jm)     ;
@@ -269,11 +274,38 @@ vabn=zeros(1,im)     ;vabs=zeros(1,im)     ;vbn=zeros(im,kb)     ;vbs=zeros(im,k
 
 
 
+
 if(iproblem ~= 3)
-    [kdz,z,zz,dz,dzz]=depth(z,zz,dz,dzz,kb,kl1,kl2);
+    [z,zz,dz,dzz]=depth();
 end
 
+[OP_AXF_XY, OP_AXB_XY, OP_AYF_XY, OP_AYB_XY, ...
+ OP_DXF_XY, OP_DXB_XY, OP_DYF_XY, OP_DYB_XY, ...
+ OP_AXF_XZ, OP_AXB_XZ, OP_AZF_XZ, OP_AZB_XZ, ...
+ OP_DXF_XZ, OP_DXB_XZ, OP_DZF_XZ, OP_DZB_XZ, ...
+ OP_AYF_YZ, OP_AYB_YZ, OP_AZF_YZ, OP_AZB_YZ, ...
+ OP_DYF_YZ, OP_DYB_YZ, OP_DZF_YZ, OP_DZB_YZ, ...
+ OP_L_XY,   OP_L_XZ,   OP_L_YZ, ...
+ OP_R_XY,   OP_R_XZ,   OP_R_YZ, ...
+ OP_SUMX_XY, OP_SUMY_XY, ...
+ OP_SUMX_XZ, OP_SUMZ_XZ, ...
+ OP_SUMY_YZ, OP_SUMZ_YZ] = new_operator(im,jm,kb);
 
+
+save('operator.mat','OP_AXF_XY', 'OP_AXB_XY', 'OP_AYF_XY', 'OP_AYB_XY', ...
+                    'OP_DXF_XY', 'OP_DXB_XY', 'OP_DYF_XY', 'OP_DYB_XY', ...
+                    'OP_AXF_XZ', 'OP_AXB_XZ', 'OP_AZF_XZ', 'OP_AZB_XZ', ...
+                    'OP_DXF_XZ', 'OP_DXB_XZ', 'OP_DZF_XZ', 'OP_DZB_XZ', ...
+                    'OP_AYF_YZ', 'OP_AYB_YZ', 'OP_AZF_YZ', 'OP_AZB_YZ', ...
+                    'OP_DYF_YZ', 'OP_DYB_YZ', 'OP_DZF_YZ', 'OP_DZB_YZ', ...
+                    'OP_L_XY',   'OP_L_XZ',   'OP_L_YZ', ...
+                    'OP_R_XY',   'OP_R_XZ',   'OP_R_YZ', ...
+                    'OP_SUMX_XY', 'OP_SUMY_XY', ...
+                    'OP_SUMX_XZ', 'OP_SUMZ_XZ', ...
+                    'OP_SUMY_YZ', 'OP_SUMZ_YZ', ...
+                    'dx','dy','dz');
+                
+save('depth.mat','z','zz','dz','dzz');
 
 if(iproblem == 1)
     
@@ -282,13 +314,7 @@ if(iproblem == 1)
         h,art,aru,arv,fsm,dum,dvm,...
         tb,sb,tclim,sclim,ub,uab,elb,etb,dt,...
         aam2d,rho,rmean,rfe,rfw,rfn,rfs,...
-        uabw,uabe,ele,elw,tbe,tbw,sbe,sbw,tbn,tbs,sbn,sbs] = seamount(dx,dy,cor,...
-        east_c,north_c,east_e,north_e,east_u,north_u,east_v,north_v,...
-        h,art,aru,arv,fsm,dum,dvm,...
-        tb,sb,tclim,sclim,ub,uab,elb,etb,dt,...
-        aam2d,rho,rmean,rfe,rfw,rfn,rfs,...
-        uabw,uabe,ele,elw,tbe,tbw,sbe,sbw,tbn,tbs,sbn,sbs,...
-        e_atmos,aam,im,jm,kb,imm1,jmm1,kbm1,slmax,zz,tbias,sbias,grav,rhoref);
+        uabw,uabe,ele,elw,tbe,tbw,sbe,sbw,tbn,tbs,sbn,sbs] = new_seamount(e_atmos,aam);
 
     
 elseif(iproblem == 2)
@@ -344,20 +370,6 @@ d=h + el;
 dt=h + et;
 w(:,:,1)=vfluxf;
 
-% % % for k=1:kb
-% % %     for j=1:jm
-% % %         for i=1:im
-% % %             l(i,j,k)=0.1*dt(i,j);
-% % %             q2b(i,j,k)=small;
-% % %             q2lb(i,j,k)=l(i,j,k)*q2b(i,j,k);
-% % %             kh(i,j,k)=l(i,j,k)*sqrt(q2b(i,j,k));
-% % %             km(i,j,k)=kh(i,j,k);
-% % %             kq(i,j,k)=kh(i,j,k);
-% % %             aam(i,j,k)=aam_init;
-% % %         end
-% % %     end
-% % % end
-
 for k=1:kb
     l(:,:,k)    = 0.1*dt(:,:);
     q2b(:,:,k)  = small;
@@ -368,19 +380,6 @@ for k=1:kb
     aam(:,:,k)  = aam_init;
 end
 
-% % % for k=1:kbm1
-% % %     for i=1:im
-% % %         for j=1:jm
-% % %             q2(i,j,k)=q2b(i,j,k);
-% % %             q2l(i,j,k)=q2lb(i,j,k);
-% % %             t(i,j,k)=tb(i,j,k);
-% % %             s(i,j,k)=sb(i,j,k);
-% % %             u(i,j,k)=ub(i,j,k);
-% % %             v(i,j,k)=vb(i,j,k);
-% % %         end
-% % %     end
-% % % end
-
 for k=1:kbm1
     q2(:,:,k) =q2b(:,:,k);
     q2l(:,:,k)=q2lb(:,:,k);
@@ -390,12 +389,12 @@ for k=1:kbm1
     v(:,:,k)  =vb(:,:,k);
 end
 
-[rho]=dens(s,t,rho,im,jm,kbm1,tbias,sbias,grav,rhoref,zz,h,fsm);
+[rho]=new_dens(s,t,h);
 
-[rho,drhox,drhoy] = baropg(rho,drhox,drhoy,...
-    im,jm,imm1,jmm1,kb,kbm1,grav,...
-    zz,dt,dum,dvm,ramp,rmean,dx,dy);
+[rho,drhox,drhoy] = baropg(rho,drhox,drhoy,im,jm,imm1,jmm1,kb,kbm1,grav,zz,dt,dum,dvm,ramp,rmean,dx,dy);
 
+
+[rho1,drhox1,drhoy1] = new_baropg(rho,rmean,dt);
 
 
 % % % for k=1:kbm1
@@ -553,10 +552,12 @@ for  iint=1:iend
     if(mode~=2)
         [advx,advy]=advct(u,v,dx,dy,dt,aam,ub,vb,aru,arv,im,jm,kb,imm1,jmm1,kbm1);
 %       [advx,advy]=new_advct(u,v,dx,dy,dt,aam,ub,vb,aru,arv,im,jm,kb,imm1,jmm1,kbm1);        
-        [rho,drhox,drhoy] = baropg(rho,drhox,drhoy,...
-            im,jm,imm1,jmm1,kb,kbm1,grav,...
-            zz,dt,dum,dvm,ramp,rmean,dx,dy);   
-        
+% % %         [rho,drhox,drhoy] = baropg(rho,drhox,drhoy,...
+% % %             im,jm,imm1,jmm1,kb,kbm1,grav,...
+% % %             zz,dt,dum,dvm,ramp,rmean,dx,dy);   
+        [rho,drhox,drhoy] = new_baropg(rho,rmean,dt);   
+
+
         for k=1:kbm1
             for j=2:jmm1
                 for i=2:imm1
