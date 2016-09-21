@@ -6,8 +6,8 @@ fsm=zeros(im,jm); dum=zeros(im,jm); dvm=zeros(im,jm);
 
 % Calculate areas of "t" and "s" cells:
 art = dx .* dy;
-aru = AXBXY(dx) .* AXBXY(dy);
-arv = AYBXY(dx) .* AYBXY(dy);
+aru = AXB_XY(dx) .* AXB_XY(dy);
+arv = AYB_XY(dx) .* AYB_XY(dy);
 aru(1,:)=aru(2,:);
 aru(:,1)=aru(:,2);
 arv(1,:)=arv(2,:);
