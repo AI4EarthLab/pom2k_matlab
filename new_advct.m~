@@ -16,22 +16,22 @@ xflux=zeros(im,jm,kb);
 yflux=zeros(im,jm,kb);
 
 for k=1:kb
-    curv(:,:,k)= (AYF1_XY(v(:,:,k)) .* DXB2_XY(AXF1_XY(dy)) - AXF1_XY(u(:,:,k)) .* DYB2_XY(AYF1_XY(dx)) ) ./ (dx .* dy);
+    curv(:,:,k)= (AYF1_XY(v(:,:,k)) .* DXB2_XY(AXF_XY(dy)) - AXF_XY(u(:,:,k)) .* DYB_XY(AYF_XY(dx)) ) ./ (dx .* dy);
 end
 %
 %     Calculate x-component of velocity advection:
 %
 for k=1:kb
-    xflux(:,:,k) = dy .* (AXF1_XY( AXB1_XY(dt) .* u(:,:,k) ) .* AXF1_XY(u(:,:,k)) ...
-                    - dt.*aam(:,:,k)*2.0.*DXF2_XY(ub(:,:,k))./dx );
-    yflux(:,:,k) = AYB1_XY(AXB1_XY(dx)) .* (AXB1_XY( AYB1_XY(dt) .* v(:,:,k) ) .* AYB1_XY(u(:,:,k)) ...
-                    - AYB1_XY(AXB1_XY(dt)) .* AYB1_XY(AXB1_XY(aam(:,:,k))) ...
-                     .* ( DYB2_XY(ub(:,:,k)) ./ AYB1_XY(AXB1_XY(dy)) + DXB2_XY(vb(:,:,k)) ./ AYB1_XY(AXB1_XY(dx))) ) ;                
+    xflux(:,:,k) = dy .* (AXF_XY( AXB_XY(dt) .* u(:,:,k) ) .* AXF_XY(u(:,:,k)) ...
+                    - dt.*aam(:,:,k)*2.0.*DXF_XY(ub(:,:,k))./dx );
+    yflux(:,:,k) = AYB_XY(AXB_XY(dx)) .* (AXB_XY( AYB_XY(dt) .* v(:,:,k) ) .* AYB_XY(u(:,:,k)) ...
+                    - AYB_XY(AXB_XY(dt)) .* AYB_XY(AXB_XY(aam(:,:,k))) ...
+                     .* ( DYB_XY(ub(:,:,k)) ./ AYB_XY(AXB_XY(dy)) + DXB_XY(vb(:,:,k)) ./ AYB_XY(AXB_XY(dx))) ) ;                
     %set NaN caused by D/A operation to 0.
     yflux(isnan(yflux))=0;    
     %     for horizontal advection:   
-    advx(:,:,k)=DXB2_XY( xflux(:,:,k) ) + DYF2_XY( yflux(:,:,k) ) ...
-                    - aru .* AXB1_XY(  curv(:,:,k) .* dt .* AYF1_XY(v(:,:,k)) );    
+    advx(:,:,k)=DXB_XY( xflux(:,:,k) ) + DYF_XY( yflux(:,:,k) ) ...
+                    - aru .* AXB_XY(  curv(:,:,k) .* dt .* AYF_XY(v(:,:,k)) );    
 end
 
 xflux=zeros(im,jm,kb);
@@ -101,16 +101,16 @@ end
 
 for k=1:kb
             
-    xflux1(:,:,k) =AYB1_XY(AXB1_XY(dy)) .* (AYB1_XY( AXB1_XY(dt) .* u(:,:,k) ) .* AXB1_XY(v(:,:,k)) ...
-                   - AYB1_XY(AXB1_XY(dt)) .* AYB1_XY(AXB1_XY(aam(:,:,k))) ...
-                     .* ( DYB2_XY(ub(:,:,k)) ./ AYB1_XY(AXB1_XY(dy)) + DXB2_XY(vb(:,:,k)) ./ AYB1_XY(AXB1_XY(dx))) ) ;      
-    yflux1(:,:,k) =dx .* (AYF1_XY( AYB1_XY(dt) .* v(:,:,k) ) .* AYF1_XY(v(:,:,k)) ...
-                    - dt.* aam(:,:,k)*2.0.*DYF2_XY(vb(:,:,k)) ./dy ); 
+    xflux1(:,:,k) =AYB_XY(AXB_XY(dy)) .* (AYB_XY( AXB_XY(dt) .* u(:,:,k) ) .* AXB_XY(v(:,:,k)) ...
+                   - AYB_XY(AXB_XY(dt)) .* AYB_XY(AXB_XY(aam(:,:,k))) ...
+                     .* ( DYB_XY(ub(:,:,k)) ./ AYB_XY(AXB_XY(dy)) + DXB_XY(vb(:,:,k)) ./ AYB_XY(AXB_XY(dx))) ) ;      
+    yflux1(:,:,k) =dx .* (AYF_XY( AYB_XY(dt) .* v(:,:,k) ) .* AYF_XY(v(:,:,k)) ...
+                    - dt.* aam(:,:,k)*2.0.*DYF_XY(vb(:,:,k)) ./dy ); 
     %set NaN caused by D/A operation to 0.
     xflux1(isnan(xflux1))=0;
     %for horizontal advection:
-    advy1(:,:,k)=DXF2_XY( xflux1(:,:,k) ) + DYB2_XY( yflux1(:,:,k) ) ;
-%                     + arv .* AYB1_XY(  curv(:,:,k) .* dt .* AXF1_XY(u(:,:,k)) ); 
+    advy1(:,:,k)=DXF_XY( xflux1(:,:,k) ) + DYB_XY( yflux1(:,:,k) ) ;
+%                     + arv .* AYB_XY(  curv(:,:,k) .* dt .* AXF_XY(u(:,:,k)) ); 
 end
 
 for k=1:kbm1

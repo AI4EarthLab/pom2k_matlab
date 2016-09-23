@@ -17,7 +17,7 @@ drhox=zeros(im,jm,kb); drhoy=zeros(im,jm,kb);
 %
 %     Calculate x-component of baroclinic pressure gradient:
 %
-drhox(:,:,1)= grav*(-zz(1)) * AXB_XY(dt) .* DXB_XY(rho(:,:,1));
+drhox(:,:,1)= grav*(-zz(1)) * AXB1_XY(dt) .* DXB2_XY(rho(:,:,1));
                     
 rho_tmp=zeros(im,kb);
 for j=1:jm
@@ -25,20 +25,20 @@ for j=1:jm
     rho_tmp(:,:)=rho(:,j,:); 
     tmp=repmat(drhox(:,j,1),1,kb) ;
     tmp(:,kb)=0;
-    drhox(:,j,:) =  tmp + SUMZ_XZ(-grav * DZB_XZ(repmat(zz,im,1)) .* AXB_XZ(repmat(dt(:,j),1,kb)) .* DXB_XZ( AZB_XZ(rho_tmp) ) ...
-                                  +grav * AZB_XZ(repmat(zz,im,1)) .* DXB_XZ(repmat(dt(:,j),1,kb)) .* DZB_XZ( AXB_XZ(rho_tmp) )); 
+    drhox(:,j,:) =  tmp + SUMZ_XZ(-grav * DZB2_XZ(repmat(zz,im,1)) .* AXB1_XZ(repmat(dt(:,j),1,kb)) .* DXB2_XZ( AZB1_XZ(rho_tmp) ) ...
+                                  +grav * AZB1_XZ(repmat(zz,im,1)) .* DXB2_XZ(repmat(dt(:,j),1,kb)) .* DZB2_XZ( AXB1_XZ(rho_tmp) )); 
 end
 
 %save('test.mat','im','jm','kb','kbm1','jmm1','imm1','grav','zz','dt','rho');
 
 for k=1:kbm1
-    drhox(:,:,k) = drhox(:,:,k) .* AXB_XY(dt) .* dum .* AXB_XY(dy);
+    drhox(:,:,k) = drhox(:,:,k) .* AXB1_XY(dt) .* dum .* AXB1_XY(dy);
 end
  
 %
 %     Calculate y-component of baroclinic pressure gradient:
 %
-drhoy(:,:,1)= grav*(-zz(1)) * AYB_XY(dt) .* DYB_XY(rho(:,:,1));
+drhoy(:,:,1)= grav*(-zz(1)) * AYB1_XY(dt) .* DYB2_XY(rho(:,:,1));
 %
 rho_tmp=zeros(jm,kb);
 for i=2:imm1
@@ -46,12 +46,12 @@ for i=2:imm1
     rho_tmp(:,:)=rho(i,:,:); 
     tmp=repmat(drhoy(i,:,1)',1,kb) ;
     tmp(:,kb)=0;
-    drhoy(i,:,:) =  tmp + SUMZ_YZ(-grav * DZB_YZ(repmat(zz,jm,1)) .* AYB_YZ(repmat(dt(i,:)',1,kb)) .* DYB_YZ( AZB_YZ(rho_tmp) ) ...
-                                   +grav * AZB_YZ(repmat(zz,jm,1)) .* DYB_YZ(repmat(dt(i,:)',1,kb)) .* DZB_YZ( AYB_YZ(rho_tmp) )); 
+    drhoy(i,:,:) =  tmp + SUMZ_YZ(-grav * DZB2_YZ(repmat(zz,jm,1)) .* AYB1_YZ(repmat(dt(i,:)',1,kb)) .* DYB2_YZ( AZB1_YZ(rho_tmp) ) ...
+                                   +grav * AZB1_YZ(repmat(zz,jm,1)) .* DYB2_YZ(repmat(dt(i,:)',1,kb)) .* DZB2_YZ( AYB1_YZ(rho_tmp) )); 
 end
 
 for k=1:kbm1
-    drhoy(:,:,k) = drhoy(:,:,k) .* AYB_XY(dt) .* dvm .* AYB_XY(dx);
+    drhoy(:,:,k) = drhoy(:,:,k) .* AYB1_XY(dt) .* dvm .* AYB1_XY(dx);
 end
 
 drhox=ramp*drhox;
