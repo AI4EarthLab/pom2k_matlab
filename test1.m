@@ -17,7 +17,7 @@ for k=2:kbm1
         end
     end
 end
-
+                 
 tmp=zeros(im,kb);
 A(:,:,1)= grav*(-zz(1)) * AXB_XY(dt) .* DXB_XY(rho(:,:,1));
 for j=2:jmm1

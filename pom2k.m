@@ -236,7 +236,7 @@ save('para.mat','small','pi','netcdf_file','iproblem','mode','nadv','nitera',...
      'sw','nread','dte','isplit','days','prtd1','prtd2','swtch','iskp','jskp',...
      'lramp','rhoref','tbias','sbias','grav','kappa','z0b','cbcmin','cbcmax',...
      'horcon','tprni','umol','hmax','vmaxl','slmax','ntp','nbct','nbcs','ispadv',...
-     'smoth','alpha','ramp','dti','dte2','dti2','iend','iprint','iswtch','ispi','isp2i');
+     'smoth','alpha','dti','dte2','dti2','iend','iprint','iswtch','ispi','isp2i');
 
 aam2d=zeros(im,jm)   ;advua=zeros(im,jm)   ;advva=zeros(im,jm)   ;adx2d=zeros(im,jm)   ;
 ady2d=zeros(im,jm)   ;art=zeros(im,jm)     ;aru=zeros(im,jm)     ;arv=zeros(im,jm)     ;
@@ -291,6 +291,7 @@ end
  OP_SUMX_XZ, OP_SUMZ_XZ, ...
  OP_SUMY_YZ, OP_SUMZ_YZ] = new_operator(im,jm,kb);
 
+save('depth.mat','z','zz','dz','dzz');
 
 save('operator.mat','OP_AXF_XY', 'OP_AXB_XY', 'OP_AYF_XY', 'OP_AYB_XY', ...
                     'OP_DXF_XY', 'OP_DXB_XY', 'OP_DYF_XY', 'OP_DYB_XY', ...
@@ -302,11 +303,8 @@ save('operator.mat','OP_AXF_XY', 'OP_AXB_XY', 'OP_AYF_XY', 'OP_AYB_XY', ...
                     'OP_R_XY',   'OP_R_XZ',   'OP_R_YZ', ...
                     'OP_SUMX_XY', 'OP_SUMY_XY', ...
                     'OP_SUMX_XZ', 'OP_SUMZ_XZ', ...
-                    'OP_SUMY_YZ', 'OP_SUMZ_YZ', ...
-                    'dx','dy','dz');
+                    'OP_SUMY_YZ', 'OP_SUMZ_YZ');
                 
-save('depth.mat','z','zz','dz','dzz');
-
 if(iproblem == 1)
     
     [dx,dy,cor,...
@@ -350,6 +348,8 @@ else
     return
 end
 
+save('xyz.mat','dx','dy','dz');
+
 %     Inertial period for temporal filter:
 period=(2.0*pi)/abs(cor(floor(im/2),floor(jm/2)))/86400.0;
 
@@ -391,20 +391,7 @@ end
 
 [rho]=new_dens(s,t,h);
 
-[rho,drhox,drhoy] = baropg(rho,drhox,drhoy,im,jm,imm1,jmm1,kb,kbm1,grav,zz,dt,dum,dvm,ramp,rmean,dx,dy);
-
-
-[rho1,drhox1,drhoy1] = new_baropg(rho,rmean,dt);
-
-
-% % % for k=1:kbm1
-% % %     for j=1:jm
-% % %         for i=1:im
-% % %             drx2d(i,j)=drx2d(i,j)+drhox(i,j,k)*dz(k);
-% % %             dry2d(i,j)=dry2d(i,j)+drhoy(i,j,k)*dz(k);
-% % %         end
-% % %     end
-% % % end
+[rho,drhox,drhoy] = new_baropg(rho, rmean, dt, ramp);
 
 for k=1:kbm1
     drx2d=drx2d+drhox(:,:,k)*dz(k);
@@ -413,46 +400,22 @@ end
 
 
 %     Calculate bottom friction coefficient:
-%
-% % % for j=1:jm
-% % %     for i=1:im
-% % %         cbc(i,j)=(kappa/log((1.e0+zz(kbm1))*h(i,j)/z0b))^2;
-% % %         cbc(i,j)=max(cbcmin,cbc(i,j));
-% % %         %
-% % %         %     If the following is invoked, then it is probable that the wrong
-% % %         %     choice of z0b or vertical spacing has been made:
-% % %         %
-% % %         cbc(i,j)=min(cbcmax,cbc(i,j));
-% % %     end
-% % % end
-
 cbc=(kappa./log((1.0+zz(kbm1))*h/z0b)).^2;
 cbc=max(cbcmin,cbc);
-%
 %     If the following is invoked, then it is probable that the wrong
 %     choice of z0b or vertical spacing has been made:
-%
 cbc=min(cbcmax,cbc);
 
 %
 %     Calculate external (2-D) CFL time step:
-%
-% % % for j=1:jm
-% % %     for i=1:im
-% % %         tps(i,j)=0.5e0/sqrt(1.e0/dx(i,j)^2+1.e0/dy(i,j)^2)/sqrt(grav*(h(i,j)+small))*fsm(i,j);
-% % %     end
-% % % end
-
 tps=0.5./sqrt(1.0./dx.^2+1.0./dy.^2) ./ sqrt(grav*(h+small)) .* fsm;
 
 d = h+el;
 dt = h+et;
 time = time0;
 
-
 %==========================================
 %           begin internal (3-D) mode
-%
 %==========================================
 
 for  iint=1:iend
@@ -550,12 +513,13 @@ for  iint=1:iend
     %
 
     if(mode~=2)
-        [advx,advy]=advct(u,v,dx,dy,dt,aam,ub,vb,aru,arv,im,jm,kb,imm1,jmm1,kbm1);
-%       [advx,advy]=new_advct(u,v,dx,dy,dt,aam,ub,vb,aru,arv,im,jm,kb,imm1,jmm1,kbm1);        
-% % %         [rho,drhox,drhoy] = baropg(rho,drhox,drhoy,...
+       [advx,advy]=advct(u,v,dx,dy,dt,aam,ub,vb,aru,arv,im,jm,kb,imm1,jmm1,kbm1);
+       [advx1,advy1]=new_advct(u,v,dx,dy,dt,aam,ub,vb,aru,arv);        
+% 
+% %         [rho,drhox,drhoy] = baropg(rho,drhox,drhoy,...
 % % %             im,jm,imm1,jmm1,kb,kbm1,grav,...
 % % %             zz,dt,dum,dvm,ramp,rmean,dx,dy);   
-        [rho,drhox,drhoy] = new_baropg(rho,rmean,dt);   
+        [rho,drhox,drhoy] = new_baropg(rho, rmean, dt, ramp);   
 
 
         for k=1:kbm1
