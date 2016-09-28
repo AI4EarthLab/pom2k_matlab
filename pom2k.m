@@ -527,7 +527,7 @@ for  iint=1:iend
     %
 
     if(mode~=2)
-       [advx,advy]=advct(u,v,dx,dy,dt,aam,ub,vb,aru,arv,im,jm,kb,imm1,jmm1,kbm1);
+% % %  [advx,advy]=advct(u,v,dx,dy,dt,aam,ub,vb,aru,arv,im,jm,kb,imm1,jmm1,kbm1);
        [advx1,advy1]=new_advct(u,v,dx,dy,dt,aam,ub,vb,aru,arv);        
 % 
 % %         [rho,drhox,drhoy] = baropg(rho,drhox,drhoy,...

@@ -80,6 +80,7 @@ L1= zeros(m,m); L1(2:m, 1:m-1) = eye(m-1);
 L2= zeros(m,m); L2(2:m, 2:m  ) = eye(m-1);
 OP_AXB1_XY=0.5*(L1+L2);
 
+
 % OP_AYF1_XY= 0.5*[1  0  0  0  0]        Y*OP_AYF1_XY= 0.5*[ Y11+Y12  Y12+Y13  Y13+Y14  Y14+Y15  0 ]
 %                 [1  1  0  0  0]                          [ Y21+Y22  Y22+Y23  Y23+Y24  Y24+Y25  0 ]
 %                 [0  1  1  0  0]                          [ Y31+Y32  Y32+Y33  Y33+Y34  Y34+Y35  0 ]
@@ -180,8 +181,9 @@ R1= zeros(k,k); R1(1:k-2, 2:k-1) = eye(k-2);
 R2= zeros(k,k); R2(2:k-1, 2:k-1) = eye(k-2);
 OP_AZB2_XZ = 0.5*(R1+R2);
 
+
 %%%%%%%%%%%%%%%%%%%%%%%% A operator in YZ plate %%%%%%%%%%%%%%%%%%
-L1= zeros(n,n); L1(1:n-1, 1:n-1) = eye(n-1);
+L1= zeros(n,n); L1(1:n-1, 1:n-1) = eye(n-1); 
 L2= zeros(n,n); L2(1:n-1, 2:n  ) = eye(n-1);
 OP_AYF1_YZ=0.5*(L1+L2);
 
