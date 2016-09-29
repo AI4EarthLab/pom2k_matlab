@@ -8,19 +8,13 @@ function [advx,advy]=new_advct(u,v,dx,dy,dt,aam,ub,vb,aru,arv)
 % *                mode calculation.                                   *
 % *                                                                    *
 % **********************************************************************
-%
-%
 load('grid.mat');
-
-curv=zeros(im,jm,kb);
-advx=zeros(im,jm,kb);
-advy=zeros(im,jm,kb);
-xflux=zeros(im,jm,kb);
-yflux=zeros(im,jm,kb);
+curv=zeros(im,jm,kb);  advx=zeros(im,jm,kb); advy=zeros(im,jm,kb);
+xflux=zeros(im,jm,kb); yflux=zeros(im,jm,kb);
 
 for k=1:kb
     curv(:,:,k)= (AYF1_XY(v(:,:,k)) .* DXB2_XY(AXF1_XY(dy)) - AXF1_XY(u(:,:,k)) .* DYB2_XY(AYF1_XY(dx)) ) ./ (dx .* dy);
-%     Calculate x-component of velocity advection:
+    % Calculate x-component of velocity advection:
     xflux(:,:,k) = dy .* (AXF1_XY( AXB1_XY(dt) .* u(:,:,k) ) .* AXF2_XY(u(:,:,k)) ...
                     - dt.*aam(:,:,k)*2.0.*DXF2_XY(ub(:,:,k))./dx );                   
     yflux(:,:,k) = AYB1_XY(AXB1_XY(dx)) .* ( ( AXB1_XY( AYB1_XY(dt) .* v(:,:,k) ) .* AYB1_XY(u(:,:,k)) ) ...
@@ -29,7 +23,7 @@ for k=1:kb
                        + DIVISION( DXB1_XY(vb(:,:,k)), AYB1_XY(AXB1_XY(dx)) ) ) ) ;
     advx(:,:,k)=DXB2_XY( xflux(:,:,k) ) + DYF2_XY( yflux(:,:,k) )...
                     - aru .* AXB2_XY(  curv(:,:,k) .* dt .* AYF2_XY(v(:,:,k)) ); 
-%     Calculate y-component of velocity advection:
+    % Calculate y-component of velocity advection:
     xflux(:,:,k) = AYB1_XY(AXB1_XY(dy)) .* ( ( AYB1_XY( AXB1_XY(dt) .* u(:,:,k) ) .* AXB1_XY(v(:,:,k)) ) ...
                      -AYB1_XY(AXB1_XY(dt)) .* AYB1_XY(AXB1_XY(aam(:,:,k))) ...
                      .*( DIVISION( DYB1_XY(ub(:,:,k)), AYB1_XY(AXB1_XY(dy)) ) ...

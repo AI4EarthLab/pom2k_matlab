@@ -5,12 +5,7 @@ function [rho,drhox,drhoy] = new_baropg(rho, rmean, dt, ramp)
 % *                                                                    *
 % **********************************************************************
 % 
-load('grid.mat');
-load('depth.mat');
-load('para.mat');
-load('masks.mat');
-load('operator.mat');
-load('xyz.mat');
+load('grid.mat'); load('depth.mat'); load('para.mat'); load('masks.mat'); load('xyz.mat');
 
 rho = rho - rmean;
 drhox=zeros(im,jm,kb); drhoy=zeros(im,jm,kb);

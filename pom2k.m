@@ -528,29 +528,24 @@ for  iint=1:iend
 
     if(mode~=2)
 % % %  [advx,advy]=advct(u,v,dx,dy,dt,aam,ub,vb,aru,arv,im,jm,kb,imm1,jmm1,kbm1);
-       [advx1,advy1]=new_advct(u,v,dx,dy,dt,aam,ub,vb,aru,arv);        
+       [advx,advy]=new_advct(u,v,dx,dy,dt,aam,ub,vb,aru,arv);        
 % 
 % %         [rho,drhox,drhoy] = baropg(rho,drhox,drhoy,...
 % % %             im,jm,imm1,jmm1,kb,kbm1,grav,...
 % % %             zz,dt,dum,dvm,ramp,rmean,dx,dy);   
         [rho,drhox,drhoy] = new_baropg(rho, rmean, dt, ramp);   
 
-
+        
         for k=1:kbm1
-            for j=2:jmm1
-                for i=2:imm1
-                    aam(i,j,k)=horcon*dx(i,j)*dy(i,j) ...
-                        *sqrt( ((u(i+1,j,k)-u(i,j,k))/dx(i,j))^2     ...
-                        +((v(i,j+1,k)-v(i,j,k))/dy(i,j))^2     ...
-                        +0.5*(0.25*(u(i,j+1,k)+u(i+1,j+1,k)     ...
-                        -u(i,j-1,k)-u(i+1,j-1,k))     ...
-                        /dy(i,j)     ...
-                        +0.25*(v(i+1,j,k)+v(i+1,j+1,k)     ...
-                        -v(i-1,j,k)-v(i-1,j+1,k))     ...
-                        /dx(i,j))^2);
-                end
-            end
-        end
+            aam(:,:,k)=horcon.*dx(:,:).*dy(:,:)...
+                .*sqrt( (DXF2_XY(u(:,:,k))./dx).^2 + (DYF2_XY(v(:,:,k))./dy).^2    ...
+                +0.5*( DYB2_XY(AYF1_XY(AXF1_XY(u(:,:,k))))./dy + DXB2_XY(AXF1_XY(AYF1_XY(v(:,:,k))))./dx).^2 );
+        end    
+        aam(:,1,:)=aam_init;
+        aam(:,jm,:)=aam_init;
+        aam(1,:,:)=aam_init;
+        aam(im,:,:)=aam_init;
+        
         %
         %     Form vertical averages of 3-D fields for use in external (2-D)
         %     mode:
@@ -562,95 +557,40 @@ for  iint=1:iend
         dry2d=zeros(im,jm);
         aam2d=zeros(im,jm);
         
-        %
-        for k=1:kbm1
-            for j=1:jm
-                for i=1:im
-                    adx2d(i,j)=adx2d(i,j)+advx(i,j,k)*dz(k);
-                    ady2d(i,j)=ady2d(i,j)+advy(i,j,k)*dz(k);
-                    drx2d(i,j)=drx2d(i,j)+drhox(i,j,k)*dz(k);
-                    dry2d(i,j)=dry2d(i,j)+drhoy(i,j,k)*dz(k);
-                    aam2d(i,j)=aam2d(i,j)+aam(i,j,k)*dz(k);
-                end
-            end
+        for k=1:kb
+            adx2d=adx2d+advx(:,:,k)*dz(k);
+            ady2d=ady2d+advy(:,:,k)*dz(k);
+            drx2d=drx2d+drhox(:,:,k)*dz(k);
+            dry2d=dry2d+drhoy(:,:,k)*dz(k);
+            aam2d=aam2d+aam(:,:,k)*dz(k);
         end
         
-        %
         [tps,advua,advva,fluxua,fluxva,wubot,wvbot,tps] = advave(tps,advua,advva,fluxua,fluxva,wubot,wvbot,tps,...
             mode,im,jm,imm1,jmm1,aam2d,...
             uab,vab,dx,dy,ua,va,cbc,aru,arv,d);
         
-        %
-        for j=1:jm
-            for i=1:im
-                adx2d(i,j)=adx2d(i,j)-advua(i,j);
-                ady2d(i,j)=ady2d(i,j)-advva(i,j);
-            end
-        end
-        %
-    end
-    %
-    for j=1:jm
-        for i=1:im
-            egf(i,j)=el(i,j)*ispi;
-        end
-    end
-    %
-    for j=1:jm
-        for i=2:im
-            utf(i,j)=ua(i,j)*(d(i,j)+d(i-1,j))*isp2i;
-        end
-    end
-    for j=2:jm
-        for i=1:im
-            vtf(i,j)=va(i,j)*(d(i,j)+d(i,j-1))*isp2i;
-        end
+        adx2d=adx2d-advua;
+        ady2d=ady2d-advva;
     end
     
+    egf=el*ispi;
     
-    %
-    %-----------------------------------------------------------------------
+    utf=ua .* 2.0 .* AXB1_XY(d) .* isp2i;
+    vtf=va .* 2.0 .* AYB1_XY(d) .* isp2i;
     
-    
-    
-    
-    
-    for iext=1:isplit    % Begin external (2-D) mode
-        %
-        %         write(6,3) iext,time
-        %   3     format(' iext,time =',i5,f9.2)
-        %
-        for j=2:jm
-            for i=2:im
-                fluxua(i,j)=0.25*(d(i,j)+d(i-1,j))  ...
-                    *(dy(i,j)+dy(i-1,j))*ua(i,j);
-                fluxva(i,j)=0.25*(d(i,j)+d(i,j-1))     ...
-                    *(dx(i,j)+dx(i,j-1))*va(i,j);
-            end
-        end
+    %----------------------------------------------------------------------    
+    for iext=1:isplit    % Begin external (2-D) mode        
         %
         %     NOTE addition of surface freshwater flux, w(i,j,1)=vflux, compared
         %     with pom98.f. See also modifications to subroutine vertvl.
-        %
-        
-        
-        for j=2:jmm1
-            for i=2:imm1
-                elf(i,j)=elb(i,j)     ...
-                    +dte2*(-(fluxua(i+1,j)-fluxua(i,j)     ...
-                    +fluxva(i,j+1)-fluxva(i,j))/art(i,j)     ...
-                    -vfluxf(i,j));
-            end
-        end
-        %
-        
+        %   
+        elf= elb+dte2 .* (-(DXF2_XY( AXB1_XY(d) .* AXB1_XY(dy) .* ua ) ...
+                             + DYF2_XY(AYB1_XY(d) .* AYB1_XY(dx) .* va)) ./ art -vfluxf);  
         
         [elf,uaf,vaf,uf,vf,w] = bcond(1,elf,uaf,vaf,uf,vf,w,...
             im,jm,kb,imm1,jmm1,kbm1,...
             fsm,grav,ramp,rfe,h,uabe,ele,el,uabw,rfw,elw,rfn,eln,vabs,rfs,els,...
             dum,dvm,hmax,u,v,t,s,tbn,sbn,dti,tbs,sbs,q2,q2l,small,vabn,dx,dy,dt,tbe,sbe,tbw,sbw,zz);
-        
-        
         
         if(mod(iext,ispadv)==0)
             [tps,advua,advva,fluxua,fluxva,wubot,wvbot,tps] = advave(tps,advua,advva,fluxua,fluxva,wubot,wvbot,tps,...
@@ -658,66 +598,19 @@ for  iint=1:iend
                 uab,vab,dx,dy,ua,va,cbc,aru,arv,d);
           
         end
-        
-        
-        
-        
-        %
-        for j=2:jmm1
-            for i=2:im
-                uaf(i,j)=adx2d(i,j)+advua(i,j)     ...
-                    -aru(i,j)*0.25     ...
-                    *(cor(i,j)*d(i,j)*(va(i,j+1)+va(i,j))     ...
-                    +cor(i-1,j)*d(i-1,j)*(va(i-1,j+1)+va(i-1,j)))     ...
-                    +0.25*grav*(dy(i,j)+dy(i-1,j))     ...
-                    *(d(i,j)+d(i-1,j))     ...
-                    *((1.e0-2.0*alpha)     ...
-                    *(el(i,j)-el(i-1,j))     ...
-                    +alpha*(elb(i,j)-elb(i-1,j)     ...
-                    +elf(i,j)-elf(i-1,j))     ...
-                    +e_atmos(i,j)-e_atmos(i-1,j))     ...
-                    +drx2d(i,j)+aru(i,j)*(wusurf(i,j)-wubot(i,j));
-            end
-        end
-        %
-        for j=2:jmm1
-            for i=2:im
-                uaf(i,j)=((h(i,j)+elb(i,j)+h(i-1,j)+elb(i-1,j))     ...
-                    *aru(i,j)*uab(i,j)     ...
-                    -4.e0*dte*uaf(i,j))     ...
-                    /((h(i,j)+elf(i,j)+h(i-1,j)+elf(i-1,j))     ...
-                    *aru(i,j));
-            end
-        end
-        
-        %
-        for j=2:jm
-            for i=2:imm1
-                vaf(i,j)=ady2d(i,j)+advva(i,j)     ...
-                    +arv(i,j)*0.25     ...
-                    *(cor(i,j)*d(i,j)*(ua(i+1,j)+ua(i,j))     ...
-                    +cor(i,j-1)*d(i,j-1)*(ua(i+1,j-1)+ua(i,j-1)))     ...
-                    +0.25*grav*(dx(i,j)+dx(i,j-1))     ...
-                    *(d(i,j)+d(i,j-1))     ...
-                    *((1.e0-2.0*alpha)*(el(i,j)-el(i,j-1))     ...
-                    +alpha*(elb(i,j)-elb(i,j-1)     ...
-                    +elf(i,j)-elf(i,j-1))     ...
-                    +e_atmos(i,j)-e_atmos(i,j-1))     ...
-                    +dry2d(i,j)+arv(i,j)*(wvsurf(i,j)-wvbot(i,j));
-            end
-        end
-        %
-        for j=2:jm
-            for i=2:imm1
-                vaf(i,j)=((h(i,j)+elb(i,j)+h(i,j-1)+elb(i,j-1))     ...
-                    *vab(i,j)*arv(i,j)     ...
-                    -4.e0*dte*vaf(i,j))     ...
-                    /((h(i,j)+elf(i,j)+h(i,j-1)+elf(i,j-1))     ...
-                    *arv(i,j));
-            end
-        end
-        %
-        
+    
+        uaf=   DIVISION( (2.0*AXB1_XY(h+elb) .* aru .* uab ...
+               -4.0* dte .* (adx2d + advua - aru .* AXB1_XY(cor .* d .* AYF1_XY(va)) ...
+               + grav .* AXB1_XY(dy) .* AXB1_XY(d)  ...
+                 .*( (1.0-2.0*alpha) .* DXB2_XY(el) + alpha* (DXB2_XY(elb)+ DXB2_XY(elf)) + DXB2_XY(e_atmos) ) ...
+               + drx2d + aru .* (wusurf-wubot))) , (2.0*AXB1_XY(h+elf) .* aru));      
+               
+        vaf=   DIVISION( (2.0*AYB1_XY(h+elb) .* arv .* vab ...
+               -4.0* dte .* (ady2d + advva + arv .* AYB1_XY(cor .* d .* AXF1_XY(ua)) ...
+               + grav .* AYB1_XY(dx) .* AYB1_XY(d)  ...
+                 .*( (1.0-2.0*alpha) .* DYB2_XY(el) + alpha* (DYB2_XY(elb)+ DYB2_XY(elf)) + DYB2_XY(e_atmos) ) ...
+               + dry2d + arv .* (wvsurf-wvbot))) , (2.0*AYB1_XY(h+elf) .* arv));  
+
         [elf,uaf,vaf,uf,vf,w] = bcond(2,elf,uaf,vaf,uf,vf,w,...
             im,jm,kb,imm1,jmm1,kbm1,...
             fsm,grav,ramp,rfe,h,uabe,ele,el,uabw,rfw,elw,rfn,eln,vabs,rfs,els,...

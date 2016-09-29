@@ -1,38 +1,43 @@
 clear all;
 
+load('grid.mat');
 load('test.mat');
-load('operator.mat');
 
-drhoy=zeros(im,jm,kbm1+1);
-A=zeros(im,jm,kbm1+1);
-B=A;
-%drhox(:,:,1)= grav*(-zz(1)) * AXB_XY(dt) .* DXB_XY(rho(:,:,1));
+aam=zeros(im,jm,kb)+500;
+aam1=aam;
 
-%
-drhoy1=drhoy;
+A1=zeros(im,jm,kb);A2=A1;A3=A1;A4=A1;
+B1=A1;B2=A1;B3=A1;B4=A1;
 
-drhoy(:,:,1)= grav*(-zz(1)) * AYB_XY(dt) .* DYB_XY(rho(:,:,1));
-%
-for k=2:kbm1
+for k=1:kbm1
     for j=2:jmm1
         for i=2:imm1
-            A(i,j,k)=0.5*(dt(i,j)+dt(i,j-1));
-            drhoy(i,j,k)=drhoy(i,j,k-1)+...
-                          +grav*0.25*(zz(k-1)-zz(k))*(dt(i,j)+dt(i,j-1))            ...
-                           *(rho(i,j,k)-rho(i,j-1,k)+rho(i,j,k-1)-rho(i,j-1,k-1))     ...
-                          +grav*0.25*(zz(k-1)+zz(k))*(dt(i,j)-dt(i,j-1))            ...
-                           *(rho(i,j,k)+rho(i,j-1,k)-rho(i,j,k-1)-rho(i,j-1,k-1));
+            A1(i,j,k)=((u(i+1,j,k)-u(i,j,k))/dx(i,j))^2;
+            A2(i,j,k)=((v(i,j+1,k)-v(i,j,k))/dy(i,j))^2 ;
+            A3(i,j,k)=0.25*(u(i,j+1,k)+u(i+1,j+1,k)-u(i,j-1,k)-u(i+1,j-1,k))/dy(i,j);
+            A4(i,j,k)=0.25*(v(i+1,j,k)+v(i+1,j+1,k)-v(i-1,j,k)-v(i-1,j+1,k))/dx(i,j);
+            aam(i,j,k)=horcon*dx(i,j)*dy(i,j) ...
+                *sqrt( ((u(i+1,j,k)-u(i,j,k))/dx(i,j))^2     ...
+                +((v(i,j+1,k)-v(i,j,k))/dy(i,j))^2     ...
+                +0.5*(0.25*(u(i,j+1,k)+u(i+1,j+1,k)     ...
+                -u(i,j-1,k)-u(i+1,j-1,k))     ...
+                /dy(i,j)     ...
+                +0.25*(v(i+1,j,k)+v(i+1,j+1,k)     ...
+                -v(i-1,j,k)-v(i-1,j+1,k))     ...
+                /dx(i,j))^2);
         end
     end
 end
 
-rho_tmp=zeros(jm,kb);
-for i=2:imm1
-    % get a 2D array from a 3D array. 
-    rho_tmp(:,:)=rho(i,:,:); 
-    tmp=repmat(drhoy(i,:,1)',1,kb) ;
-    tmp(:,kb)=0;
-    B(i,:,:)=AYB_YZ(repmat(dt(i,:)',1,kb));
-    drhoy1(i,:,:) = tmp+ SUMZ_YZ(-grav * DZB_YZ(repmat(zz,jm,1)) .* AYB_YZ(repmat(dt(i,:)',1,kb)) .* DYB_YZ( AZB_YZ(rho_tmp) ) ...
-                                   +grav * AZB_YZ(repmat(zz,jm,1)) .* DYB_YZ(repmat(dt(i,:)',1,kb)) .* DZB_YZ( AYB_YZ(rho_tmp) )); 
-end
+save('test.mat','horcon','dx','dy','u','v');
+
+for k=1:kbm1
+    B1(:,:,k)=(DXF2_XY(u(:,:,k))./dx(:,:)).^2;
+    B2(:,:,k)=(DYF2_XY(v(:,:,k))./dy(:,:)).^2;
+    B3(:,:,k)=DYB2_XY(AYF1_XY(AXF1_XY(u(:,:,k))))./dy(:,:);
+    B4(:,:,k)=DXB2_XY(AXF1_XY(AYF1_XY(v(:,:,k))))./dx(:,:);
+    
+    aam1(:,:,k)=horcon.*dx(:,:).*dy(:,:)...
+                .*sqrt( (DXF2_XY(u(:,:,k))./dx).^2 + (DYF2_XY(v(:,:,k))./dy).^2    ...
+                +0.5*( DYB2_XY(AYF1_XY(AXF1_XY(u(:,:,k))))./dy + DXB2_XY(AXF1_XY(AYF1_XY(v(:,:,k))))./dx).^2 );
+end  
