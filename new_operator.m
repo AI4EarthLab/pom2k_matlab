@@ -396,7 +396,7 @@ OP_L_YZ = L;
 OP_R_YZ = R;
 
 %%%%%%%%%%%%%%%%%%%%%%%% OP_SUM operator %%%%%%%%%%%%%%%%%%
-% Define sum operator along with X and Y directions. 
+% Define sum operator along with Z directions. 
 %   L=[1 0 0 0 0 0 0]      R=[1 1 1 1 0]
 %     [1 1 0 0 0 0 0]        [0 1 1 1 0] 
 %     [1 1 1 0 0 0 0]        [0 0 1 1 0]
@@ -404,21 +404,22 @@ OP_R_YZ = R;
 %     [1 1 1 1 1 0 0]        [0 0 0 0 0]
 %     [1 1 1 1 1 1 0]        
 %     [0 0 0 0 0 0 0]        
-L=tril(ones(m,m)); L(m,:)=0;
-R=triu(ones(n,n)); R(:,n)=0;
-OP_SUMX_XY= L;
-OP_SUMY_XY= R;
+%L=tril(ones(m,m)); L(m,:)=0;
+%R=triu(ones(n,n)); R(:,n)=0;
+%OP_SUMX_XY= L;
+%OP_SUMY_XY= R;
 
-L=tril(ones(m,m)); L(m,:)=0;
-R=triu(ones(k,k)); R(:,k)=0;
-OP_SUMX_XZ= L;
-OP_SUMZ_XZ= R;
+%L=tril(ones(m,m)); L(m,:)=0;
+%R=triu(ones(k,k)); R(:,k)=0;
+%OP_SUMX_XZ= L;
+%OP_SUMZ_XZ= R;
 
 
-L=tril(ones(n,n)); L(n,:)=0;
-R=triu(ones(k,k)); R(:,k)=0;
-OP_SUMY_YZ= L;
-OP_SUMZ_YZ= R;
+%L=tril(ones(n,n)); L(n,:)=0;
+R=triu(ones(k,k)); R2=eye(k,k);
+OP_SUMZ2=R-R2;
+R(:,k)=0;
+OP_SUMZ1= R;
 
 end
 
