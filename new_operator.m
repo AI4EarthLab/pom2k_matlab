@@ -12,9 +12,7 @@ function [OP_AXF1_XY, OP_AXB1_XY, OP_AYF1_XY, OP_AYB1_XY, ...
           OP_DYF2_YZ, OP_DYB2_YZ, OP_DZF2_YZ, OP_DZB2_YZ, ...
           OP_L_XY,   OP_L_XZ,   OP_L_YZ, ...
           OP_R_XY,   OP_R_XZ,   OP_R_YZ, ...
-          OP_SUMX_XY, OP_SUMY_XY, ...
-          OP_SUMX_XZ, OP_SUMZ_XZ, ...
-          OP_SUMY_YZ, OP_SUMZ_YZ] = new_operator(m,n,k)
+          OP_SUMZ1, OP_SUMZ2] = new_operator(m,n,k)
 % Computing the basic averaging and differencing operators to smplify
 % code.
 
@@ -58,7 +56,7 @@ function [OP_AXF1_XY, OP_AXB1_XY, OP_AYF1_XY, OP_AYB1_XY, ...
 
 
 %%%%%%%%%%%%%%%%%%%%%%%% A operator in XY plate %%%%%%%%%%%%%%%%%%
-% OP_AXF_XY1= 0.5*[1  1  0  0  0  0  0]  OP_AXF_XY1*X= 0.5*[ X11+X21  X12+X22  X13+X23  X14+X24  X15+X25 ]
+% OP_AXF1_XY= 0.5*[1  1  0  0  0  0  0]  OP_AXF_XY1*X= 0.5*[ X11+X21  X12+X22  X13+X23  X14+X24  X15+X25 ]
 %                 [0  1  1  0  0  0  0]                    [ X21+X31  X22+X32  X23+X33  X24+X34  X25+X35 ]
 %                 [0  0  1  1  0  0  0]                    [ X31+X41  X32+X42  X33+X43  X34+X44  X35+X45 ]
 %                 [0  0  0  1  1  0  0]                    [ X41+X51  X42+X52  X43+X53  X44+X54  X45+X55 ]
@@ -397,33 +395,18 @@ OP_R_YZ = R;
 
 %%%%%%%%%%%%%%%%%%%%%%%% OP_SUM operator %%%%%%%%%%%%%%%%%%
 % Define sum operator along with X and Y directions. 
-%   L=[1 0 0 0 0 0 0]      R=[1 1 1 1 0]
-%     [1 1 0 0 0 0 0]        [0 1 1 1 0] 
-%     [1 1 1 0 0 0 0]        [0 0 1 1 0]
-%     [1 1 1 1 0 0 0]        [0 0 0 1 0]
-%     [1 1 1 1 1 0 0]        [0 0 0 0 0]
-%     [1 1 1 1 1 1 0]        
-%     [0 0 0 0 0 0 0]        
-L=tril(ones(m,m)); L(m,:)=0;
-R=triu(ones(n,n)); R(:,n)=0;
-OP_SUMX_XY= L;
-OP_SUMY_XY= R;
+%   R1=[1 1 1 1 1 0]     R2=[0 1 1 1 1 1]
+%      [0 1 1 1 1 0]        [0 0 1 1 1 1] 
+%      [0 0 1 1 1 0]        [0 0 0 1 1 1]
+%      [0 0 0 1 1 0]        [0 0 0 0 1 1]
+%      [0 0 0 0 1 0]        [0 0 0 0 0 1]
+%      [0 0 0 0 0 0]        [0 0 0 0 0 0]
 
-L=tril(ones(m,m)); L(m,:)=0;
-R=triu(ones(k,k)); R(:,k)=0;
-OP_SUMX_XZ= L;
-OP_SUMZ_XZ= R;
+R1=triu(ones(k,k)); R1(:,k)=0;
+OP_SUMZ1= R1;
 
-
-L=tril(ones(n,n)); L(n,:)=0;
-R=triu(ones(k,k)); R(:,k)=0;
-OP_SUMY_YZ= L;
-OP_SUMZ_YZ= R;
-
-end
-
-function test_a()
-F=OP_AXB_XY*X;
+R2=triu(ones(k,k))-eye(k);
+OP_SUMZ2= R2;
 end
 
 

@@ -20,7 +20,7 @@ for j=1:jm
     rho_tmp(:,:)=rho(:,j,:); 
     tmp=repmat(drhox(:,j,1),1,kb) ;
     tmp(:,kb)=0;
-    drhox(:,j,:) =  tmp + SUMZ_XZ(-grav * DZB2_XZ(repmat(zz,im,1)) .* AXB1_XZ(repmat(dt(:,j),1,kb)) .* DXB2_XZ( AZB1_XZ(rho_tmp) ) ...
+    drhox(:,j,:) =  tmp + SUMZ1(-grav * DZB2_XZ(repmat(zz,im,1)) .* AXB1_XZ(repmat(dt(:,j),1,kb)) .* DXB2_XZ( AZB1_XZ(rho_tmp) ) ...
                                   +grav * AZB1_XZ(repmat(zz,im,1)) .* DXB2_XZ(repmat(dt(:,j),1,kb)) .* DZB2_XZ( AXB1_XZ(rho_tmp) )); 
 end
 
@@ -41,7 +41,7 @@ for i=2:imm1
     rho_tmp(:,:)=rho(i,:,:); 
     tmp=repmat(drhoy(i,:,1)',1,kb) ;
     tmp(:,kb)=0;
-    drhoy(i,:,:) =  tmp + SUMZ_YZ(-grav * DZB2_YZ(repmat(zz,jm,1)) .* AYB1_YZ(repmat(dt(i,:)',1,kb)) .* DYB2_YZ( AZB1_YZ(rho_tmp) ) ...
+    drhoy(i,:,:) =  tmp + SUMZ1(-grav * DZB2_YZ(repmat(zz,jm,1)) .* AYB1_YZ(repmat(dt(i,:)',1,kb)) .* DYB2_YZ( AZB1_YZ(rho_tmp) ) ...
                                    +grav * AZB1_YZ(repmat(zz,jm,1)) .* DYB2_YZ(repmat(dt(i,:)',1,kb)) .* DZB2_YZ( AYB1_YZ(rho_tmp) )); 
 end
 

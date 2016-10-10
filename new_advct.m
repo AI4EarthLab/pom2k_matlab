@@ -1,4 +1,4 @@
-function [advx,advy]=new_advct(u,v,dx,dy,dt,aam,ub,vb,aru,arv)
+function [advx,advy]=new_advct(u,v,dt,aam,ub,vb)
 % **********************************************************************
 % *                                                                    *
 % * FUNCTION    :  Calculates the horizontal portions of momentum      *
@@ -8,7 +8,7 @@ function [advx,advy]=new_advct(u,v,dx,dy,dt,aam,ub,vb,aru,arv)
 % *                mode calculation.                                   *
 % *                                                                    *
 % **********************************************************************
-load('grid.mat');
+load('grid.mat');load('xyz.mat');
 curv=zeros(im,jm,kb);  advx=zeros(im,jm,kb); advy=zeros(im,jm,kb);
 xflux=zeros(im,jm,kb); yflux=zeros(im,jm,kb);
 

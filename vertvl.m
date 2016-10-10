@@ -1,6 +1,4 @@
-function [xflux,yflux,...
-    w]=vertvl (xflux,yflux,...
-    w,dx,dy,dz,dt,u,v,vfluxb,vfluxf,etf,etb,dti2,im,jm,imm1,jmm1,kbm1)
+function [xflux,yflux,w]=vertvl (xflux,yflux,w,dx,dy,dz,dt,u,v,vfluxb,vfluxf,etf,etb,dti2,im,jm,imm1,jmm1,kbm1)
 % **********************************************************************
 % *                                                                    *
 % * FUN%TION    :  %alculates vertical velocity.                       *

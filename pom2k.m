@@ -254,7 +254,7 @@ uab=zeros(im,jm)     ;uaf=zeros(im,jm)     ;utb=zeros(im,jm)     ;utf=zeros(im,j
 va=zeros(im,jm)      ;vab=zeros(im,jm)     ;vaf=zeros(im,jm)     ;
 vtb=zeros(im,jm)     ;vtf=zeros(im,jm)     ;wssurf=zeros(im,jm)  ;wtsurf=zeros(im,jm)  ;
 wubot=zeros(im,jm)   ;wusurf=zeros(im,jm)  ;wvbot=zeros(im,jm)   ;wvsurf=zeros(im,jm)  ;
-
+wubot1=zeros(im,jm)  ;wvbot1=zeros(im,jm)   ;
 
 aam=zeros(im,jm,kb)  ;advx=zeros(im,jm,kb) ;advy=zeros(im,jm,kb) ;a=zeros(im,jm,kb)    ;
 c=zeros(im,jm,kb)    ;drhox=zeros(im,jm,kb);drhoy=zeros(im,jm,kb);dtef=zeros(im,jm,kb) ;
@@ -293,9 +293,7 @@ end
  OP_DYF2_YZ, OP_DYB2_YZ, OP_DZF2_YZ, OP_DZB2_YZ, ...
  OP_L_XY,   OP_L_XZ,   OP_L_YZ, ...
  OP_R_XY,   OP_R_XZ,   OP_R_YZ, ...
- OP_SUMX_XY, OP_SUMY_XY, ...
- OP_SUMX_XZ, OP_SUMZ_XZ, ...
- OP_SUMY_YZ, OP_SUMZ_YZ] = new_operator(im,jm,kb);
+ OP_SUMZ1, OP_SUMZ2] = new_operator(im,jm,kb);
 
 save('depth.mat','z','zz','dz','dzz');
 
@@ -314,9 +312,7 @@ save('operator.mat',...
 'OP_DYF2_YZ', 'OP_DYB2_YZ', 'OP_DZF2_YZ', 'OP_DZB2_YZ', ...
 'OP_L_XY',    'OP_L_XZ',   'OP_L_YZ', ...                  
 'OP_R_XY',    'OP_R_XZ',   'OP_R_YZ', ...                  
-'OP_SUMX_XY', 'OP_SUMY_XY', ...                            
-'OP_SUMX_XZ', 'OP_SUMZ_XZ', ...                                    
-'OP_SUMY_YZ', 'OP_SUMZ_YZ' );
+'OP_SUMZ1', 'OP_SUMZ2');
 
                 
 if(iproblem == 1)
@@ -362,7 +358,7 @@ else
     return
 end
 
-save('xyz.mat','dx','dy','dz');
+save('xyz.mat','dx','dy','dz','art','aru','arv');
 
 %     Inertial period for temporal filter:
 period=(2.0*pi)/abs(cor(floor(im/2),floor(jm/2)))/86400.0;
@@ -528,7 +524,7 @@ for  iint=1:iend
 
     if(mode~=2)
 % % %  [advx,advy]=advct(u,v,dx,dy,dt,aam,ub,vb,aru,arv,im,jm,kb,imm1,jmm1,kbm1);
-       [advx,advy]=new_advct(u,v,dx,dy,dt,aam,ub,vb,aru,arv);        
+       [advx,advy]=new_advct(u,v,dt,aam,ub,vb);        
 % 
 % %         [rho,drhox,drhoy] = baropg(rho,drhox,drhoy,...
 % % %             im,jm,imm1,jmm1,kb,kbm1,grav,...
@@ -565,9 +561,10 @@ for  iint=1:iend
             aam2d=aam2d+aam(:,:,k)*dz(k);
         end
         
-        [tps,advua,advva,fluxua,fluxva,wubot,wvbot,tps] = advave(tps,advua,advva,fluxua,fluxva,wubot,wvbot,tps,...
-            mode,im,jm,imm1,jmm1,aam2d,...
-            uab,vab,dx,dy,ua,va,cbc,aru,arv,d);
+        %[tps2,advua,advva,fluxua,fluxva,wubot,wvbot,tps0] = advave(tps,advua,advva,fluxua,fluxva,wubot,wvbot,tps,...
+        %    mode,im,jm,imm1,jmm1,aam2d,...
+        %    uab,vab,dx,dy,ua,va,cbc,aru,arv,d);
+        [tps,wubot,wvbot,advua,advva] = new_advave(tps,wubot,wvbot,mode,aam2d,uab,vab,ua,va,cbc,d);
         
         adx2d=adx2d-advua;
         ady2d=ady2d-advva;
@@ -593,9 +590,11 @@ for  iint=1:iend
             dum,dvm,hmax,u,v,t,s,tbn,sbn,dti,tbs,sbs,q2,q2l,small,vabn,dx,dy,dt,tbe,sbe,tbw,sbw,zz);
         
         if(mod(iext,ispadv)==0)
-            [tps,advua,advva,fluxua,fluxva,wubot,wvbot,tps] = advave(tps,advua,advva,fluxua,fluxva,wubot,wvbot,tps,...
+            [tps2,advua,advva,fluxua,fluxva,wubot,wvbot,tps] = advave(tps,advua,advva,fluxua,fluxva,wubot,wvbot,tps,...
                 mode,im,jm,imm1,jmm1,aam2d,...
                 uab,vab,dx,dy,ua,va,cbc,aru,arv,d);
+           % [tps,wubot,wvbot,advua,advva] = new_advave(tps,wubot,wvbot,mode,aam2d,uab,vab,ua,va,cbc,d);
+
           
         end
     
@@ -615,36 +614,17 @@ for  iint=1:iend
             im,jm,kb,imm1,jmm1,kbm1,...
             fsm,grav,ramp,rfe,h,uabe,ele,el,uabw,rfw,elw,rfn,eln,vabs,rfs,els,...
             dum,dvm,hmax,u,v,t,s,tbn,sbn,dti,tbs,sbs,q2,q2l,small,vabn,dx,dy,dt,tbe,sbe,tbw,sbw,zz);
-        %
-        if(iext==(isplit-2))
-            for j=1:jm
-                for i=1:im
-                    etf(i,j)=0.25*smoth*elf(i,j);
-                end
-            end
-            %
-        elseif(iext==(isplit-1))
-            %
-            for j=1:jm
-                for i=1:im
-                    etf(i,j)=etf(i,j)+0.5*(1.-.5e0*smoth)*elf(i,j);
-                end
-            end
-            %
-        elseif(iext==isplit)
-            %
-            for j=1:jm
-                for i=1:im
-                    etf(i,j)=(etf(i,j)+0.5*elf(i,j))*fsm(i,j);
-                end
-            end
-            %
-        end
-        %
-        %     Stop if velocity condition violated (generally due to %FL
-        %     criterion not being satisfied):
-        %
         
+        if(iext==(isplit-2))
+            etf=0.25*smoth*elf;
+        elseif(iext==(isplit-1))
+            etf=etf+0.5*(1.0-0.5*smoth)*elf;
+        elseif(iext==isplit)
+            etf=(etf+0.5*elf).*fsm;
+        end
+         
+        % Stop if velocity condition violated (generally due to %FL
+        % criterion not being satisfied):   
         vamax=0.0;
         %
         for j=1:jm
@@ -656,118 +636,65 @@ for  iint=1:iend
                 end
             end
         end
-        %
+        
         if(vamax<=vmaxl)
             %
             %     Apply filter to remove time split and reset time sequence:
             %
-            for j=1:jm
-                for i=1:im
-                    ua(i,j)=ua(i,j)     ...
-                        +0.5*smoth*(uab(i,j)-2.0*ua(i,j)+uaf(i,j));
-                    va(i,j)=va(i,j)     ...
-                        +0.5*smoth*(vab(i,j)-2.0*va(i,j)+vaf(i,j));
-                    el(i,j)=el(i,j)     ...
-                        +0.5*smoth*(elb(i,j)-2.0*el(i,j)+elf(i,j));
-                    elb(i,j)=el(i,j);
-                    el(i,j)=elf(i,j);
-                    d(i,j)=h(i,j)+el(i,j);
-                    uab(i,j)=ua(i,j);
-                    ua(i,j)=uaf(i,j);
-                    vab(i,j)=va(i,j);
-                    va(i,j)=vaf(i,j);
-                end
-            end
-            %
+            ua=ua+0.5*smoth*(uab-2.0*ua+uaf);
+            va=va+0.5*smoth*(vab-2.0*va+vaf);
+            el=el+0.5*smoth*(elb-2.0*el+elf);
+            elb=el;
+            el=elf;
+            d=h+el;
+            uab=ua;
+            ua=uaf;
+            vab=va;
+            va=vaf;
+            
             if(iext~=isplit)
-                for j=1:jm
-                    for i=1:im
-                        egf(i,j)=egf(i,j)+el(i,j)*ispi;
-                    end
-                end
-                for j=1:jm
-                    for i=2:im
-                        utf(i,j)=utf(i,j)+ua(i,j)*(d(i,j)+d(i-1,j))*isp2i;
-                    end
-                end
-                for j=2:jm
-                    for i=1:im
-                        vtf(i,j)=vtf(i,j)+va(i,j)*(d(i,j)+d(i,j-1))*isp2i;
-                    end
-                end
+                egf=egf+el*ispi;
+                utf=utf+2.0* ua .* AXB1_XY(d) * isp2i;
+                vtf=vtf+2.0* va .* AYB1_XY(d) * isp2i;
             end
-            %
         end
-        %
-    end %
-    
-    
+    end
     
     %===========================================
     %End of external (2-D) mode
-    %
-    %
     %=============================================
     
-    if(vamax<=vmaxl)
-        
+    if(vamax<=vmaxl) 
         %
         %     continue with internal (3-D) mode calculation:
         %
-        if((iint~= 1|| time0~=0.e0)&&mode~=2)
+        if((iint~= 1|| time0~=0.e0) && mode~=2)
             %
             %     Adjust u(z) and v(z) such that depth average of (u,v) = (ua,va):
             %
             tps=zeros(im,jm);
-            %
             for k=1:kbm1
-                for j=1:jm
-                    for i=1:im
-                        
-                        tps(i,j)=tps(i,j)+u(i,j,k)*dz(k);
-                    end
-                end
+                tps=tps+u(:,:,k)*dz(k);
             end
-            
-            %
+  
             for k=1:kbm1
-                for j=1:jm
-                    for i=2:im
-                        u(i,j,k)=(u(i,j,k)-tps(i,j))+     ...
-                            (utb(i,j)+utf(i,j))/(dt(i,j)+dt(i-1,j));
-                    end
-                end
+                u(:,:,k)=(u(:,:,k)-tps)+   DIVISION((utb+utf), 2.0*AXB1_XY(dt));
             end
-            
-            
-            %
-            
+
             tps =zeros(im,jm);
-            %
             for k=1:kbm1
-                for j=1:jm
-                    for i=1:im
-                        tps(i,j)=tps(i,j)+v(i,j,k)*dz(k);
-                    end
-                end
+                tps=tps+v(:,:,k)*dz(k);
             end
-            
+
             for k=1:kbm1
-                for j=2:jm
-                    for i=1:im
-                        v(i,j,k)=(v(i,j,k)-tps(i,j))+ ...
-                            (vtb(i,j)+vtf(i,j))/(dt(i,j)+dt(i,j-1));
-                    end
-                end
+                v(:,:,k)=(v(:,:,k)-tps)+   DIVISION((vtb+vtf), 2.0*AYB1_XY(dt));
             end
-            
             
             %     vertvl calculates w from u, v, dt (h+et), etf and etb:
             %
             
-            [a,c,...
-                w]=vertvl(a,c,...
-                w,dx,dy,dz,dt,u,v,vfluxb,vfluxf,etf,etb,dti2,im,jm,imm1,jmm1,kbm1);
+            %[a,c,w]=vertvl(a,c,w,dx,dy,dz,dt,u,v,vfluxb,vfluxf,etf,etb,dti2,im,jm,imm1,jmm1,kbm1);     
+            [a1,c1,w1]=new_vertvl(w,dt,u,v,vfluxb,vfluxf,etf,etb,dti2);
             
             [elf,uaf,vaf,uf,vf,w] = bcond(5,elf,uaf,vaf,uf,vf,w,...
                 im,jm,kb,imm1,jmm1,kbm1,...

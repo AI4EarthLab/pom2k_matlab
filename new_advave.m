@@ -1,14 +1,12 @@
-function [curv2d,advua,advva,fluxua,fluxva,wubot,wvbot,tps] = advave(curv2d,advua,advva,fluxua,fluxva,wubot,wvbot,tps,...
-                                                                     mode,im,jm,imm1,jmm1,aam2d,...
-                                                                     uab,vab,dx,dy,ua,va,cbc,aru,arv,d)
+function  [curv2d,wubot,wvbot,advua,advva] = new_advave(curv2d,wubot,wvbot,mode,aam2d,uab,vab,ua,va,cbc,d)
 % **********************************************************************
 % *                                                                    *
 % * FUNCTION    :  Calculates horizontal advection and diffusion.      *
 % *                                                                    *
 % **********************************************************************
-%
-fluxua=zeros(im,jm);
-fluxva=zeros(im,jm);
+load('grid.mat');load('xyz.mat');
+
+
 tps = zeros(im,jm);
 tps = AYB1_XY(AXB1_XY(d)) .* AXB1_XY(AYB1_XY(aam2d)) .* ( DYB1_XY(uab)...
      .*DIVISION( 1.0,AYB1_XY(AXB1_XY(dy)) ) + DXB1_XY(vab) .* DIVISION( 1.0,AYB1_XY(AXB1_XY(dx)) ) );
@@ -21,9 +19,8 @@ advva = DXF2_XY( ( AYB1_XY(AXB1_XY(d).*ua) .* AXB1_XY(va)-tps ) .* AYB1_XY(AXB1_
         +DYB2_XY( ( AYF1_XY(AYB1_XY(d).*va) .* AYF1_XY(va) - 2.0*d .* aam2d .* DYF2_XY(vab)./dy ) .* dx );
 
 %%%%%%%%%%%%%%%%%%% 
-wubot = zeros(im,jm);
-wvbot = zeros(im,jm);
-curv2d = zeros(im,jm);
+%wubot = zeros(im,jm);
+%wvbot = zeros(im,jm);
 
 if(mode==2)
     wubot = -AXB2_XY(cbc) .* sqrt( uab.^2+AXB2_XY(AYF2_XY(vab)).^2 ) .* uab;
