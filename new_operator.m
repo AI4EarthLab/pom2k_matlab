@@ -407,7 +407,6 @@ OP_SUMZ1= R1;
 
 R2=triu(ones(k,k))-eye(k);
 OP_SUMZ2= R2;
+
 end
-
-
 
