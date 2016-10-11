@@ -1,10 +1,9 @@
 function [fb,f,fclim,ff]=advt1(fb,f,fclim,ff,u,v,aam,w,h)
 load('grid.mat');load('depth.mat');load('para.mat');load('operator.mat');load('xyz.mat');load('masks.mat');
-xflux=zeros(im,jm,kb);yflux=zeros(im,jm,kb);
 f(:,:,kb)=f(:,:,kbm1);fb(:,:,kb)=fb(:,:,kbm1);
 zflux(:,:,1)=f(:,:,1).*w(:,:,1).*art;     
 zflux(:,:,kb)=0.e0;
-% % %Èç¹ûÃ»ÓĞÉÏÊö±ß½çÌõ¼ş£¬ÒÔÏÂÁ½¸öÑ­»·¿ÉÒÔºÏ²¢³ÉÒ»¸ö
+% % %å¦‚æœæ²¡æœ‰ä¸Šè¿°è¾¹ç•Œæ¡ä»¶ï¼Œä»¥ä¸‹ä¸¤ä¸ªå¾ªç¯å¯ä»¥åˆå¹¶æˆä¸€ä¸ª
 for j=2:jmm1
     zflux(:,j,:)=AZB2_XZ( permute(f(:,j,:),[1,3,2]) ).*permute(w(:,j,:),[1,3,2]).*repmat(art(:,j),1,kb);
 end
