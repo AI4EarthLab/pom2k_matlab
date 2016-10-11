@@ -1,4 +1,4 @@
-function [fb,f,fclim,ff]=advt1(fb,f,fclim,ff,u,v,aam,w,h)
+function [fb,f,fclim,ff]=advt1(fb,f,fclim,ff,u,v,aam,w,h,etb,etf)
 load('grid.mat');load('depth.mat');load('para.mat');load('operator.mat');load('xyz.mat');load('masks.mat');
 f(:,:,kb)=f(:,:,kbm1);fb(:,:,kb)=fb(:,:,kbm1);
 zflux(:,:,1)=f(:,:,1).*w(:,:,1).*art;     
