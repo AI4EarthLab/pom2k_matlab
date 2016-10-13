@@ -1,0 +1,347 @@
+ function [sm,sh,dh,cc,...
+         ee,gg,l,kq,km,kh,...
+         uf,vf,q2b,q2lb,a,c]=profq(sm,sh,dh,cc,...
+         ee,gg,l,kq,km,kh,...
+         uf,vf,q2,q2b,q2lb,a,c,...
+         h,etf,dti2,umol,dzz,grav,rho,kappa,u,v,dt,small,fsm,im,jm,kb,imm1,jmm1,kbm1,tbias,sbias,dz,...
+         wusurf,wubot,wvsurf,wvbot,t,s,rhoref,zz,z)
+% **********************************************************************
+% *                                        Updated: Sep. 24, 2003      *
+% * FUNCTION    :  Solves for q2 (twice the turbulent kinetic energy), *
+% *                q2l (q2 x turbulent length scale), km (vertical     *
+% *                kinematic viscosity) and kh (vertical kinematic     *
+% *                diffusivity), using a simplified version of the     *
+% *                level 2 1/2 model of Mellor and Yamada (1982).      *
+% * In this version, the Craig-Banner sub-model whereby breaking wave  * 
+% * tke is injected into the surface is included. However, we use an   *
+% * analytical solution to the near surface tke equation to solve for  *
+% * q2 at the surface giving the same result as C-B diffusion. The new *
+% * scheme is simpler and more robust than the latter scheme.          *     
+% *                                                                    *
+% * References                                                         *
+% *   Craig, P. D. and M. L. Banner, Modeling wave-enhanced turbulence *
+% *     in the ocean surface layer. J. Phys. Oceanogr., 24, 2546-2559, *
+% *     1994.                                                          *
+% *   Ezer, T., On the seasonal mixed-layer simulated by a basin-scale *
+% *     ocean model and the Mellor-Yamada turbulence scheme,           *
+% *     J. Geophys. Res., 105(C7), 16,843-16,855, 2000.                *
+% *   Mellor, G.L. and T. Yamada, Development of a turbulence          *
+% *     closure model for geophysical fluid fluid problems,            *
+% *     Rev. Geophys. Space Phys., 20, 851-875, 1982.                  *
+% *   Mellor, G. L., One-dimensional, ocean surface layer modeling,    *
+% *     a problem and a solution. J. Phys. Oceanogr., 31(3), 790-809,  *
+% *     2001.                                                          *
+% *   Mellor, G.L. and A. Blumberg, Wave breaking and ocean surface    *
+% *     thermal response, J. Phys. Oceanogr., 2003.                    *
+% *   Stacey, M. W., Simulations of the wind-forced near-surface       *
+% *     circulation in Knight Inlet: a parameterization of the         *
+% *     roughness length. J. Phys. Oceanogr., 29, 1363-1367, 1999.     *
+% *                                                                    *
+% **********************************************************************
+%
+      
+%
+%      real sm(im,jm,kb),sh(im,jm,kb),cc(im,jm,kb)
+%      real gh(im,jm,kb),boygr(im,jm,kb),dh(im,jm),stf(im,jm,kb)
+%      real prod(im,jm,kb),kn(im,jm,kb)
+%      real a1,a2,b1,b2,c1
+%      real coef1,coef2,coef3,coef4,coef5
+%      real const1,e1,e2,ghc
+%      real p,sef,sp,tp
+%      real l0(im,jm)
+%      real cbcnst,surfl,shiw
+%      real utau2, df0,df1,df2 
+ %     equivalence (prod,kn)
+%
+      a1=0.92e0;b1=16.6e0;a2=0.74e0;b2=10.1e0;c1=0.08e0;
+      e1=1.8e0;e2=1.33e0;
+      sef=1.e0;
+      cbcnst=100.;surfl=2.e5;shiw=0.0;
+      
+% 
+      l0=zeros(im,jm);
+      kn = zeros(im,jm);
+      boygr=zeros(im,jm,kb);
+      gh=zeros(im,jm,kb);
+      stf=zeros(im,jm,kb);
+      
+      dh = h + etf;
+%
+      for k=2:kbm1
+        for j=1:jm
+          for i=1:im
+            a(i,j,k)=-dti2*(kq(i,j,k+1)+kq(i,j,k)+2.e0*umol)*.5e0 ...
+                /(dzz(k-1)*dz(k)*dh(i,j)*dh(i,j));
+            c(i,j,k)=-dti2*(kq(i,j,k-1)+kq(i,j,k)+2.e0*umol)*.5e0     ...
+                /(dzz(k-1)*dz(k-1)*dh(i,j)*dh(i,j));
+          end
+        end
+      end
+%
+%-----------------------------------------------------------------------
+%
+%     The following section solves the equation:
+%
+%       dti2*(kq*q2')' - q2*(2.*dti2*dtef+1.) = -q2b
+%
+%     Surface and bottom boundary conditions:
+%
+      const1=(16.6e0^(2.e0/3.e0))*sef;
+     
+%
+% initialize fields that are not calculated on all boundaries
+% but are later used there
+    for i=1:im
+        ee(i,jm,1)=0.;
+        gg(i,jm,1)=0.;
+        l0(i,jm)=0.;
+    end
+    for j=1:jm
+        ee(im,j,1)=0.;
+        gg(im,j,1)=0.;
+        l0(im,j)=0.;
+    end
+    for i=1:im
+        for j=1:jm
+            for k=2:kbm1
+                kn(i,j,k)=0.;
+            end
+        end
+    end
+%
+   
+      for j=1:jmm1
+        for i=1:imm1
+           
+          utau2=sqrt((.5e0*(wusurf(i,j)+wusurf(i+1,j)))^2     ...
+                  +(.5e0*(wvsurf(i,j)+wvsurf(i,j+1)))^2);
+% Wave breaking energy- a variant of Craig & Banner (1994)
+% see Mellor and Blumberg, 2003.
+          ee(i,j,1)=0.e0;
+          gg(i,j,1)=(15.8*cbcnst)^(2./3.)*utau2;
+% Surface length scale following Stacey (1999).
+          l0(i,j)=surfl*utau2/grav;
+%
+          uf(i,j,kb)=sqrt((.5e0*(wubot(i,j)+wubot(i+1,j)))^2     ...
+                   +(.5e0*(wvbot(i,j)+wvbot(i,j+1)))^2)*const1;
+        end
+      end
+%
+%    Calculate speed of sound squared:
+
+      for k=1:kbm1
+        for j=1:jm
+          for i=1:im
+            tp=t(i,j,k)+tbias;
+            sp=s(i,j,k)+sbias;
+%
+%     Calculate pressure in units of decibars:
+%
+            p=grav*rhoref*(-zz(k)* h(i,j))*1.e-4;
+            cc(i,j,k)=1449.1e0+.00821e0*p+4.55e0*tp -.045e0*tp^2     ...
+                 +1.34e0*(sp-35.0e0);
+            cc(i,j,k)=cc(i,j,k)     ...
+                 /sqrt((1.e0-.01642e0*p/cc(i,j,k))     ...  
+                 *(1.e0-0.40e0*p/cc(i,j,k)^2));
+             
+          end
+        end
+      end
+%
+%     Calculate buoyancy gradient:
+%
+%
+      for k=2:kbm1
+        for j=1:jm
+          for i=1:im
+            q2b(i,j,k)=abs(q2b(i,j,k));
+            q2lb(i,j,k)=abs(q2lb(i,j,k));
+            boygr(i,j,k)=grav*(rho(i,j,k-1)-rho(i,j,k))     ...
+                    /(dzz(k-1)* h(i,j));
+% *** NOTE: comment out next line if dens fores not include pressure     ... 
+     +(grav^2)*2.e0/(cc(i,j,k-1)^2+cc(i,j,k)^2);
+          end
+        end
+      end
+%
+      for k=2:kbm1
+        for j=1:jm
+          for i=1:im
+            l(i,j,k)=abs(q2lb(i,j,k)/q2b(i,j,k));
+            if(z(k)>-0.5)
+                 l(i,j,k)=max(l(i,j,k),kappa*l0(i,j));
+            end
+            gh(i,j,k)=(l(i,j,k)^2)*boygr(i,j,k)/q2b(i,j,k);
+            gh(i,j,k)=min(gh(i,j,k),.028e0);
+          end
+        end
+      end
+%
+      for j=1:jm
+        for i=1:im
+          l(i,j,1)=kappa*l0(i,j);
+          l(i,j,kb)=0.e0;
+          gh(i,j,1)=0.e0;
+          gh(i,j,kb)=0.e0;
+        end
+      end
+%
+%    Calculate production of turbulent kinetic energy:
+%
+      for k=2:kbm1
+        for j=2:jmm1
+          for i=2:imm1
+            kn(i,j,k)=km(i,j,k)*.25e0*sef     ...  
+                 *((u(i,j,k)-u(i,j,k-1)     ...
+                      +u(i+1,j,k)-u(i+1,j,k-1))^2     ...
+                     +(v(i,j,k)-v(i,j,k-1)     ...
+                      +v(i,j+1,k)-v(i,j+1,k-1))^2)     ... 
+                  /(dzz(k-1)*dh(i,j))^2     ...  
+%   Add shear due to internal wave field     ...
+             -shiw*km(i,j,k)*boygr(i,j,k);
+            kn(i,j,k)=kn(i,j,k)+kh(i,j,k)*boygr(i,j,k);
+          end
+        end
+      end
+%
+%  NOTE: Richardson # dep. dissipation correction (Mellor: 2001; Ezer, 2000),
+%  depends on ghc the critical number (empirical -6 to -2) to increase mixing.
+      ghc=-6.0e0;
+      for k=1:kb
+        for j=1:jm
+          for i=1:im
+            stf(i,j,k)=1.e0;
+% It is unclear yet if diss. corr. is needed when surf. waves are included.
+%           if(gh(i,j,k).lt.0.e0)
+%    ...        stf(i,j,k)=1.0e0-0.9e0*(gh(i,j,k)/ghc)**1.5e0
+%           if(gh(i,j,k).lt.ghc) stf(i,j,k)=0.1e0
+            dtef(i,j,k)=sqrt(abs(q2b(i,j,k)))*stf(i,j,k)    ... 
+                  /(b1*l(i,j,k)+small);
+          end
+        end
+      end
+%
+      for k=2:kbm1
+        for j=1:jm
+          for i=1:im
+            gg(i,j,k)=1.e0/(a(i,j,k)+c(i,j,k)*(1.e0-ee(i,j,k-1))     ...
+                      -(2.e0*dti2*dtef(i,j,k)+1.e0));
+            ee(i,j,k)=a(i,j,k)*gg(i,j,k);
+            gg(i,j,k)=(-2.e0*dti2*kn(i,j,k)+c(i,j,k)*gg(i,j,k-1)     ...
+                 -uf(i,j,k))*gg(i,j,k);
+          end
+        end
+      end
+%
+      for k=1:kbm1
+        ki=kb-k;
+        for j=1:jm
+          for i=1:im
+            uf(i,j,ki)=ee(i,j,ki)*uf(i,j,ki+1)+gg(i,j,ki);
+          end
+        end
+      end
+%
+%-----------------------------------------------------------------------
+%
+%     The following section solves the equation:
+%
+%       dti2(kq*q2l')' - q2l*(dti2*dtef+1.) = -q2lb
+%
+      for j=1:jm
+        for i=1:im
+          ee(i,j,2)=0.e0;
+          gg(i,j,2)=0.e0;
+          vf(i,j,kb)=0.e0;
+        end
+      end
+%
+      for k=2:kbm1
+        for j=1:jm
+          for i=1:im
+            dtef(i,j,k)=dtef(i,j,k)     ...
+                   *(1.e0+e2*((1.e0/abs(z(k)-z(1))     ...
+                               +1.e0/abs(z(k)-z(kb)))     ...
+                                *l(i,j,k)/(dh(i,j)*kappa))^2);
+            gg(i,j,k)=1.e0/(a(i,j,k)+c(i,j,k)*(1.e0-ee(i,j,k-1))     ...
+                      -(dti2*dtef(i,j,k)+1.e0));
+            ee(i,j,k)=a(i,j,k)*gg(i,j,k);
+            gg(i,j,k)=(dti2*(-kn(i,j,k)*l(i,j,k)*e1)     ...
+                 +c(i,j,k)*gg(i,j,k-1)-vf(i,j,k))*gg(i,j,k);
+          end
+        end
+      end
+%
+      for k=1:kb-2
+        ki=kb-k;
+        for j=1:jm
+          for i=1:im
+            vf(i,j,ki)=ee(i,j,ki)*vf(i,j,ki+1)+gg(i,j,ki);
+          end
+        end
+      end
+%
+      for k=2:kbm1
+        for j=1:jm
+          for i=1:im
+            if(uf(i,j,k)<=small || vf(i,j,k)<=small) 
+              uf(i,j,k)=small;
+              vf(i,j,k)=0.1*dt(i,j)*small;
+            end
+          end
+        end
+      end
+%
+%-----------------------------------------------------------------------
+%
+%     The following section solves for km and kh:
+%
+      coef4=18.e0*a1*a1+9.e0*a1*a2;
+      coef5=9.e0*a1*a2;
+ %
+%     Note that sm and sh limit to infinity when gh approaches 0.0288:
+%
+      for k=1:kb
+        for j=1:jm
+          for i=1:im
+            coef1=a2*(1.e0-6.e0*a1/b1*stf(i,j,k));
+            coef2=3.e0*a2*b2/stf(i,j,k)+18.e0*a1*a2;
+            coef3=a1*(1.e0-3.e0*c1-6.e0*a1/b1*stf(i,j,k));
+            sh(i,j,k)=coef1/(1.e0-coef2*gh(i,j,k));
+            sm(i,j,k)=coef3+sh(i,j,k)*coef4*gh(i,j,k);
+            sm(i,j,k)=sm(i,j,k)/(1.e0-coef5*gh(i,j,k));
+          end
+        end
+      end
+%
+      for k=1:kb
+        for j=1:jm
+          for i=1:im
+            kn(i,j,k)=l(i,j,k)*sqrt(abs(q2(i,j,k)));
+            kq(i,j,k)=(kn(i,j,k)*.41e0*sh(i,j,k)+kq(i,j,k))*.5e0;
+            km(i,j,k)=(kn(i,j,k)*sm(i,j,k)+km(i,j,k))*.5e0;
+            kh(i,j,k)=(kn(i,j,k)*sh(i,j,k)+kh(i,j,k))*.5e0;
+          end
+        end
+      end
+% cosmetics: make boundr. values as interior
+% (even if not used: printout otherwise may show strange values)
+      for k=1:kb
+        for i=1:im
+           km(i,jm,k)=km(i,jmm1,k)*fsm(i,jm);
+           kh(i,jm,k)=kh(i,jmm1,k)*fsm(i,jm);
+           km(i,1,k)=km(i,2,k)*fsm(i,1);
+           kh(i,1,k)=kh(i,2,k)*fsm(i,1);
+        end
+        for j=1:jm
+           km(im,j,k)=km(imm1,j,k)*fsm(im,j);
+           kh(im,j,k)=kh(imm1,j,k)*fsm(im,j);
+           km(1,j,k)=km(2,j,k)*fsm(1,j);
+           kh(1,j,k)=kh(2,j,k)*fsm(1,j);
+        end
+      end
+%
+      return
+%
+      end
+  
