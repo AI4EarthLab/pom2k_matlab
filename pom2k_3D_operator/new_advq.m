@@ -5,7 +5,7 @@ function [qf]=new_advq(qb,q,dt,u,v,w,aam,h,dum,dvm,art,etb,etf,dti2)
 % *                vertical advection for turbulent quantities.        *
 % *                                                                    *
 % **********************************************************************
-load('grid.mat');load('xyz.mat');load('operator.mat');
+load('grid.mat');load('operator.mat');
 xflux = zeros(im,jm,kb);
 yflux = zeros(im,jm,kb);
 

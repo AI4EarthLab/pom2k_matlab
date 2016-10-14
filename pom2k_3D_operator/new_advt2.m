@@ -1,6 +1,6 @@
 
 function [fb,f,fclim,ff,sw] = advt2(fb,f,fclim,ff,xflux,yflux,etb,etf,w,dt,aam,h,u,v)
-load('grid.mat');load('depth.mat');load('para.mat');load('operator.mat');load('xyz.mat');load('masks.mat');
+load('grid.mat');load('para.mat');load('operator.mat');
 xmassflux=zeros(im,jm,kb);ymassflux=zeros(im,jm,kb);
 xflux=zeros(im,jm,kb);yflux=zeros(im,jm,kb);zflux=zeros(im,jm,kb);
 %

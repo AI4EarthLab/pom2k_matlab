@@ -4,7 +4,7 @@ function  [curv2d,wubot,wvbot,advua,advva] = new_advave(curv2d,wubot,wvbot,mode,
 % * FUNCTION    :  Calculates horizontal advection and diffusion.      *
 % *                                                                    *
 % **********************************************************************
-load('grid.mat');load('xyz.mat');
+load('grid.mat');
 
 
 tps = zeros(im,jm);

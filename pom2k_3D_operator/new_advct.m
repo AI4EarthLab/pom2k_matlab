@@ -8,7 +8,7 @@ function [advx,advy]=new_advct(u,v,dt,aam,ub,vb)
 % *                mode calculation.                                   *
 % *                                                                    *
 % **********************************************************************
-load('grid.mat');load('xyz.mat');
+load('grid.mat');
 curv=zeros(im,jm,kb);  advx=zeros(im,jm,kb); advy=zeros(im,jm,kb);
 xflux=zeros(im,jm,kb); yflux=zeros(im,jm,kb);
 

@@ -1,5 +1,5 @@
 function [vf] = advv(advy,cor,dt,e_atmos,drhoy,h,vb,vf,u,v,w,egf,egb,etf,etb)
-load('grid.mat');load('depth.mat');load('para.mat');load('operator.mat');load('xyz.mat');load('masks.mat');
+load('grid.mat');load('para.mat');load('operator.mat');
 
 vf=zeros(im,jm,kb);
 %

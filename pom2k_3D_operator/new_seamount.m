@@ -1,12 +1,14 @@
 function[dx,dy,cor,...
     east_c,north_c,east_e,north_e,east_u,north_u,east_v,north_v,...
-    h,art,aru,arv,fsm,dum,dvm,...
-    tb,sb,tclim,sclim,ub,uab,elb,etb,dt,...
-    aam2d,rho,rmean,rfe,rfw,rfn,rfs,...
-    uabw,uabe,ele,elw,tbe,tbw,sbe,sbw,tbn,tbs,sbn,sbs] = new_seamount(e_atmos,aam)
+    h,art,aru,arv,fsm,dum,dvm, ...
+    tb,sb,tclim,sclim,ub,uab,elb,etb,dt, ...
+    aam2d,rho,rmean,rfe,rfw,rfn,rfs, ...
+    uabw,uabe,ele,elw,tbe,tbw,sbe,sbw,tbn,tbs,sbn,sbs, ...
+    dx_3d,dy_3d,cor_3d, ...
+    h_3d,art_3d,aru_3d,arv_3d, ...
+    fsm_3d,dum_3d,dvm_3d,dt_3d] = new_seamount(e_atmos,aam)
     
 load('grid.mat');
-load('depth.mat');
 load('para.mat');
 
 dx=zeros(im,jm)      ;dy=zeros(im,jm)      ;cor=zeros(im,jm)     ;
@@ -21,6 +23,10 @@ uabw=zeros(1,jm)     ;uabe=zeros(1,jm)     ;ele=zeros(1,jm)      ;elw=zeros(1,jm
 tbe=zeros(jm,kb)     ;tbw=zeros(jm,kb)     ;sbe=zeros(jm,kb)     ;sbw=zeros(jm,kb)     ;
 tbn=zeros(im,kb)     ;tbs=zeros(im,kb)     ;sbn=zeros(im,kb)     ;sbs=zeros(im,kb)     ;
 rfe            =0.0  ;rfn            =0.0  ;rfs            =0.0;
+
+dx_3d=zeros(im,jm,kb) ;dy_3d=zeros(im,jm,kb) ;cor_3d=zeros(im,jm,kb) ;
+h_3d=zeros(im,jm,kb)  ;art_3d=zeros(im,jm,kb);aru_3d=zeros(im,jm,kb) ;arv_3d=zeros(im,jm,kb) ;
+fsm_3d=zeros(im,jm,kb);dum_3d=zeros(im,jm,kb);dvm_3d=zeros(im,jm,kb) ;dt_3d=zeros(im,jm,kb);
 
 % **********************************************************************
 % *                                                                    *
@@ -290,7 +296,17 @@ h(:,jm)=1.0;
 %[art,aru,arv,fsm,dum,dvm]=areas_masks(im,jm,dx,dy,h);
 [art,aru,arv,fsm,dum,dvm]=new_areas_masks(dx,dy,h);
 
-save('masks.mat','art','aru','arv','fsm','dum','dvm');
+dx_3d=repmat(dx,1,1,kb);
+dy_3d=repmat(dy,1,1,kb);
+cor_3d=repmat(cor,1,1,kb);
+h_3d=repmat(h,1,1,kb);
+art_3d=repmat(art,1,1,kb);
+aru_3d=repmat(aru,1,1,kb);
+arv_3d=repmat(arv,1,1,kb);
+fsm_3d=repmat(fsm,1,1,kb);
+dum_3d=repmat(dum,1,1,kb);
+dvm_3d=repmat(dvm,1,1,kb);
+
 
 %     Adjust bottom topography so that cell to cell variations
 %     in h for not exceed parameter slmax:
@@ -325,7 +341,9 @@ etb=-e_atmos;
 dt=h-e_atmos;
 aam2d=aam(:,:,1);
 
-[rho]=new_dens(sb,tb,h);
+dt_3d=repmat(dt,1,1,kb);
+
+[rho]=new_dens(sb,tb,h_3d,fsm_3d);
 
 %     Generated horizontally averaged density field (in this
 %     application, the initial condition for density is a function

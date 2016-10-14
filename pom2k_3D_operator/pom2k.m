@@ -13,14 +13,6 @@ jmm2=jm-2;
 kbm1=kb-1;
 kbm2=kb-2;
 
-%     Integers defining the number of logarithmic layers at the
-%     surface and bottom (used by subroutine depth). The number of
-%     logarithmic layers are kl1-2 at the surface and kb-kl2-1
-%     at the bottom. For no log portions, set kl1=2 and kl2=kb-1:
-kl1=6;
-kl2=kb-2;
-
-save('grid.mat','im','jm','kb','imm1','imm2','jmm1','jmm2','kbm1','kbm2','kl1','kl2');
 
 alpha          =0.0;dte            =0.0;dti            =0.0;dti2           =0.0;
 grav           =0.0;hmax           =0.0;kappa          =0.0;pi             =0.0;
@@ -31,6 +23,13 @@ umol           =0.0;vmaxl 		    =0.0;
 
 iint           =0;iprint         =0;iskp           =0;jskp         =0;
 kl1            =0;kl2            =0;mode           =0;ntp			=0;
+
+%     Integers defining the number of logarithmic layers at the
+%     surface and bottom (used by subroutine depth). The number of
+%     logarithmic layers are kl1-2 at the surface and kb-kl2-1
+%     at the bottom. For no log portions, set kl1=2 and kl2=kb-1:
+kl1=6;
+kl2=kb-2;
 
 source='pom2k  2006-05-03';
 
@@ -231,14 +230,6 @@ iswtch=floor(swtch*24.0*3600.0/dti+0.5);
 
 ispi=1.0/isplit;
 isp2i=1.0/(2.0*isplit);
-
-save('para.mat','small','pi','netcdf_file','iproblem','mode','nadv','nitera',...
-     'sw','nread','dte','isplit','days','prtd1','prtd2','swtch','iskp','jskp',...
-     'lramp','rhoref','tbias','sbias','grav','kappa','z0b','cbcmin','cbcmax',...
-     'horcon','tprni','umol','hmax','vmaxl','slmax','ntp','nbct','nbcs','ispadv',...
-     'smoth','alpha','dti','dte2','dti2','iend','iprint','iswtch','ispi','isp2i');
-
-
      
 aam2d=zeros(im,jm)   ;advua=zeros(im,jm)   ;advva=zeros(im,jm)   ;adx2d=zeros(im,jm)   ;
 ady2d=zeros(im,jm)   ;art=zeros(im,jm)     ;aru=zeros(im,jm)     ;arv=zeros(im,jm)     ;
@@ -274,11 +265,13 @@ tbe=zeros(jm,kb)     ;tbn=zeros(im,kb)     ;tbs=zeros(im,kb)     ;tbw=zeros(jm,k
 uabe=zeros(1,jm)     ;uabw=zeros(1,jm)     ;ube=zeros(jm,kb)     ;ubw=zeros(jm,kb)     ;
 vabn=zeros(1,im)     ;vabs=zeros(1,im)     ;vbn=zeros(im,kb)     ;vbs=zeros(im,kb)     ;
 
+d_3d=zeros(im,jm,kb) ;dt_3d=zeros(im,jm,kb);
 
-
+save('grid.mat','im','jm','kb','imm1','imm2','jmm1','jmm2','kbm1','kbm2','kl1','kl2');
 
 if(iproblem ~= 3)
     [z,zz,dz,dzz]=depth();
+    [z_3d,zz_3d,dz_3d,dzz_3d]=new_depth();
 end
 
 [OP_AXF1_XY, OP_AXB1_XY, OP_AYF1_XY, OP_AYB1_XY, ...
@@ -297,7 +290,14 @@ end
  OP_R_XY,   OP_R_XZ,   OP_R_YZ, ...
  OP_SUMZ1, OP_SUMZ2] = new_operator(im,jm,kb);
 
-save('depth.mat','z','zz','dz','dzz');
+save('grid.mat','im','jm','kb','imm1','imm2','jmm1','jmm2','kbm1','kbm2','kl1','kl2',...
+                'z','zz','dz','dzz','z_3d','zz_3d','dz_3d','dzz_3d');
+            
+save('para.mat','small','pi','netcdf_file','iproblem','mode','nadv','nitera',...
+     'sw','nread','dte','isplit','days','prtd1','prtd2','swtch','iskp','jskp',...
+     'lramp','rhoref','tbias','sbias','grav','kappa','z0b','cbcmin','cbcmax',...
+     'horcon','tprni','umol','hmax','vmaxl','slmax','ntp','nbct','nbcs','ispadv',...
+     'smoth','alpha','dti','dte2','dti2','iend','iprint','iswtch','ispi','isp2i');
 
 save('operator.mat',...
 'OP_AXF1_XY', 'OP_AXB1_XY', 'OP_AYF1_XY', 'OP_AYB1_XY', ...
@@ -318,15 +318,16 @@ save('operator.mat',...
 
                 
 if(iproblem == 1)
-    
     [dx,dy,cor,...
         east_c,north_c,east_e,north_e,east_u,north_u,east_v,north_v,...
         h,art,aru,arv,fsm,dum,dvm,...
         tb,sb,tclim,sclim,ub,uab,elb,etb,dt,...
         aam2d,rho,rmean,rfe,rfw,rfn,rfs,...
-        uabw,uabe,ele,elw,tbe,tbw,sbe,sbw,tbn,tbs,sbn,sbs] = new_seamount(e_atmos,aam);
-
-    
+        uabw,uabe,ele,elw,tbe,tbw,sbe,sbw,tbn,tbs,sbn,sbs, ...
+        dx_3d,dy_3d,cor_3d, ...
+        h_3d,art_3d,aru_3d,arv_3d, ...
+        fsm_3d,dum_3d,dvm_3d,dt_3d] = new_seamount(e_atmos,aam);
+   
 elseif(iproblem == 2)
    [dx,dy,cor,...
         east_c,north_c,east_e,north_e,east_u,north_u,east_v,north_v,...
@@ -360,7 +361,10 @@ else
     return
 end
 
-save('xyz.mat','dx','dy','dz','art','aru','arv');
+save('grid.mat','im','jm','kb','imm1','imm2','jmm1','jmm2','kbm1','kbm2','kl1','kl2',...
+                'z','zz','dz','dzz','z_3d','zz_3d','dz_3d','dzz_3d',...
+                'dx','dy','dz','art','aru','arv','art','aru','arv','fsm','dum','dvm',...
+                'dx_3d','dy_3d','art_3d','aru_3d','arv_3d','art_3d','aru_3d','arv_3d','fsm_3d','dum_3d','dvm_3d');
 
 %     Inertial period for temporal filter:
 period=(2.0*pi)/abs(cor(floor(im/2),floor(jm/2)))/86400.0;
@@ -382,26 +386,26 @@ d=h + el;
 dt=h + et;
 w(:,:,1)=vfluxf;
 
-for k=1:kb
-    l(:,:,k)    = 0.1*dt(:,:);
-    q2b(:,:,k)  = small;
-    q2lb(:,:,k) = l(:,:,k).*q2b(:,:,k);
-    kh(:,:,k)   = l(:,:,k).*sqrt(q2b(:,:,k));
-    km(:,:,k)   = kh(:,:,k);
-    kq(:,:,k)   = kh(:,:,k);
-    aam(:,:,k)  = aam_init;
-end
+d_3d=repmat(d,1,1,kb);
+dt_3d=repmat(dt,1,1,kb);
 
-for k=1:kbm1
-    q2(:,:,k) =q2b(:,:,k);
-    q2l(:,:,k)=q2lb(:,:,k);
-    t(:,:,k)  =tb(:,:,k);
-    s(:,:,k)  =sb(:,:,k);
-    u(:,:,k)  =ub(:,:,k);
-    v(:,:,k)  =vb(:,:,k);
-end
 
-[rho]=new_dens(s,t,h);
+l           = 0.1*dt_3d;
+q2b(:,:,:)  = small;
+q2lb        = l.*q2b;
+kh          = l.*sqrt(q2b);
+km          = kh;
+kq          = kh;
+aam(:,:,:)= aam_init;
+
+q2 =q2b;
+q2l=q2lb;
+t  =tb;
+s  =sb;
+u  =ub;
+v  =vb;
+
+[rho]=new_dens(s,t,h_3d,fsm_3d);
 
 [rho,drhox,drhoy] = new_baropg(rho, rmean, dt, ramp);
 

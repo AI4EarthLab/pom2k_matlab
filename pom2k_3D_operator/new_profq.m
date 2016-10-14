@@ -48,7 +48,7 @@
 %      real utau2, df0,df1,df2 
  %     equivalence (prod,kn)
 %
-load('grid.mat');load('operator.mat');load('para.mat');load('depth.mat');
+load('grid.mat');load('operator.mat');load('para.mat');
 
 sm=zeros(im,jm,kb);
 sh=zeros(im,jm,kb);

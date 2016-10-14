@@ -1,5 +1,5 @@
 function [uf] = advu(advx,cor,dt,e_atmos,drhox,h,ub,uf,u,v,w,egf,egb,etf,etb)
-load('grid.mat');load('depth.mat');load('para.mat');load('operator.mat');load('xyz.mat');load('masks.mat');
+load('grid.mat');load('para.mat');load('operator.mat');
 uf=zeros(im,jm,kb);
 %
 for j=1:jm
