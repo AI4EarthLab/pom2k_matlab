@@ -97,7 +97,7 @@ isplit=30;
 %     and time as required:
 time_start='2000-01-01 00:00:00 +00:00';
 
-days=0.025;       % run duration in days
+days=1.025;       % run duration in days
 
 prtd1=0.0125;     % Initial print interval (days)
 
@@ -201,7 +201,6 @@ smoth=0.100;
 %     value, alpha=.2250 permits a longer time step):
 alpha=0.2250;
 
-
 %     Initial value of aam:
 aam_init=500.0;
 
@@ -247,7 +246,7 @@ uab=zeros(im,jm)     ;uaf=zeros(im,jm)     ;utb=zeros(im,jm)     ;utf=zeros(im,j
 va=zeros(im,jm)      ;vab=zeros(im,jm)     ;vaf=zeros(im,jm)     ;
 vtb=zeros(im,jm)     ;vtf=zeros(im,jm)     ;wssurf=zeros(im,jm)  ;wtsurf=zeros(im,jm)  ;
 wubot=zeros(im,jm)   ;wusurf=zeros(im,jm)  ;wvbot=zeros(im,jm)   ;wvsurf=zeros(im,jm)  ;
-wubot1=zeros(im,jm)  ;wvbot1=zeros(im,jm)   ;
+wubot1=zeros(im,jm)  ;wvbot1=zeros(im,jm)  ;
 
 aam=zeros(im,jm,kb)  ;advx=zeros(im,jm,kb) ;advy=zeros(im,jm,kb) ;a=zeros(im,jm,kb)    ;
 c=zeros(im,jm,kb)    ;drhox=zeros(im,jm,kb);drhoy=zeros(im,jm,kb);dtef=zeros(im,jm,kb) ;
