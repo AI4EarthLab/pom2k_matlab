@@ -6,28 +6,28 @@ function  [curv2d,wubot,wvbot,advua,advva] = new_advave(curv2d,wubot,wvbot,mode,
 % **********************************************************************
 load('grid.mat');
 
-
-tps = zeros(im,jm);
-tps = AYB1_XY(AXB1_XY(d)) .* AXB1_XY(AYB1_XY(aam2d)) .* ( DYB1_XY(uab)...
-     .*DIVISION( 1.0,AYB1_XY(AXB1_XY(dy)) ) + DXB1_XY(vab) .* DIVISION( 1.0,AYB1_XY(AXB1_XY(dx)) ) );
-
 advua = zeros(im,jm);
-advva=zeros(im,jm);
-advua = DXB2_XY(( AXF1_XY(AXB1_XY(d).*ua) .* AXF2_XY(ua)-2.0*d .* aam2d .* DXF2_XY(uab)./dx ) .* dy ) ...
-        +DYF2_XY( ( AXB1_XY(AYB1_XY(d).*va) .* AYB1_XY(ua)-tps ) .* AYB1_XY(AXB1_XY(dx)) );
-advva = DXF2_XY( ( AYB1_XY(AXB1_XY(d).*ua) .* AXB1_XY(va)-tps ) .* AYB1_XY(AXB1_XY(dy)) )...
-        +DYB2_XY( ( AYF1_XY(AYB1_XY(d).*va) .* AYF1_XY(va) - 2.0*d .* aam2d .* DYF2_XY(vab)./dy ) .* dx );
+advva = zeros(im,jm);
+tps = zeros(im,jm);
+
+tps = AYB1(AXB1(d)) .* AXB1(AYB1(aam2d)) ...
+       .*  ( DYB1(uab) .*DIVISION( 1.0,AYB1(AXB1(dy)) ) + DXB1(vab) .* DIVISION( 1.0,AYB1(AXB1(dx)) ) );
+
+advua = DXB2(( AXF1(AXB1(d).*ua) .* AXF2(ua)-2.0*d .* aam2d .* DXF2(uab)./dx ) .* dy ) ...
+        +DYF2( ( AXB1(AYB1(d).*va) .* AYB1(ua)-tps ) .* AYB1(AXB1(dx)) );
+advva = DXF2( ( AYB1(AXB1(d).*ua) .* AXB1(va)-tps ) .* AYB1(AXB1(dy)) )...
+        +DYB2( ( AYF1(AYB1(d).*va) .* AYF1(va) - 2.0*d .* aam2d .* DYF2(vab)./dy ) .* dx );
 
 %%%%%%%%%%%%%%%%%%% 
 %wubot = zeros(im,jm);
 %wvbot = zeros(im,jm);
 
 if(mode==2)
-    wubot = -AXB2_XY(cbc) .* sqrt( uab.^2+AXB2_XY(AYF2_XY(vab)).^2 ) .* uab;
-    wvbot = -AYB2_XY(cbc) .* sqrt( vab.^2+AYB2_XY(AXF2_XY(uab)).^2 ) .* vab;
-    curv2d = (AYF2_XY(va) .* DXC_XY(dy) - AXF2_XY(ua) .* DYC_XY(dx))./(dx.*dy);
-    advua = advua-aru .* AXB2_XY( curv2d .* d .* AYF2_XY(va) );  
-    advva = advva+arv .* AYB2_XY( curv2d .* d .* AXF2_XY(ua) );
+    wubot = -AXB2(cbc) .* sqrt( uab.^2+AXB2(AYF2(vab)).^2 ) .* uab;
+    wvbot = -AYB2(cbc) .* sqrt( vab.^2+AYB2(AXF2(uab)).^2 ) .* vab;
+    curv2d = (AYF2(va) .* DXC(dy) - AXF2(ua) .* DYC(dx))./(dx.*dy);
+    advua = advua-aru  .* AXB2( curv2d .* d .* AYF2(va) );  
+    advva = advva+arv  .* AYB2( curv2d .* d .* AXF2(ua) );
 end
 
 return 

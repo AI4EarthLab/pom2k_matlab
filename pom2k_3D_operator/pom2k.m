@@ -314,7 +314,7 @@ save('operator.mat',...
 'OP_DYF2_YZ', 'OP_DYB2_YZ', 'OP_DZF2_YZ', 'OP_DZB2_YZ', ...
 'OP_L_XY',    'OP_L_XZ',   'OP_L_YZ', ...                  
 'OP_R_XY',    'OP_R_XZ',   'OP_R_YZ', ...                  
-'OP_SUMZ1', 'OP_SUMZ2');
+'OP_SUMZ1',   'OP_SUMZ2');
 
                 
 if(iproblem == 1)
@@ -407,13 +407,13 @@ v  =vb;
 
 [rho]=new_dens(s,t,h_3d,fsm_3d);
 
+%[rho,drhox,drhoy] =baropg(rho,drhox,drhoy,im,jm,imm1,jmm1,kb,kbm1,grav,zz,dt,dum,dvm,ramp,rmean,dx,dy);                       
 [rho,drhox,drhoy] = new_baropg(rho, rmean, dt, ramp);
 
 for k=1:kbm1
     drx2d=drx2d+drhox(:,:,k)*dz(k);
     dry2d=dry2d+drhoy(:,:,k)*dz(k);
 end
-
 
 %     Calculate bottom friction coefficient:
 cbc=(kappa./log((1.0+zz(kbm1))*h/z0b)).^2;
@@ -430,11 +430,13 @@ d = h+el;
 dt = h+et;
 time = time0;
 
+d_3d=repmat(d,1,1,kb);
+dt_3d=repmat(dt,1,1,kb);
+
 %==========================================
 %           begin internal (3-D) mode
 %==========================================
-
-for  iint=1:iend
+for iint=1:iend
     time=dti*iint*1.0/86400.0+time0;
     if(lramp~=0)
         ramp = time/period;
@@ -444,12 +446,10 @@ for  iint=1:iend
     else
         ramp=1.0;
     end
-    %
+
     %       write(6,2) mode,iint,time
     %   2   format(' mode,iint,time =',2i5,f9.2)
-    %
     %-----------------------------------------------------------------------
-    %
     %     Set time dependent, surface and lateral boundary conditions.
     %     The latter will be used in subroutine bcond. Users may
     %     wish to create a subroutine to supply wusurf, wvsurf, wtsurf,
@@ -530,28 +530,22 @@ for  iint=1:iend
 
     if(mode~=2)
 % % %  [advx,advy]=advct(u,v,dx,dy,dt,aam,ub,vb,aru,arv,im,jm,kb,imm1,jmm1,kbm1);
-       [advx,advy]=new_advct(u,v,dt,aam,ub,vb);        
-% 
-% %         [rho,drhox,drhoy] = baropg(rho,drhox,drhoy,...
+        [advx,advy]=new_advct(u,v,dt_3d,aam,ub,vb);        
+% % %         [rho,drhox,drhoy] = baropg(rho,drhox,drhoy,...
 % % %             im,jm,imm1,jmm1,kb,kbm1,grav,...
 % % %             zz,dt,dum,dvm,ramp,rmean,dx,dy);   
         [rho,drhox,drhoy] = new_baropg(rho, rmean, dt, ramp);   
-
-        
-        for k=1:kbm1
-            aam(:,:,k)=horcon.*dx(:,:).*dy(:,:)...
-                .*sqrt( (DXF2_XY(u(:,:,k))./dx).^2 + (DYF2_XY(v(:,:,k))./dy).^2    ...
-                +0.5*( DYB2_XY(AYF1_XY(AXF1_XY(u(:,:,k))))./dy + DXB2_XY(AXF1_XY(AYF1_XY(v(:,:,k))))./dx).^2 );
-        end    
+     
+        aam=horcon .* dx_3d .* dy_3d .*sqrt( (DXF2(u)./dx_3d).^2 + (DYF2(v)./dy_3d).^2    ...
+                +0.5*( DYB2(AYF1(AXF1(u)))./dy_3d + DXB2(AXF1(AYF1(v)))./dx_3d).^2 );
         aam(:,1,:)=aam_init;
         aam(:,jm,:)=aam_init;
         aam(1,:,:)=aam_init;
         aam(im,:,:)=aam_init;
-        
-        %
+        aam(:,:,kb)=aam_init;
+
         %     Form vertical averages of 3-D fields for use in external (2-D)
         %     mode:
-        %
         
         adx2d=zeros(im,jm);
         ady2d=zeros(im,jm);
@@ -578,8 +572,8 @@ for  iint=1:iend
     
     egf=el*ispi;
     
-    utf=ua .* 2.0 .* AXB1_XY(d) .* isp2i;
-    vtf=va .* 2.0 .* AYB1_XY(d) .* isp2i;
+    utf=ua .* 2.0 .* AXB1(d) .* isp2i;
+    vtf=va .* 2.0 .* AYB1(d) .* isp2i;
     
     %----------------------------------------------------------------------    
     for iext=1:isplit    % Begin external (2-D) mode        
@@ -587,8 +581,7 @@ for  iint=1:iend
         %     NOTE addition of surface freshwater flux, w(i,j,1)=vflux, compared
         %     with pom98.f. See also modifications to subroutine vertvl.
         %   
-        elf= elb+dte2 .* (-(DXF2_XY( AXB1_XY(d) .* AXB1_XY(dy) .* ua ) ...
-                             + DYF2_XY(AYB1_XY(d) .* AYB1_XY(dx) .* va)) ./ art -vfluxf);  
+        elf= elb+dte2.*(-(DXF2( AXB1(d).*AXB1(dy).*ua)+DYF2(AYB1(d).*AYB1(dx).*va))./ art-vfluxf);  
         
         [elf,uaf,vaf,uf,vf,w] = bcond(1,elf,uaf,vaf,uf,vf,w,...
             im,jm,kb,imm1,jmm1,kbm1,...
@@ -596,25 +589,23 @@ for  iint=1:iend
             dum,dvm,hmax,u,v,t,s,tbn,sbn,dti,tbs,sbs,q2,q2l,small,vabn,dx,dy,dt,tbe,sbe,tbw,sbw,zz);
         
         if(mod(iext,ispadv)==0)
-            [tps2,advua,advva,fluxua,fluxva,wubot,wvbot,tps] = advave(tps,advua,advva,fluxua,fluxva,wubot,wvbot,tps,...
-                mode,im,jm,imm1,jmm1,aam2d,...
-                uab,vab,dx,dy,ua,va,cbc,aru,arv,d);
-           % [tps,wubot,wvbot,advua,advva] = new_advave(tps,wubot,wvbot,mode,aam2d,uab,vab,ua,va,cbc,d);
-
-          
+% % %             [tps2,advua,advva,fluxua,fluxva,wubot,wvbot,tps0] = advave(tps,advua,advva,fluxua,fluxva,wubot,wvbot,tps,...
+% % %                 mode,im,jm,imm1,jmm1,aam2d,...
+% % %                 uab,vab,dx,dy,ua,va,cbc,aru,arv,d);
+            [tps,wubot,wvbot,advua,advva] = new_advave(tps,wubot,wvbot,mode,aam2d,uab,vab,ua,va,cbc,d); 
         end
     
-        uaf=   DIVISION( (2.0*AXB1_XY(h+elb) .* aru .* uab ...
-               -4.0* dte .* (adx2d + advua - aru .* AXB1_XY(cor .* d .* AYF1_XY(va)) ...
-               + grav .* AXB1_XY(dy) .* AXB1_XY(d)  ...
-                 .*( (1.0-2.0*alpha) .* DXB2_XY(el) + alpha* (DXB2_XY(elb)+ DXB2_XY(elf)) + DXB2_XY(e_atmos) ) ...
-               + drx2d + aru .* (wusurf-wubot))) , (2.0*AXB1_XY(h+elf) .* aru));      
+        uaf=   DIVISION( (2.0*AXB1(h+elb) .* aru .* uab ...
+               -4.0* dte .* (adx2d + advua - aru .* AXB1(cor .* d .* AYF1(va)) ...
+               + grav .* AXB1(dy) .* AXB1(d)  ...
+                 .*( (1.0-2.0*alpha) .* DXB2(el) + alpha* (DXB2(elb)+ DXB2(elf)) + DXB2(e_atmos) ) ...
+               + drx2d + aru .* (wusurf-wubot))) , (2.0*AXB1(h+elf) .* aru));      
                
-        vaf=   DIVISION( (2.0*AYB1_XY(h+elb) .* arv .* vab ...
-               -4.0* dte .* (ady2d + advva + arv .* AYB1_XY(cor .* d .* AXF1_XY(ua)) ...
-               + grav .* AYB1_XY(dx) .* AYB1_XY(d)  ...
-                 .*( (1.0-2.0*alpha) .* DYB2_XY(el) + alpha* (DYB2_XY(elb)+ DYB2_XY(elf)) + DYB2_XY(e_atmos) ) ...
-               + dry2d + arv .* (wvsurf-wvbot))) , (2.0*AYB1_XY(h+elf) .* arv));  
+        vaf=   DIVISION( (2.0*AYB1(h+elb) .* arv .* vab ...
+               -4.0* dte .* (ady2d + advva + arv .* AYB1(cor .* d .* AXF1(ua)) ...
+               + grav .* AYB1(dx) .* AYB1(d)  ...
+                 .*( (1.0-2.0*alpha) .* DYB2(el) + alpha* (DYB2(elb)+ DYB2(elf)) + DYB2(e_atmos) ) ...
+               + dry2d + arv .* (wvsurf-wvbot))) , (2.0*AYB1(h+elf) .* arv));  
 
         [elf,uaf,vaf,uf,vf,w] = bcond(2,elf,uaf,vaf,uf,vf,w,...
             im,jm,kb,imm1,jmm1,kbm1,...
@@ -629,10 +620,10 @@ for  iint=1:iend
             etf=(etf+0.5*elf).*fsm;
         end
          
-        % Stop if velocity condition violated (generally due to %FL
+        % Stop if velocity condition violated (generally due to CFL
         % criterion not being satisfied):   
         vamax=0.0;
-        %
+        
         for j=1:jm
             for i=1:im
                 if(abs(vaf(i,j))>=vamax)
@@ -660,8 +651,8 @@ for  iint=1:iend
             
             if(iext~=isplit)
                 egf=egf+el*ispi;
-                utf=utf+2.0* ua .* AXB1_XY(d) * isp2i;
-                vtf=vtf+2.0* va .* AYB1_XY(d) * isp2i;
+                utf=utf+2.0* ua .* AXB1(d) * isp2i;
+                vtf=vtf+2.0* va .* AYB1(d) * isp2i;
             end
         end
     end
@@ -682,11 +673,11 @@ for  iint=1:iend
             for k=1:kbm1
                 tps=tps+u(:,:,k)*dz(k);
             end
-  
+            
             for k=1:kbm1
                 u(:,:,k)=(u(:,:,k)-tps)+   DIVISION((utb+utf), 2.0*AXB1_XY(dt));
             end
-
+            
             tps =zeros(im,jm);
             for k=1:kbm1
                 tps=tps+v(:,:,k)*dz(k);
@@ -699,7 +690,8 @@ for  iint=1:iend
             %     vertvl calculates w from u, v, dt (h+et), etf and etb:
             %
             
-            %[a,c,w]=vertvl(a,c,w,dx,dy,dz,dt,u,v,vfluxb,vfluxf,etf,etb,dti2,im,jm,imm1,jmm1,kbm1);     
+            %[a,c,w]=vertvl(a,c,w,dx,dy,dz,dt,u,v,vfluxb,vfluxf,etf,etb,dti2,im,jm,imm1,jmm1,kbm1);  
+
             [a,c,w]=new_vertvl(w,dt,u,v,vfluxb,vfluxf,etf,etb,dti2);
             
             [elf,uaf,vaf,uf,vf,w] = bcond(5,elf,uaf,vaf,uf,vf,w,...
@@ -713,39 +705,18 @@ for  iint=1:iend
             % calculate q2f and q2lf using uf, vf, a and c as temporary variables:
            % [q2b,q2,uf,a,c]=advq(q2b,q2,uf,a,c,...
            %     dt,dx,dy,dz,u,v,w,aam,h,dum,dvm,art,etb,etf,im,jm,imm1,jmm1,kbm1,dti2);
-           uf=new_advq(q2b,q2,dt,u,v,w,aam,h,dum,dvm,art,etb,etf,dti2);    
+           uf=new_advq(q2b,q2,dt,u,v,w,aam,h,etb,etf,dti2);    
            % [q2lb,q2l,vf,a,c]=advq(q2lb,q2l,vf,a,c,...
            %     dt,dx,dy,dz,u,v,w,aam,h,dum,dvm,art,etb,etf,im,jm,imm1,jmm1,kbm1,dti2);
-           vf=new_advq(q2lb,q2l,dt,u,v,w,aam,h,dum,dvm,art,etb,etf,dti2);  
-
-
+           vf=new_advq(q2lb,q2l,dt,u,v,w,aam,h,etb,etf,dti2);  
+          
             [a,c,tps,dtef,...
                 ee,gg,l,kq,km,kh,...
-                uf,vf,q2b,q2lb,a,c]=profq(a,c,tps,dtef,....
+                uf,vf,q2b,q2lb,a,c]=new_profq(a,c,tps,dtef,....
                 ee,gg,l,kq,km,kh,...
                 uf,vf,q2,q2b,q2lb,a,c,...
                 h,etf,dti2,umol,dzz,grav,rho,kappa,u,v,dt,small,fsm,im,jm,kb,imm1,jmm1,kbm1,tbias,sbias,dz,...
                 wusurf,wubot,wvsurf,wvbot,t,s,rhoref,zz,z);
-            
-% % %             [a0,c0,tps0,dtef0,...
-% % %                 ee0,gg0,l0,kq0,km0,kh0,...
-% % %                 uf0,vf0,q2b0,q2lb0,a0,c0]=profq(a,c,tps,dtef,....
-% % %                 ee,gg,l,kq,km,kh,...
-% % %                 uf,vf,q2,q2b,q2lb,a,c,...
-% % %                 h,etf,dti2,umol,dzz,grav,rho,kappa,u,v,dt,small,fsm,im,jm,kb,imm1,jmm1,kbm1,tbias,sbias,dz,...
-% % %                 wusurf,wubot,wvsurf,wvbot,t,s,rhoref,zz,z);
- 
-% % %             [a,c,tps,dtef,...
-% % %                 ee,gg,l,kq,km,kh,...
-% % %                 uf,vf,q2b,q2lb,a,c]=bk_new_profq(a,c,tps,dtef,....
-% % %                 ee,gg,l,kq,km,kh,...
-% % %                 uf,vf,q2,q2b,q2lb,a,c,...
-% % %                 h,etf,dti2,umol,dzz,grav,rho,kappa,u,v,dt,small,fsm,im,jm,kb,imm1,jmm1,kbm1,tbias,sbias,dz,...
-% % %                 wusurf,wubot,wvsurf,wvbot,t,s,rhoref,zz,z);
-% % % %             
-% % % %            [kq1,km1,kh1,uf1,vf1,q2b1,q2lb1]=new_profq(ee,gg,l,kq,km,kh,uf,vf,q2,q2b,q2lb,...
-% % % %                                        h,etf,dzz,rho,u,v,dt,fsm,wusurf,wubot,wvsurf,wvbot,t,s);
-
             
             [elf,uaf,vaf,uf,vf,w] = bcond(6,elf,uaf,vaf,uf,vf,w,...
                 im,jm,kb,imm1,jmm1,kbm1,...
@@ -988,15 +959,10 @@ for  iint=1:iend
     end
     %
     %     End of print section
-    %
     %-----------------------------------------------------------------------
     %
     %  End of internal (3-D) mode
-    %
-    %-----------------------------------------------------------------------
-    %
-    
-    
+    %-----------------------------------------------------------------------  
 end
 %internal loop ended
 %write(6,4) time,iint,iext,iprint
@@ -1019,14 +985,9 @@ ko(5)=kb;
 %
 %     Save this data for a seamless restart:
 %
-
 %    write_to_file(im,jm,kb,time,wubot,wvbot,aam2d,ua,uab,va,vab,el,elb,et,etb,egb,...
 %    utb,vtb,u,ub,w,v,vb,t,tb,s,sb,rho,adx2d,ady2d,advua,advva,...
 %    km,kh,kq,l,q2,q2b,aam,q2l,q2lb);
-
     printall(im,jm,imm1,jmm1,iskp,jskp,uab,vab,elb,d,dx,dy,time,u,v,w,t,s,rho,aam,km,kb,mode,dt,zz,z);
     
-%
-%
-%
 %     End of main program
