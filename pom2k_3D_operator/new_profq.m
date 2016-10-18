@@ -68,9 +68,6 @@ q2lb=abs(q2lb);
 boygr=-grav*DZB1(rho).*DIVISION( 1.0,(dzz2_3d.*h_3d) );
 % *** NOTE: comment out next line if dens fores not include pressure     ... 
      +(grav^2)./AZB1(cc.^2); 
- 
-
-%
 
 l=abs(q2lb./q2b);
 l0_3d=repmat(l0,1,1,kb);
@@ -148,7 +145,6 @@ idx=find(uf<=small | vf<=small);
 uf(idx)=small;
 vf(idx)=0.1*dt_3d(idx)*small;
   
-%
 % % %-----------------------------------------------------------------------
 %
 %     The following section solves for km and kh:
