@@ -36,7 +36,8 @@ for k=2:kbm2
 end
 %
 tps = AXB2_XY(cbc) .* sqrt( ub(:,:,kbm1).^2 + AXB2_XY( AYF1_XY( vb(:,:,kbm1) ) ).^2 );
-uf(:,:,kbm1) = (c(:,:,kbm1).* gg(:,:,kbm2)-uf(:,:,kbm1))./(tps*dti2./(-dz(kbm1)*dh)-1.e0-(ee(:,:,kbm2)-1.e0).*c(:,:,kbm1)).*dum;
+uf(:,:,kbm1) = (c(:,:,kbm1).* gg(:,:,kbm2)-uf(:,:,kbm1))  ...
+               ./(tps*dti2./(-dz(kbm1)*dh)-1.e0-(ee(:,:,kbm2)-1.e0).*c(:,:,kbm1)).*dum;
 %
 for k=2:kbm1
     ki=kb-k;
@@ -44,3 +45,5 @@ for k=2:kbm1
 end
 %
 wubot=-tps.*uf(:,:,kbm1);
+
+return
