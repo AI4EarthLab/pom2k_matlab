@@ -15,6 +15,7 @@ function [a,c,ee,gg,tps,uf,wubot] = profu(a,c,ee,gg,tps,uf,wubot,...
 % *                speed.                                              *
 % *                                                                    *
 % **********************************************************************
+load('grid.mat');load('operator.mat');load('para.mat');
 dh = AXB1_XY(h+etf);dh(1,:)=1.e0;dh(:,1)=1.e0;
 bond1=c(1,:,:);bond2=c(:,1,:);
 c = AXB1(km);
