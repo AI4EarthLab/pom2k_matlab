@@ -16,6 +16,7 @@ function [a,c,ee,gg,tps,vf,wvbot] = profv(a,c,ee,gg,tps,vf,wvbot,...
 % *                speed.                                              *
 % *                                                                    *
 % **********************************************************************
+load('grid.mat');load('operator.mat');load('para.mat');
 dh = AYB1_XY(h+etf);dh(1,:)=1.e0;dh(:,1)=1.e0;
 bond1=c(1,:,:);bond2=c(:,1,:);
 c = AYB1(km);
