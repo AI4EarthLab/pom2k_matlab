@@ -97,7 +97,7 @@ isplit=30;
 %     and time as required:
 time_start='2000-01-01 00:00:00 +00:00';
 
-days=1.025;       % run duration in days
+days=0.025;       % run duration in days
 
 prtd1=0.0125;     % Initial print interval (days)
 
@@ -734,16 +734,16 @@ for iint=1:iend
             %
             if(mode~=4)
                 %
-                if(nadv==1)
+                if(nadv==1)    
+% % %                     [tb,t,tclim,uf,a,c,zflux]=advt1(tb,t,tclim,uf,a,c,...
+% % %                         zflux,dt,u,v,aam,tprni,...
+% % %                         dum,dvm,w,art,etb,etf,dti2,dx,dy,dz,h,im,jm,kb,imm1,jmm1,kbm1);
+                    uf=new_advt1(tb,t,dt,u,v,aam,tprni,w,etb,etf,h);
                     
-                    [tb,t,tclim,uf,a,c,zflux]=advt1(tb,t,tclim,uf,a,c,...
-                        zflux,dt,u,v,aam,tprni,...
-                        dum,dvm,w,art,etb,etf,dti2,dx,dy,dz,h,im,jm,kb,imm1,jmm1,kbm1);
-                    
-                    [sb,s,sclim,vf,a,c,zflux]=advt1(sb,s,sclim,vf,a,c,...
-                        zflux,dt,u,v,aam,tprni,...
-                        dum,dvm,w,art,etb,etf,dti2,dx,dy,dz,h,im,jm,kb,imm1,jmm1,kbm1);
-                    
+% % %                     [sb,s,sclim,vf,a,c,zflux]=advt1(sb,s,sclim,vf,a,c,...
+% % %                         zflux,dt,u,v,aam,tprni,...
+% % %                         dum,dvm,w,art,etb,etf,dti2,dx,dy,dz,h,im,jm,kb,imm1,jmm1,kbm1);
+                    vf=new_advt1(sb,s,dt,u,v,aam,tprni,w,etb,etf,h);
                 elseif(nadv==2)
                     %
                    

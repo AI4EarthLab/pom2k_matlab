@@ -94,5 +94,4 @@ for k=1:kbm1
 end
 return 
 end
-%
-% *                                                                    *
+
