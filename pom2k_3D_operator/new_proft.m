@@ -2,7 +2,6 @@ function [f,wfsurf,fsurf,nbc,dh,...
          a,c,ee,gg] = proft(f,wfsurf,fsurf,nbc,dh,...
                             a,c,ee,gg,...
                             h,etf,dti2,dz,dzz,swrad,ntp,im,jm,kb,kbm1,kbm2,kh,umol)
-
 % **********************************************************************
 % *                                                                    *
 % * FUN%TION    :  Solves for vertical diffusion of temperature and    *
@@ -35,7 +34,6 @@ ee = zeros(im,jm,kb);gg = zeros(im,jm,kb);
 tmp1 = zeros(im,jm,kb);tmp2 = zeros(im,jm,kb);rad=zeros(im,jm,kb);
 dh = h + etf;
 dh_3d=repmat(dh,1,1,kb);swrad_3d=repmat(swrad,1,1,kb);
-
 
 for k=2:kbm1
     tmp1(:,:,k)=dzz(k-1)*dz(k);
@@ -81,3 +79,4 @@ for k=2:kbm1
     ki=kb-k;
     f(:,:,ki)=(ee(:,:,ki).*f(:,:,ki+1)+gg(:,:,ki));
 end
+return
