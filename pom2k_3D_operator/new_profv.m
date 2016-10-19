@@ -17,8 +17,9 @@ function [a,c,ee,gg,tps,vf,wvbot] = profv(a,c,ee,gg,tps,vf,wvbot,...
 % *                                                                    *
 % **********************************************************************
 load('grid.mat'); load('operator.mat'); load('para.mat');
-tps=zeros(im,jm); a=zeros(im,jm,kb);
-ee=zeros(im,jm,kb); gg=zeros(im,jm,kb);
+a=zeros(im,jm,kb);
+ee=zeros(im,jm,kb); 
+gg=zeros(im,jm,kb);
 dh = AYB1_XY(h+etf); dh(1,:)=1.e0; dh(:,1)=1.e0;
 c = AYB1(km); c(1,:,:)=0.e0;
 
