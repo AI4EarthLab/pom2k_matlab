@@ -1,5 +1,6 @@
 function [a,c,ee,gg,tps,uf,wubot] = profu(a,c,ee,gg,tps,uf,wubot,...
                                     etf,h,km,dti2,umol,dz,dzz,wusurf,cbc,dum,im,jm,kb,imm1,jmm1,kbm1,kbm2,ub,vb)
+
 % **********************************************************************
 % *                                                                    *
 % * FUN%TION    :  Solves for vertical diffusion of x-momentum using   *
@@ -17,14 +18,12 @@ function [a,c,ee,gg,tps,uf,wubot] = profu(a,c,ee,gg,tps,uf,wubot,...
 % **********************************************************************
 load('grid.mat');load('operator.mat');load('para.mat');
 dh = AXB1_XY(h+etf);dh(1,:)=1.e0;dh(:,1)=1.e0;
-bond1=c(1,:,:);bond2=c(:,1,:);
+a=zeros(im,jm,kb);ee=zeros(im,jm,kb);gg=zeros(im,jm,kb);
 c = AXB1(km);
-c(1,:,:)=bond1;c(:,1,:)=bond2;
-
 %
 for k=2:kbm1
-    a(:,:,k-1)=-dti2*(c(:,:,k)+umol)./(dz(k-1)*dzz(k-1)*dh.^2);
-    c(:,:,k)=-dti2*(c(:,:,k)+umol)./(dz(k)*dzz(k-1)*dh.^2);
+    a(:,:,k-1) = DIVISION( -dti2*(c(:,:,k)+umol),(dz(k-1)*dzz(k-1)*dh.^2) );
+    c(:,:,k) = DIVISION( -dti2*(c(:,:,k)+umol),(dz(k)*dzz(k-1)*dh.^2) );
 end
 %
 ee(:,:,1)=a(:,:,1) ./ (a(:,:,1)-1.e0);
@@ -37,7 +36,7 @@ for k=2:kbm2
 end
 %
 tps = AXB2_XY(cbc) .* sqrt( ub(:,:,kbm1).^2 + AXB2_XY( AYF1_XY( vb(:,:,kbm1) ) ).^2 );
-uf(:,:,kbm1) = (c(:,:,kbm1).* gg(:,:,kbm2)-uf(:,:,kbm1))  ...
+uf(:,:,kbm1) = (c(:,:,kbm1).* gg(:,:,kbm2)-uf(:,:,kbm1))...
                ./(tps*dti2./(-dz(kbm1)*dh)-1.e0-(ee(:,:,kbm2)-1.e0).*c(:,:,kbm1)).*dum;
 %
 for k=2:kbm1
@@ -48,3 +47,4 @@ end
 wubot=-tps.*uf(:,:,kbm1);
 
 return
+
