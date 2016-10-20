@@ -66,7 +66,7 @@ ad2=[0.23,20.0,17.0,14.0,7.90];
 %
 %       dti2*(kh*f')'-f=-fb
 %
-
+load('grid.mat');load('operator.mat');load('para.mat');
 dh = h+etf;
 rad=zeros(im,jm,kb);
 %

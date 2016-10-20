@@ -733,20 +733,10 @@ for iint=1:iend
             %      calculate tf and sf using uf, vf, a and c as temporary variables:
             %
             if(mode~=4)
-                %
                 if(nadv==1)    
-% % %                     [tb,t,tclim,uf,a,c,zflux]=advt1(tb,t,tclim,uf,a,c,...
-% % %                         zflux,dt,u,v,aam,tprni,...
-% % %                         dum,dvm,w,art,etb,etf,dti2,dx,dy,dz,h,im,jm,kb,imm1,jmm1,kbm1);
                     uf=new_advt1(tb,t,dt,u,v,aam,tprni,w,etb,etf,h);
-                    
-% % %                     [sb,s,sclim,vf,a,c,zflux]=advt1(sb,s,sclim,vf,a,c,...
-% % %                         zflux,dt,u,v,aam,tprni,...
-% % %                         dum,dvm,w,art,etb,etf,dti2,dx,dy,dz,h,im,jm,kb,imm1,jmm1,kbm1);
                     vf=new_advt1(sb,s,dt,u,v,aam,tprni,w,etb,etf,h);
-                elseif(nadv==2)
-                    %
-                   
+                elseif(nadv==2)                  
                     [tb,t,tclim,uf,a,c,nitera,sw,...
                      zflux] = advt2(tb,t,tclim,uf,a,c,nitera,sw,...
                                                  zflux,...
@@ -759,58 +749,30 @@ for iint=1:iend
                                                  etb,etf,w,art,fsm,dt,aam,tprni,h,dum,dvm,dx,dy,u,v,aru,arv,dz,dzz);      
                     %
                 else
-                    %
-                    
                     disp 'Invalid value for nadv ..... '
                     disp 'program terminated'
                     
                     return
-                    %
                 end
-                %
+
+                [uf] = new_proft(uf,wtsurf,tsurf,nbct,h,etf,swrad,kh)
+                [vf] = new_proft(vf,wssurf,ssurf,nbcs,h,etf,swrad,kh);
                 
-                [uf,wtsurf,tsurf,nbct,tps,...
-                    a,c,ee,gg] = proft(uf,wtsurf,tsurf,nbct,tps,...
-                    a,c,ee,gg,...
-                    h,etf,dti2,dz,dzz,swrad,ntp,im,jm,kb,kbm1,kbm2,kh,umol);
-                
-                %
-                [vf,wssurf,ssurf,nbcs,tps,...
-                    a,c,ee,gg] = proft(vf,wssurf,ssurf,nbcs,tps,...
-                    a,c,ee,gg,...
-                    h,etf,dti2,dz,dzz,swrad,ntp,im,jm,kb,kbm1,kbm2,kh,umol);
-                %
                 [elf,uaf,vaf,uf,vf,w] = bcond(4,elf,uaf,vaf,uf,vf,w,...
                     im,jm,kb,imm1,jmm1,kbm1,...
                     fsm,grav,ramp,rfe,h,uabe,ele,el,uabw,rfw,elw,rfn,eln,vabs,rfs,els,...
                     dum,dvm,hmax,u,v,t,s,tbn,sbn,dti,tbs,sbs,q2,q2l,small,vabn,dx,dy,dt,tbe,sbe,tbw,sbw,zz);
-                for k=1:kb
-                    for j=1:jm
-                        for i=1:im
-                            t(i,j,k)=t(i,j,k)     ...
-                                +.5e0*smoth*(uf(i,j,k)+tb(i,j,k)     ...
-                                -2.e0*t(i,j,k));
-                            s(i,j,k)=s(i,j,k)     ...
-                                +.5e0*smoth*(vf(i,j,k)+sb(i,j,k)     ...
-                                -2.e0*s(i,j,k));
-                            tb(i,j,k)=t(i,j,k);
-                            t(i,j,k)=uf(i,j,k);
-                            sb(i,j,k)=s(i,j,k);
-                            s(i,j,k)=vf(i,j,k);
-                        end
-                    end
-                end
-                %
-                %
-                %
-                [rho]=dens(s,t,rho,...
-                    im,jm,kbm1,tbias,sbias,grav,rhoref,zz,h,fsm);
-                
-                %
+                               
+                t=t+.5e0*smoth*(uf+tb-2.e0*t);
+                s=s+.5e0*smoth*(vf+sb-2.e0*s);
+                tb=t;
+                t=uf;
+                sb=s;
+                s=vf;
+
+                [rho]=new_dens(s,t,h_3d,fsm_3d);
             end  % end if
-            %
-            %     calculate uf and vf:
-            %
+            % calculate uf and vf:
             [uf] = advu(advx,aru,dz,cor,dt,e_atmos,dy,drhox,h,dti2,ub,uf,u,v,w,im,jm,kb,imm1,jmm1,kbm1,grav,egf,egb,etf,etb);
             [vf] = advv(advy,arv,dz,cor,dt,e_atmos,dx,drhoy,h,dti2,vb,vf,u,v,w,im,jm,kb,imm1,jmm1,kbm1,grav,egf,egb,etf,etb);
             [a,c,ee,gg,tps,uf,wubot] = profu(a,c,ee,gg,tps,uf,wubot,...
