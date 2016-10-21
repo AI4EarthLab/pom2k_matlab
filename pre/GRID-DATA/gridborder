@@ -1,0 +1,37 @@
+C
+C*********************************************************
+C                                          'gridborder' 
+C
+C---- Selected boundary points. The values I=100 or J= 10     ----
+C---- are scaled to I=IM or J=JM respectively.                ----
+C---- LINE1: set model resolution                             ----
+C---- LINE2: X (longitude) of boundary points                 ----
+C---- LINE3: Y (latitude)  of boundary points                 ----
+C
+C--------------- points on north boundary ------------------------
+      NT=2
+      DATA ITOP(1),ITOP(2)/  1,         100/
+      DATA TOPX(1),TOPX(2)/-75.5,      -70.5/
+      DATA TOPY(1),TOPY(2)/ 39.5,       39.5/
+C
+C--------------- points on south boundary ------------------------
+      NB=2
+      DATA IBOT(1),IBOT(2)/  1,         100/
+      DATA BOTX(1),BOTX(2)/-77.5,      -71.5/
+      DATA BOTY(1),BOTY(2)/ 31.5,       31.5/
+C
+C--------------- points on west boundary -------------------------
+      NL=4
+      DATA JLFT(1),JLFT(2),JLFT(3),JLFT(4)/  1,   30,   50,   100/ 
+      DATA LFTX(1),LFTX(2),LFTX(3),LFTX(4)/-77.5,-77.5,-76.5,-75.5/
+      DATA LFTY(1),LFTY(2),LFTY(3),LFTY(4)/ 31.5, 34.0, 36.0, 39.5/   
+C
+C--------------- points on east boundary -------------------------
+      NR=2
+      DATA JRHT(1),JRHT(2)/  1,         100/
+      DATA RHTX(1),RHTX(2)/-71.5,      -70.5/
+      DATA RHTY(1),RHTY(2)/ 31.5,       39.5/
+C
+      RHTX(NR)=TOPX(NT)
+      RHTY(NR)=TOPY(NT)
+C*********************************************************

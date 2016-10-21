@@ -1,0 +1,23 @@
+
+-----------------------------------------
+ ETOPO5 data extracted from NGDC web
+-----------------------------------------
+Area: 
+              40 North latitude
+                       |
+ 79 West longitude    - -     70 West longitude
+                       |
+              31 North latitude
+
+Data format:  Datavalues in whole Meters
+              (- = below sea level)
+
+Delimiter: tab
+
+Grid size: 109 x 109 matrix of 5-minute grid values beginning
+           at NorthWest corner progressing Eastward for 109
+           values, then stepping 5 minutes South for the next
+           row, ending at SouthEast corner.
+
+Note: Negative latitudes are South.
+      Negative longitudes are West.

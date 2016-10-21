@@ -1,0 +1,84 @@
+                                POMVIZ PACKAGE
+
+                        List of Matlab/netCDF functions
+
+              (To be used to process netCDF files output by pom2k)
+
+The full POMVIZ package is provided in either the "zip" file pomviz.zip or
+the "tar" file pomviz.tar.
+
+The package requires Charles Denham's netCDF Toolbox for Matlab-5/6, available 
+from:
+
+  http://crusty.er.usgs.gov/~cdenham/MexCDF/nc4ml5.html#DOWNLOADING
+
+                             ---------------------
+
+% isection:        returns a vertical section of a 3-D variable along
+%                  i=iindex from a *.nc file from pom2k
+
+% jsection:        returns a vertical section of a 3-D variable along
+%                  j=jindex from a *.nc file from pom2k
+
+% ksection:        returns a "horizontal" section of a 2-D or 3-D variable 
+%                  along k=kindex from a *.nc file from pom2k
+
+% ksectionvel:     returns a "horizontal" section of horizontal velocity
+%                  vectors along k=kindex from a *.nc file from pom2k
+
+% horiz_section:   returns a horizontal section of a 3-D variable at
+%                  height, height, from a *.nc file from pom2k
+
+% horiz_sectionvel:returns a horizontal section of horizontal velocity
+%                  vectors at height, height, from a *.nc file from pom2k
+
+% psection:        plots a section (an extended version of pcolor)
+
+% psectionvel:     plots a horizontal velocity section using arrows
+
+% profvel:         computes a velocity profile at cell (i,j) from a 
+%                  *.nc file from pom2k
+
+% pprofvel:        plots one velocity profile
+
+% arrows:          draws arrows
+
+% getpageprofvel:  gets and plots a page of velocity profiles
+
+% getplot_isection: gets and plots a vertical section of a 3-D variable 
+%                  along i=iindex from a *.nc file from pom2k
+
+% getplot_jsection: gets and plots a vertical section of a 3-D variable 
+%                  along j=jindex from a *.nc file from pom2k
+
+% getplot_ksection: gets and plots a "horizontal" section of a 2-D or 3-D
+%                  variable at height, height, from a *.nc file from pom2k
+
+% getplot_ksectionvel: gets and plots a "horizontal" section of a 2-D or
+%                  3-D variable, and the horizontal velocity, along k=kindex 
+%                  from a *.nc file from pom2k
+
+% getplot_horiz_section: gets and plots a horizontal section of a 3-D
+%                  variable at height, height, from a *.nc file from pom2k
+
+% getplot_horiz_sectionvel: gets and plots a horizontal section of a 3-D
+%                  variable, and the horizontal velocity, at height, height, 
+%                  from a *.nc file from pom2k
+
+% getplot_profvel: gets and plots a velocity profile at cell (i,j) from a 
+%                  *.nc file from pom2k
+
+% getplot_profloc: gets and plots locations of cells for velocity profiles
+
+% get_point:       returns the value of a 2-D or 3-D variable 
+%                  at a given point from a *.nc file from pom2k
+
+% plotall:         general plotting program, which assembles a set of POMVIZ
+%                  functions
+
+
+John Hunter,
+Antarctic CRC,
+University of Tasmania 
+
+21/01/2002
