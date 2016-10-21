@@ -1,6 +1,4 @@
-function [a,c,ee,gg,tps,vf,wvbot] = profv(a,c,ee,gg,tps,vf,wvbot,...
-                                          dvm,dz,dzz,im,jm,kb,imm1,jmm1,kbm1,kbm2,...
-                                          km,cbc,ub,vb,umol,wvsurf,h,etf,dti2)                                            
+function [vf,wvbot] = new_profv(vf,etf,h,km,wvsurf,cbc,ub,vb)
 % **********************************************************************
 %                                                                      *
 % * FUNCTION    :  Solves for vertical diffusion of y-momentum using   *

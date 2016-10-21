@@ -1,11 +1,9 @@
-function [uf] = advu(advx,cor,dt,e_atmos,drhox,h,ub,uf,u,v,w,egf,egb,etf,etb)
+function [uf] = new_advu(advx,cor,dt,e_atmos,drhox,h,ub,u,v,w,egf,egb,etf,etb)
 load('grid.mat');load('para.mat');load('operator.mat');
 
 h_3d = repmat(h,1,1,kb); 
 dt_3d = repmat(dt,1,1,kb); 
-dy_3d = repmat(dy,1,1,kb);
 etb_3d = repmat(etb,1,1,kb);
-aru_3d = repmat(aru,1,1,kb); 
 cor_3d = repmat(cor,1,1,kb);
 egf_3d = repmat(egf,1,1,kb);
 egb_3d = repmat(egb,1,1,kb); 

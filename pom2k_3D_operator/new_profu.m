@@ -1,5 +1,4 @@
-function [a,c,ee,gg,tps,uf,wubot] = profu(a,c,ee,gg,tps,uf,wubot,...
-                                    etf,h,km,dti2,umol,dz,dzz,wusurf,cbc,dum,im,jm,kb,imm1,jmm1,kbm1,kbm2,ub,vb)
+function [uf,wubot] = new_profu(uf,etf,h,km,wusurf,cbc,ub,vb)
 
 % **********************************************************************
 % *                                                                    *
@@ -35,7 +34,7 @@ for k=2:kbm2
     gg(:,:,k)=(c(:,:,k).*gg(:,:,k-1)-uf(:,:,k)).*gg(:,:,k);
 end
 %
-tps = AXB2_XY(cbc) .* sqrt( ub(:,:,kbm1).^2 + AXB2_XY( AYF1_XY( vb(:,:,kbm1) ) ).^2 );
+tps = AXB2(cbc) .* sqrt( ub(:,:,kbm1).^2 + AXB2( AYF1( vb(:,:,kbm1) ) ).^2 );
 uf(:,:,kbm1) = (c(:,:,kbm1).* gg(:,:,kbm2)-uf(:,:,kbm1))...
                ./(tps*dti2./(-dz(kbm1)*dh)-1.e0-(ee(:,:,kbm2)-1.e0).*c(:,:,kbm1)).*dum;
 %

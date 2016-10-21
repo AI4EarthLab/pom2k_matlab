@@ -1,18 +1,8 @@
 clear all;
 
-im=7;
-jm=5;
-kb=6;
-% im=65;
-% jm=49;
-% kb=21;
-imm1=im-1;
-imm2=im-2;
-jmm1=jm-1;
-jmm2=jm-2;
-kbm1=kb-1;
-kbm2=kb-2;
-
+im=7; jm=5; kb=6;
+% im=65; jm=49; kb=21;
+imm1=im-1; imm2=im-2; jmm1=jm-1; jmm2=jm-2; kbm1=kb-1; kbm2=kb-2;
 
 alpha          =0.0;dte            =0.0;dti            =0.0;dti2           =0.0;
 grav           =0.0;hmax           =0.0;kappa          =0.0;pi             =0.0;
@@ -773,23 +763,21 @@ for iint=1:iend
                 [rho]=new_dens(s,t,h_3d,fsm_3d);
             end  % end if
             % calculate uf and vf:
-            [uf] = advu(advx,aru,dz,cor,dt,e_atmos,dy,drhox,h,dti2,ub,uf,u,v,w,im,jm,kb,imm1,jmm1,kbm1,grav,egf,egb,etf,etb);
-            [vf] = advv(advy,arv,dz,cor,dt,e_atmos,dx,drhoy,h,dti2,vb,vf,u,v,w,im,jm,kb,imm1,jmm1,kbm1,grav,egf,egb,etf,etb);
-            [a,c,ee,gg,tps,uf,wubot] = profu(a,c,ee,gg,tps,uf,wubot,...
-                etf,h,km,dti2,umol,dz,dzz,wusurf,cbc,dum,im,jm,kb,imm1,jmm1,kbm1,kbm2,ub,vb);
+            uf = new_advu(advx,cor,dt,e_atmos,drhox,h,ub,u,v,w,egf,egb,etf,etb);
+            vf = new_advv(advy,cor,dt,e_atmos,drhoy,h,vb,u,v,w,egf,egb,etf,etb);
             
-            [a,c,ee,gg,tps,vf,wvbot] = profv(a,c,ee,gg,tps,vf,wvbot,...
-                dvm,dz,dzz,im,jm,kb,imm1,jmm1,kbm1,kbm2,...
-                km,cbc,ub,vb,umol,wvsurf,h,etf,dti2) ;
+            vf0=vf;
+            
+            [uf,wubot] = new_profu(uf,etf,h,km,wusurf,cbc,ub,vb);           
+            [vf,wvbot] = new_profv(vf,etf,h,km,wvsurf,cbc,ub,vb);
             
             [elf,uaf,vaf,uf,vf,w] = bcond(3,elf,uaf,vaf,uf,vf,w,...
                 im,jm,kb,imm1,jmm1,kbm1,...
                 fsm,grav,ramp,rfe,h,uabe,ele,el,uabw,rfw,elw,rfn,eln,vabs,rfs,els,...
                 dum,dvm,hmax,u,v,t,s,tbn,sbn,dti,tbs,sbs,q2,q2l,small,vabn,dx,dy,dt,tbe,sbe,tbw,sbw,zz);
-            %
             
             tps = zeros(im,jm);
-            %
+
             for k=1:kbm1
                 for j=1:jm
                     for i=1:im
