@@ -18,7 +18,7 @@ load('grid.mat'); load('operator.mat'); load('para.mat');
 a=zeros(im,jm,kb);
 ee=zeros(im,jm,kb); 
 gg=zeros(im,jm,kb);
-dh = AYB1_XY(h+etf); dh(1,:)=1.e0; dh(:,1)=1.e0;
+dh = AYB1(h+etf); dh(1,:)=1.e0; dh(:,1)=1.e0;
 c = AYB1(km); c(1,:,:)=0.e0;
 
 %
@@ -36,7 +36,7 @@ for k=2:kbm2
     gg(:,:,k) = (c(:,:,k) .* gg(:,:,k-1)-vf(:,:,k)) .* gg(:,:,k);
 end
 %
-tps = AYB2_XY(cbc) .* sqrt( AYB2_XY( AXF1_XY( ub(:,:,kbm1) ) ).^2 + vb(:,:,kbm1).^2 );
+tps = AYB2(cbc) .* sqrt( AYB2( AXF1( ub(:,:,kbm1) ) ).^2 + vb(:,:,kbm1).^2 );
 tps(1,:) = 0.e0;
 vf(:,:,kbm1) = (c(:,:,kbm1) .* gg(:,:,kbm2) - vf(:,:,kbm1))  ...
                ./(tps * dti2./(-dz(kbm1) * dh)-1.e0 - (ee(:,:,kbm2)-1.e0) .* c(:,:,kbm1)) .* dvm;

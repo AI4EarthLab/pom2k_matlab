@@ -110,7 +110,7 @@ l(:,:,1)=kappa*l0; l(:,:,kb)=0;
 gh(:,:,1)=0      ; gh(:,:,kb)=0;
 
 %    Calculate production of turbulent kinetic energy:
-kn= DIVISION(km.*sef.*(AXF2(DZB2(u)).^2 + AYF2(DZB2(v)).^2) , (tmp.*dh_3d).^2) -shiw.*km.*boygr + kh.*boygr
+kn= DIVISION(km.*sef.*(AXF2(DZB2(u)).^2 + AYF2(DZB2(v)).^2) , (tmp.*dh_3d).^2) -shiw.*km.*boygr + kh.*boygr;
 %
 %  NOTE: Richardson # dep. dissipation correction (Mellor: 2001; Ezer, 2000),
 %  depends on ghc the critical number (empirical -6 to -2) to increase mixing.

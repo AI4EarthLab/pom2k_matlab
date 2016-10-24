@@ -16,7 +16,7 @@ function [uf,wubot] = new_profu(uf,etf,h,km,wusurf,cbc,ub,vb)
 % *                                                                    *
 % **********************************************************************
 load('grid.mat');load('operator.mat');load('para.mat');
-dh = AXB1_XY(h+etf);dh(1,:)=1.e0;dh(:,1)=1.e0;
+dh = AXB1(h+etf);dh(1,:)=1.e0;dh(:,1)=1.e0;
 a=zeros(im,jm,kb);ee=zeros(im,jm,kb);gg=zeros(im,jm,kb);
 c = AXB1(km);
 %

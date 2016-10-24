@@ -2,14 +2,10 @@ function [OP_AXF1_XY, OP_AXB1_XY, OP_AYF1_XY, OP_AYB1_XY, ...
           OP_AXF2_XY, OP_AXB2_XY, OP_AYF2_XY, OP_AYB2_XY, ...        
           OP_AXF1_XZ, OP_AXB1_XZ, OP_AZF1_XZ, OP_AZB1_XZ, ...
           OP_AXF2_XZ, OP_AXB2_XZ, OP_AZF2_XZ, OP_AZB2_XZ, ...
-          OP_AYF1_YZ, OP_AYB1_YZ, OP_AZF1_YZ, OP_AZB1_YZ, ...
-          OP_AYF2_YZ, OP_AYB2_YZ, OP_AZF2_YZ, OP_AZB2_YZ, ...
           OP_DXF1_XY, OP_DXB1_XY, OP_DYF1_XY, OP_DYB1_XY, ...
           OP_DXF2_XY, OP_DXB2_XY, OP_DYF2_XY, OP_DYB2_XY, ...
           OP_DXF1_XZ, OP_DXB1_XZ, OP_DZF1_XZ, OP_DZB1_XZ, ...
           OP_DXF2_XZ, OP_DXB2_XZ, OP_DZF2_XZ, OP_DZB2_XZ, ...
-          OP_DYF1_YZ, OP_DYB1_YZ, OP_DZF1_YZ, OP_DZB1_YZ, ...
-          OP_DYF2_YZ, OP_DYB2_YZ, OP_DZF2_YZ, OP_DZB2_YZ, ...
           OP_L_XY,   OP_L_XZ,   OP_L_YZ, ...
           OP_R_XY,   OP_R_XZ,   OP_R_YZ, ...
           OP_SUMZ1, OP_SUMZ2] = new_operator(m,n,k)
@@ -180,41 +176,6 @@ R2= zeros(k,k); R2(2:k-1, 2:k-1) = eye(k-2);
 OP_AZB2_XZ = 0.5*(R1+R2);
 
 
-%%%%%%%%%%%%%%%%%%%%%%%% A operator in YZ plate %%%%%%%%%%%%%%%%%%
-L1= zeros(n,n); L1(1:n-1, 1:n-1) = eye(n-1); 
-L2= zeros(n,n); L2(1:n-1, 2:n  ) = eye(n-1);
-OP_AYF1_YZ=0.5*(L1+L2);
-
-L1= zeros(n,n); L1(2:n, 1:n-1) = eye(n-1);
-L2= zeros(n,n); L2(2:n, 2:n  ) = eye(n-1);
-OP_AYB1_YZ=0.5*(L1+L2);
-
-R1= zeros(k,k); R1(1:k-1, 1:k-1) = eye(k-1);
-R2= zeros(k,k); R2(2:k  , 1:k-1) = eye(k-1);
-OP_AZF1_YZ = 0.5*(R1+R2);
-
-R1= zeros(k,k); R1(1:k-1, 2:k) = eye(k-1);
-R2= zeros(k,k); R2(2:k  , 2:k) = eye(k-1);
-OP_AZB1_YZ = 0.5*(R1+R2);
-
-L1= zeros(n,n); L1(2:n-1, 2:n-1) = eye(n-2);
-L2= zeros(n,n); L2(2:n-1, 3:n  ) = eye(n-2);
-OP_AYF2_YZ=0.5*(L1+L2);
-
-
-L1= zeros(n,n); L1(2:n-1, 1:n-2) = eye(n-2);
-L2= zeros(n,n); L2(2:n-1, 2:n-1) = eye(n-2);
-OP_AYB2_YZ=0.5*(L1+L2);
-
-R1= zeros(k,k); R1(2:k-1, 2:k-1) = eye(k-2);
-R2= zeros(k,k); R2(3:k  , 2:k-1) = eye(k-2);
-OP_AZF2_YZ = 0.5*(R1+R2);
-
-
-R1= zeros(k,k); R1(1:k-2, 2:k-1) = eye(k-2);
-R2= zeros(k,k); R2(2:k-1 ,2:k-1) = eye(k-2);
-OP_AZB2_YZ = 0.5*(R1+R2);
-
 
 %%%%%%%%%%%%%%%%%%%%%%%% D operator in XY plate %%%%%%%%%%%%%%%%%%
 % OP_DXF1_XY=[ -1  1  0  0  0  0  0]    OP_DXF1_XY*X =[ X21-X11  X22-X12   X23-X13   X24-X14   X25-X15 ]
@@ -342,40 +303,6 @@ R1= zeros(k,k); R1(1:k-2, 2:k-1) = -eye(k-2);
 R2= zeros(k,k); R2(2:k-1, 2:k-1) =  eye(k-2);
 OP_DZB2_XZ= R1+R2;
 
-
-
-%%%%%%%%%%%%%%%%%%%%%%%% D operator in YZ plate %%%%%%%%%%%%%%%%%%
-L1= zeros(n,n); L1(1:n-1, 1:n-1) = -eye(n-1);
-L2= zeros(n,n); L2(1:n-1, 2:n  ) =  eye(n-1);
-OP_DYF1_YZ= L1+L2;
-
-L1= zeros(n,n); L1(2:n, 1:n-1) = -eye(n-1);
-L2= zeros(n,n); L2(2:n, 2:n  ) =  eye(n-1);
-OP_DYB1_YZ= L1+L2;
-
-R1= zeros(k,k); R1(1:k-1, 1:k-1) = -eye(k-1);
-R2= zeros(k,k); R2(2:k  , 1:k-1) =  eye(k-1);
-OP_DZF1_YZ= R1+R2;
-
-R1= zeros(k,k); R1(1:k-1, 2:k) = -eye(k-1);
-R2= zeros(k,k); R2(2:k  , 2:k) =  eye(k-1);
-OP_DZB1_YZ= R1+R2;
-
-L1= zeros(n,n); L1(2:n-1, 2:n-1) = -eye(n-2);
-L2= zeros(n,n); L2(2:n-1, 3:n  ) =  eye(n-2);
-OP_DYF2_YZ= L1+L2;
-
-L1= zeros(n,n); L1(2:n-1, 1:n-2) = -eye(n-2);
-L2= zeros(n,n); L2(2:n-1, 2:n-1) =  eye(n-2);
-OP_DYB2_YZ= L1+L2;
-
-R1= zeros(k,k); R1(2:k-1, 2:k-1) = -eye(k-2);
-R2= zeros(k,k); R2(3:k  , 2:k-1) =  eye(k-2);
-OP_DZF2_YZ= R1+R2;
-
-R1= zeros(k,k); R1(1:k-2, 2:k-1) = -eye(k-2);
-R2= zeros(k,k); R2(2:k-1, 2:k-1) =  eye(k-2);
-OP_DZB2_YZ= R1+R2;
 
 %%%%%%%%%%%%%%%%%%%%%%%% OP_L and OP_R operator %%%%%%%%%%%%%%%%%%
 L=eye(m,m); L(1,1)=0;L(m,m)=0;
