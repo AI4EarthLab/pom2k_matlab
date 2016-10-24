@@ -71,12 +71,10 @@ nread=0;
 %     External (2-D) time step (secs.) according to CFL:
 dte=6.0;
 
-%     <Internal (3-D) time step>/<External (2-D) time step>
-%     (dti/dte; dimensionless):
+%     <Internal (3-D) time step>/<External (2-D) time step> (dti/dte; dimensionless):
 isplit=30;
 
-%     Date and time of start of initial run of model in format (i.e.
-%     UDUNITS convention)
+%     Date and time of start of initial run of model in format (i.e. UDUNITS convention)
 %
 %       YYYY-MM-DD HH:MM:SS <+/->HH:MM
 %
@@ -106,8 +104,7 @@ jskp=3;             % Printout skip interval in j
 lramp=false;
 
 
-%     Reference density (recommended values: 1025 for seawater,
-%     1000 for freswater; S.I. units):
+%     Reference density (recommended values: 1025 for seawater, 1000 for freswater; S.I. units):
 rhoref=1025.0;
 
 tbias=0.0;         % Temperature bias (deg. C)
@@ -126,22 +123,18 @@ cbcmax=1.0;        % Maximum bottom friction coeff.
 
 horcon=0.20;       % Smagorinsky diffusivity coeff.
 
-%     Inverse horizontal turbulent Prandtl number
-%     (ah/am; dimensionless):
+%     Inverse horizontal turbulent Prandtl number (ah/am; dimensionless):
 %
 %     NOTE that tprni=0.0 yields zero horizontal diffusivity!
 tprni=.20;
 
-%     Background viscosity used in subroutines profq, proft, profu and
-%     profv (S.I. units):
+%     Background viscosity used in subroutines profq, proft, profu and profv (S.I. units):
 umol=2.e-5;
 
-%     Maximum depth used in radiation boundary condition in subroutine
-%     bcond (metres):
+%     Maximum depth used in radiation boundary condition in subroutine bcond (metres):
 hmax=4500.0;
 
-%     Maximum magnitude of vaf (used in check that essentially tests
-%     for CFL violation):
+%     Maximum magnitude of vaf (used in check that essentially tests for CFL violation):
 vmaxl=100.0;
 
 %     Maximum allowable value of:
