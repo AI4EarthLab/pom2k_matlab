@@ -16,9 +16,9 @@ function [uf,wubot] = new_profu(uf,etf,h,km,wusurf,cbc,ub,vb)
 % *                                                                    *
 % **********************************************************************
 load('grid.mat');load('operator.mat');load('para.mat');
-dh = AXB1(h+etf);dh(1,:)=1.e0;dh(:,1)=1.e0;
+dh = AXB(h+etf);dh(1,:)=1.e0;dh(:,1)=1.e0;
 a=zeros(im,jm,kb);ee=zeros(im,jm,kb);gg=zeros(im,jm,kb);
-c = AXB1(km);
+c = AXB(km);
 %
 for k=2:kbm1
     a(:,:,k-1) = DIVISION( -dti2*(c(:,:,k)+umol),(dz(k-1)*dzz(k-1)*dh.^2) );
@@ -34,7 +34,7 @@ for k=2:kbm2
     gg(:,:,k)=(c(:,:,k).*gg(:,:,k-1)-uf(:,:,k)).*gg(:,:,k);
 end
 %
-tps = AXB2(cbc) .* sqrt( ub(:,:,kbm1).^2 + AXB2( AYF1( vb(:,:,kbm1) ) ).^2 );
+tps = AXB(cbc) .* sqrt( ub(:,:,kbm1).^2 + AXB( AYF( vb(:,:,kbm1) ) ).^2 );
 uf(:,:,kbm1) = (c(:,:,kbm1).* gg(:,:,kbm2)-uf(:,:,kbm1))...
                ./(tps*dti2./(-dz(kbm1)*dh)-1.e0-(ee(:,:,kbm2)-1.e0).*c(:,:,kbm1)).*dum;
 %

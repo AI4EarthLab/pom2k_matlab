@@ -59,8 +59,8 @@ for k=2:kbm1
     tmp2(:,:,k)=dzz(k-1)*dz(k-1);
 end
 
-a= DIVISION(-dti2 .* (AZF1(kq)+umol) , (tmp1 .* dh_3d .* dh_3d));
-c= DIVISION(-dti2 .* (AZB1(kq)+umol) , (tmp2 .* dh_3d .* dh_3d));
+a= DIVISION(-dti2 .* (AZF(kq)+umol) , (tmp1 .* dh_3d .* dh_3d));
+c= DIVISION(-dti2 .* (AZB(kq)+umol) , (tmp2 .* dh_3d .* dh_3d));
 %-----------------------------------------------------------------------
 %     The following section solves the equation:
 %
@@ -77,13 +77,13 @@ gg(:,jm,1)=0; gg(im,:,1)=0;
 l0(:,jm)  =0; l0(im,:)=0;
 kn(:,:,:)=0;
       
-utau2 = sqrt( AXF1(wusurf).^2 +AYF1(wvsurf).^2 );
+utau2 = sqrt( AXF(wusurf).^2 +AYF(wvsurf).^2 );
 % Wave breaking energy- a variant of Craig & Banner (1994), see Mellor and Blumberg, 2003.
 ee(:,:,1)=zeros(im,jm);
 gg(:,:,1)=(15.8*cbcnst)^(2./3.)*utau2;
  % Surface length scale following Stacey (1999).
 l0 = surfl*utau2/grav;                     
-uf(:,:,kb) = sqrt( AXF1(wubot).^2 +AYF1(wvbot).^2 ) .* const1;
+uf(:,:,kb) = sqrt( AXF(wubot).^2 +AYF(wvbot).^2 ) .* const1;
         
 %    Calculate speed of sound squared:
 h_3d=repmat(h,1,1,kb);      
@@ -99,7 +99,7 @@ tmp = zeros(im,jm,kb);
 for k=2:kbm1
     tmp(:,:,k)=dzz(k-1);
 end
-boygr=DIVISION(-grav* DZB1(rho) , tmp .* h_3d ) + DIVISION(grav^2 , AZB2(cc.^2));
+boygr=DIVISION(-grav* DZB(rho) , tmp .* h_3d ) + DIVISION(grav^2 , AZB(cc.^2));
 
 l=q2lb ./ q2b;
 l=max(l, repmat(kappa*l0,1,1,kb));
@@ -110,7 +110,7 @@ l(:,:,1)=kappa*l0; l(:,:,kb)=0;
 gh(:,:,1)=0      ; gh(:,:,kb)=0;
 
 %    Calculate production of turbulent kinetic energy:
-kn= DIVISION(km.*sef.*(AXF2(DZB2(u)).^2 + AYF2(DZB2(v)).^2) , (tmp.*dh_3d).^2) -shiw.*km.*boygr + kh.*boygr;
+kn= DIVISION(km.*sef.*(AXF(DZB(u)).^2 + AYF(DZB(v)).^2) , (tmp.*dh_3d).^2) -shiw.*km.*boygr + kh.*boygr;
 %
 %  NOTE: Richardson # dep. dissipation correction (Mellor: 2001; Ezer, 2000),
 %  depends on ghc the critical number (empirical -6 to -2) to increase mixing.

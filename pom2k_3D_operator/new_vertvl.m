@@ -10,13 +10,13 @@ dt_3d=repmat(dt,1,1,kb);
 w = zeros(im,jm,kb);
 w(:,:,1)=0.5*(vfluxb+vfluxf);
 %     Reestablish boundary conditions:      
-xflux = AXB1(dy_3d) .* AXB1(dt_3d) .* u; 
-yflux = AYB1(dx_3d) .* AYB1(dt_3d) .* v;
+xflux = AXB(dy_3d) .* AXB(dt_3d) .* u; 
+yflux = AYB(dx_3d) .* AYB(dt_3d) .* v;
 % NOTE that, if one wishes to include freshwater flux, the
 % surface velocity should be set to vflux(i,j). See also
 % change made to 2-D volume conservation equation which
 % calculates elf.
 tps=OP_L_XZ*(etf-etb)/dti2;
 tps=repmat(tps,1,1,kb);
-w=SUM2(w+dz_3d .* ( ( DXF2(xflux)+DYF2(yflux) )./(dx_3d.*dy_3d)+ tps));
+w=SUM2(w+dz_3d .* ( ( DXF(xflux)+DYF(yflux) )./(dx_3d.*dy_3d)+ tps));
 end

@@ -1,9 +1,9 @@
-function F=AXF1(X)
+function F=AYB(X)
 load('operator.mat');
 [mx,ny,kz]=size(X);
 F=zeros(mx,ny,kz);
 for k=1:kz
-    F(:,:,k)=OP_AXF1_XY*X(:,:,k);
+    F(:,:,k)=X(:,:,k)*OP_AYB1_XY;
 end
 
 end

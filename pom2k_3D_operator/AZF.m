@@ -1,4 +1,4 @@
-function F=AZF2(X)
+function F=AZF(X)
 load('operator.mat');
 [mx,ny,kz]=size(X);
 F=zeros(mx,ny,kz);

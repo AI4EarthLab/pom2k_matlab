@@ -519,8 +519,8 @@ for iint=1:iend
 % % %             zz,dt,dum,dvm,ramp,rmean,dx,dy);   
         [rho,drhox,drhoy] = new_baropg(rho, rmean, dt, ramp);   
      
-        aam=horcon .* dx_3d .* dy_3d .*sqrt( (DXF2(u)./dx_3d).^2 + (DYF2(v)./dy_3d).^2    ...
-                +0.5*( DYB2(AYF1(AXF1(u)))./dy_3d + DXB2(AXF1(AYF1(v)))./dx_3d).^2 );
+        aam=horcon .* dx_3d .* dy_3d .*sqrt( (DXF(u)./dx_3d).^2 + (DYF(v)./dy_3d).^2    ...
+                +0.5*( DYB(AYF(AXF(u)))./dy_3d + DXB(AXF(AYF(v)))./dx_3d).^2 );
         aam(:,1,:)=aam_init;
         aam(:,jm,:)=aam_init;
         aam(1,:,:)=aam_init;
@@ -555,8 +555,8 @@ for iint=1:iend
     
     egf=el*ispi;
     
-    utf=ua .* 2.0 .* AXB1(d) .* isp2i;
-    vtf=va .* 2.0 .* AYB1(d) .* isp2i;
+    utf=ua .* 2.0 .* AXB(d) .* isp2i;
+    vtf=va .* 2.0 .* AYB(d) .* isp2i;
     
     %----------------------------------------------------------------------    
     for iext=1:isplit    % Begin external (2-D) mode        
@@ -564,7 +564,7 @@ for iint=1:iend
         %     NOTE addition of surface freshwater flux, w(i,j,1)=vflux, compared
         %     with pom98.f. See also modifications to subroutine vertvl.
         %   
-        elf= elb+dte2.*(-(DXF2( AXB1(d).*AXB1(dy).*ua)+DYF2(AYB1(d).*AYB1(dx).*va))./ art-vfluxf);  
+        elf= elb+dte2.*(-(DXF( AXB(d).*AXB(dy).*ua)+DYF(AYB(d).*AYB(dx).*va))./ art-vfluxf);  
         
         [elf,uaf,vaf,uf,vf,w] = bcond(1,elf,uaf,vaf,uf,vf,w,...
             im,jm,kb,imm1,jmm1,kbm1,...
@@ -578,17 +578,17 @@ for iint=1:iend
             [tps,wubot,wvbot,advua,advva] = new_advave(tps,wubot,wvbot,mode,aam2d,uab,vab,ua,va,cbc,d); 
         end
     
-        uaf=   DIVISION( (2.0*AXB1(h+elb) .* aru .* uab ...
-               -4.0* dte .* (adx2d + advua - aru .* AXB1(cor .* d .* AYF1(va)) ...
-               + grav .* AXB1(dy) .* AXB1(d)  ...
-                 .*( (1.0-2.0*alpha) .* DXB2(el) + alpha* (DXB2(elb)+ DXB2(elf)) + DXB2(e_atmos) ) ...
-               + drx2d + aru .* (wusurf-wubot))) , (2.0*AXB1(h+elf) .* aru));      
+        uaf=   DIVISION( (2.0*AXB(h+elb) .* aru .* uab ...
+               -4.0* dte .* (adx2d + advua - aru .* AXB(cor .* d .* AYF(va)) ...
+               + grav .* AXB(dy) .* AXB(d)  ...
+                 .*( (1.0-2.0*alpha) .* DXB(el) + alpha* (DXB(elb)+ DXB(elf)) + DXB(e_atmos) ) ...
+               + drx2d + aru .* (wusurf-wubot))) , (2.0*AXB(h+elf) .* aru));      
                
-        vaf=   DIVISION( (2.0*AYB1(h+elb) .* arv .* vab ...
-               -4.0* dte .* (ady2d + advva + arv .* AYB1(cor .* d .* AXF1(ua)) ...
-               + grav .* AYB1(dx) .* AYB1(d)  ...
-                 .*( (1.0-2.0*alpha) .* DYB2(el) + alpha* (DYB2(elb)+ DYB2(elf)) + DYB2(e_atmos) ) ...
-               + dry2d + arv .* (wvsurf-wvbot))) , (2.0*AYB1(h+elf) .* arv));  
+        vaf=   DIVISION( (2.0*AYB(h+elb) .* arv .* vab ...
+               -4.0* dte .* (ady2d + advva + arv .* AYB(cor .* d .* AXF(ua)) ...
+               + grav .* AYB(dx) .* AYB(d)  ...
+                 .*( (1.0-2.0*alpha) .* DYB(el) + alpha* (DYB(elb)+ DYB(elf)) + DYB(e_atmos) ) ...
+               + dry2d + arv .* (wvsurf-wvbot))) , (2.0*AYB(h+elf) .* arv));  
 
         [elf,uaf,vaf,uf,vf,w] = bcond(2,elf,uaf,vaf,uf,vf,w,...
             im,jm,kb,imm1,jmm1,kbm1,...
@@ -634,8 +634,8 @@ for iint=1:iend
             
             if(iext~=isplit)
                 egf=egf+el*ispi;
-                utf=utf+2.0* ua .* AXB1(d) * isp2i;
-                vtf=vtf+2.0* va .* AYB1(d) * isp2i;
+                utf=utf+2.0* ua .* AXB(d) * isp2i;
+                vtf=vtf+2.0* va .* AYB(d) * isp2i;
             end
         end
     end
@@ -658,7 +658,7 @@ for iint=1:iend
             end
             
             for k=1:kbm1
-                u(:,:,k)=(u(:,:,k)-tps)+   DIVISION((utb+utf), 2.0*AXB1(dt));
+                u(:,:,k)=(u(:,:,k)-tps)+   DIVISION((utb+utf), 2.0*AXB(dt));
             end
             
             tps =zeros(im,jm);
@@ -667,7 +667,7 @@ for iint=1:iend
             end
 
             for k=1:kbm1
-                v(:,:,k)=(v(:,:,k)-tps)+   DIVISION((vtb+vtf), 2.0*AYB1(dt));
+                v(:,:,k)=(v(:,:,k)-tps)+   DIVISION((vtb+vtf), 2.0*AYB(dt));
             end
             
             %     vertvl calculates w from u, v, dt (h+et), etf and etb:
