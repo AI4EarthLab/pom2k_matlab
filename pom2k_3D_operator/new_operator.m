@@ -1,6 +1,5 @@
-function [OP_AXF, OP_AXB, OP_AYF, OP_AYB,OP_AZF, OP_AZB, ...
-          OP_DXF1_XY, OP_DXB1_XY, OP_DYF1_XY, OP_DYB1_XY, ...
-          OP_DXF1_XZ, OP_DXB1_XZ, OP_DZF1_XZ, OP_DZB1_XZ, ...
+function [OP_AXF, OP_AXB, OP_AYF, OP_AYB, OP_AZF, OP_AZB, ...
+          OP_DXF, OP_DXB, OP_DYF, OP_DYB, OP_DZF, OP_DZB, ...
           OP_L_XY,   OP_L_XZ,   OP_L_YZ, ...
           OP_R_XY,   OP_R_XZ,   OP_R_YZ, ...
           OP_SUMZ1, OP_SUMZ2] = new_operator(m,n,k)
@@ -118,7 +117,7 @@ OP_AZB(1,1)=1;
 %            [  0  0  0  0  0  0  0]                  [       0        0         0         0         0 ]
 L1= zeros(m,m); L1(1:m-1, 1:m-1) = -eye(m-1);
 L2= zeros(m,m); L2(1:m-1, 2:m  ) =  eye(m-1);
-OP_DXF1_XY= L1+L2;
+OP_DXF= L1+L2;
 
 
 % OP_DXB1_XY=[  0  0  0  0  0  0  0]    OP_DXB1_XY*X =[       0        0         0         0         0 ]
@@ -130,7 +129,7 @@ OP_DXF1_XY= L1+L2;
 %            [  0  0  0  0  0 -1  1]                  [ X71-X61  X72-X62   X73-X63   X74-X64   X75-X65 ]
 L1= zeros(m,m); L1(2:m, 1:m-1) = -eye(m-1);
 L2= zeros(m,m); L2(2:m, 2:m  ) =  eye(m-1);
-OP_DXB1_XY= L1+L2;
+OP_DXB= L1+L2;
 
 % OP_DYF1_XY=[ -1  0  0  0  0 ]         Y*OP_DYF1_XY =[ Y12-Y11   Y13-Y12   Y14-Y13   Y15-Y14  0 ]
 %            [  1 -1  0  0  0 ]                       [ Y22-Y21   Y23-Y22   Y24-Y23   Y25-Y24  0 ]
@@ -141,7 +140,7 @@ OP_DXB1_XY= L1+L2;
 %                                                     [ Y22-Y21   Y73-Y72   Y74-Y73   Y75-Y74  0 ]
 R1= zeros(n,n); R1(1:n-1, 1:n-1) = -eye(n-1);
 R2= zeros(n,n); R2(2:n  , 1:n-1) =  eye(n-1);
-OP_DYF1_XY= R1+R2;
+OP_DYF= R1+R2;
 
 % OP_DYB1_XY=[  0 -1  0  0  0 ]         Y*OP_DYB1_XY =[ 0  Y12-Y11   Y13-Y12   Y14-Y13   Y15-Y14 ]
 %            [  0  1 -1  0  0 ]                       [ 0  Y22-Y21   Y23-Y22   Y24-Y23   Y15-Y14 ]
@@ -152,24 +151,15 @@ OP_DYF1_XY= R1+R2;
 %                                                     [ 0  Y72-Y71   Y73-Y72   Y74-Y73   Y75-Y74 ]
 R1= zeros(n,n); R1(1:n-1, 2:n) = -eye(n-1);
 R2= zeros(n,n); R2(2:n  , 2:n) =  eye(n-1);
-OP_DYB1_XY= R1+R2;
-
-%%%%%%%%%%%%%%%%%%%%%%%% D operator in XZ plate %%%%%%%%%%%%%%%%%%
-L1= zeros(m,m); L1(1:m-1, 1:m-1) = -eye(m-1);
-L2= zeros(m,m); L2(1:m-1, 2:m  ) =  eye(m-1);
-OP_DXF1_XZ= L1+L2;
-
-L1= zeros(m,m); L1(2:m, 1:m-1) = -eye(m-1);
-L2= zeros(m,m); L2(2:m, 2:m  ) =  eye(m-1);
-OP_DXB1_XZ= L1+L2;
+OP_DYB= R1+R2;
 
 R1= zeros(k,k); R1(1:k-1, 1:k-1) = -eye(k-1);
 R2= zeros(k,k); R2(2:k  , 1:k-1) =  eye(k-1);
-OP_DZF1_XZ= R1+R2;
+OP_DZF= R1+R2;
 
 R1= zeros(k,k); R1(1:k-1, 2:k ) = -eye(k-1);
 R2= zeros(k,k); R2(2:k  , 2:k ) =  eye(k-1);
-OP_DZB1_XZ= R1+R2;
+OP_DZB= R1+R2;
 
 %%%%%%%%%%%%%%%%%%%%%%%% OP_L and OP_R operator %%%%%%%%%%%%%%%%%%
 L=eye(m,m); L(1,1)=0;L(m,m)=0;

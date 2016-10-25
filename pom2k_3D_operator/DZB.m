@@ -5,7 +5,7 @@ F=zeros(mx,ny,kz);
 tmp=zeros(mx,kz);
 for j=1:ny
     tmp(:,:)=X(:,j,:);
-    F(:,j,:)=tmp*OP_DZB1_XZ;
+    F(:,j,:)=tmp*OP_DZB;
 end
 
 end
