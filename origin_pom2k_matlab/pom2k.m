@@ -2,7 +2,7 @@ clear all;
 
 im=7;
 jm=5;
-kb=5;
+kb=6;
 %im=65;
 %jm=49;
 %kb=21;
@@ -93,7 +93,7 @@ isplit=30;
 time_start='2000-01-01 00:00:00 +00:00';
 
 days=0.025;       % run duration in days
-
+days=10.25;
 prtd1=0.0125;     % Initial print interval (days)
 
 prtd2=1.0;         % Final print interval (days)
