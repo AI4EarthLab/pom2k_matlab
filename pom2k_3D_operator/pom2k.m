@@ -1,7 +1,7 @@
 clear all;
 
-im=7; jm=5; kb=6;
-% im=65; jm=49; kb=21;
+%im=7; jm=5; kb=6;
+ im=65; jm=49; kb=21;
 imm1=im-1; imm2=im-2; jmm1=jm-1; jmm2=jm-2; kbm1=kb-1; kbm2=kb-2;
 
 alpha          =0.0;dte            =0.0;dti            =0.0;dti2           =0.0;
@@ -253,8 +253,7 @@ d_3d=zeros(im,jm,kb) ;dt_3d=zeros(im,jm,kb);
 save('grid.mat','im','jm','kb','imm1','imm2','jmm1','jmm2','kbm1','kbm2','kl1','kl2');
 
 if(iproblem ~= 3)
-    [z,zz,dz,dzz]=depth();
-    [z_3d,zz_3d,dz_3d,dzz_3d]=new_depth();
+    [z,zz,dz,dzz,z_3d,zz_3d,dz_3d,dzz_3d]=new_depth();
 end
 
 [OP_AXF, OP_AXB, OP_AYF, OP_AYB, OP_AZF, OP_AZB, ...
@@ -654,9 +653,8 @@ for iint=1:iend
             %
             
             [a,c,w]=vertvl(a,c,w,dx,dy,dz,dt,u,v,vfluxb,vfluxf,etf,etb,dti2,im,jm,imm1,jmm1,kbm1);  
+            %[a0,c0,w0]=new_vertvl(a,c,w,dx,dy,dz,dt,u,v,vfluxb,vfluxf,etf,etb,dti2,im,jm,imm1,jmm1,kbm1);  
 
-            %[a,c,w]=new_vertvl(w,dt,u,v,vfluxb,vfluxf,etf,etb,dti2);
-            
             [elf,uaf,vaf,uf,vf,w] = bcond(5,elf,uaf,vaf,uf,vf,w,...
                 im,jm,kb,imm1,jmm1,kbm1,...
                 fsm,grav,ramp,rfe,h,uabe,ele,el,uabw,rfw,elw,rfn,eln,vabs,rfs,els,...

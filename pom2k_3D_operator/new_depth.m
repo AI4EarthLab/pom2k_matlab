@@ -1,4 +1,4 @@
-function [z_3d,zz_3d,dz_3d,dzz_3d]=new_depth()
+function [z,zz,dz,dzz,z_3d,zz_3d,dz_3d,dzz_3d]=new_depth()
 
 load('grid.mat');
 

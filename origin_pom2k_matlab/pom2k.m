@@ -1,11 +1,11 @@
 clear all;
 
-im=7;
-jm=5;
-kb=6;
-%im=65;
-%jm=49;
-%kb=21;
+% im=7;
+% jm=5;
+% kb=6;
+im=65;
+jm=49;
+kb=21;
 imm1=im-1;
 imm2=im-2;
 jmm1=jm-1;
