@@ -14,25 +14,7 @@ function [OP_AXF, OP_AXB, OP_AYF, OP_AYB, OP_AZF, OP_AZB, ...
 % OP_DXB_XY: get the x difference operator with backward method,delta_x f(i,j)=(f(i,j  )-f(i-1,j))/2
 % OP_DYF_XY: get the y difference operator with forward method, delta_y f(i,j)=(f(i,j+1)-f(i,  j))/2
 % OP_DYB_XY: get the y difference operator with backward method,delta_y f(i,j)=(f(i,j  )-f(i,j-1))/2
-%
-% OP_AXF_XZ: get the x average operator with forward method,    avg_f^x(i,k)=(f(i,k)+f(i+1,j))/2
-% OP_AXB_XZ: get the x average operator with backward method,   avg_f^x(i,k)=(f(i,k)+f(i-1,j))/2
-% OP_AYF_XZ: get the y average operator with forward method,    avg_f^y(i,k)=(f(i,k)+f(i,j+1))/2
-% OP_AYB_XZ: get the y average operator with backward method,   avg_f^y(i,k)=(f(i,k)+f(i,j-1))/2
-% OP_DXF_XZ: get the x difference operator with forward method, delta_x f(i,k)=(f(i+1,k)-f(i,  k))/2
-% OP_DXB_XZ: get the x difference operator with backward method,delta_x f(i,k)=(f(i,  k)-f(i-1,k))/2
-% OP_DYF_XZ: get the y difference operator with forward method, delta_y f(i,k)=(f(i,k+1)-f(i,  k))/2
-% OP_DYB_XZ: get the y difference operator with backward method,delta_y f(i,k)=(f(i,k  )-f(i,k-1))/2
-%
-% OP_AXF_XY: get the x average operator with forward method,    avg_f^x(j,k)=(f(j,k)+f(j+1,k))/2
-% OP_AXB_XY: get the x average operator with backward method,   avg_f^x(j,k)=(f(j,k)+f(j-1,k))/2
-% OP_AYF_XY: get the y average operator with forward method,    avg_f^y(j,k)=(f(j,k)+f(j,k+1))/2
-% OP_AYB_XY: get the y average operator with backward method,   avg_f^y(j,k)=(f(j,k)+f(j,k-1))/2
-% OP_DXF_XY: get the x difference operator with forward method, delta_x f(j,k)=(f(j+1,k)-f(j,  k))/2
-% OP_DXB_XY: get the x difference operator with backward method,delta_x f(j,k)=(f(j,  k)-f(j-1,k))/2
-% OP_DYF_XY: get the y difference operator with forward method, delta_y f(j,k)=(f(j,k+1)-f(j,  k))/2
-% OP_DYB_XY: get the y difference operator with backward method,delta_y f(j,k)=(f(j,  k)-f(j,k-1))/2
-%
+
 
 
 % Suppose:
@@ -115,10 +97,10 @@ OP_AZB(1,1)=1;
 %            [  0  0  0  0 -1  1  0]                  [ X61-X51  X62-X52   X63-X53   X64-X54   X65-X55 ]
 %            [  0  0  0  0  0 -1  1]                  [ X71-X61  X72-X62   X73-X63   X74-X64   X75-X65 ]
 %            [  0  0  0  0  0  0  0]                  [       0        0         0         0         0 ]
-L1= zeros(m,m); L1(1:m-1, 1:m-1) = -eye(m-1);
-L2= zeros(m,m); L2(1:m-1, 2:m  ) =  eye(m-1);
-OP_DXF= L1+L2;
-
+L1= -eye(m,m); 
+L2=[zeros(m,1) eye(m,m-1)];
+L3=zeros(m,m); L3(m,m)=1;
+OP_DXF=(L1+L2+L3)
 
 % OP_DXB1_XY=[  0  0  0  0  0  0  0]    OP_DXB1_XY*X =[       0        0         0         0         0 ]
 %            [ -1  1  0  0  0  0  0]                  [ X21-X11  X22-X12   X23-X13   X24-X14   X25-X15 ]
@@ -127,9 +109,10 @@ OP_DXF= L1+L2;
 %            [  0  0  0 -1  1  0  0]                  [ X51-X41  X52-X42   X53-X43   X54-X44   X55-X45 ]
 %            [  0  0  0  0 -1  1  0]                  [ X61-X51  X62-X52   X63-X53   X64-X54   X65-X55 ]
 %            [  0  0  0  0  0 -1  1]                  [ X71-X61  X72-X62   X73-X63   X74-X64   X75-X65 ]
-L1= zeros(m,m); L1(2:m, 1:m-1) = -eye(m-1);
-L2= zeros(m,m); L2(2:m, 2:m  ) =  eye(m-1);
-OP_DXB= L1+L2;
+L1=eye(m,m); 
+L2=[zeros(1,m); -eye(m-1,m)];
+L3=zeros(m,m); L3(1,1)=-1;
+OP_DXB=(L1+L2+L3);
 
 % OP_DYF1_XY=[ -1  0  0  0  0 ]         Y*OP_DYF1_XY =[ Y12-Y11   Y13-Y12   Y14-Y13   Y15-Y14  0 ]
 %            [  1 -1  0  0  0 ]                       [ Y22-Y21   Y23-Y22   Y24-Y23   Y25-Y24  0 ]
@@ -138,9 +121,10 @@ OP_DXB= L1+L2;
 %            [  0  0  0  1  0 ]                       [ Y22-Y21   Y53-Y52   Y54-Y53   Y55-Y54  0 ]
 %                                                     [ Y22-Y21   Y63-Y62   Y64-Y63   Y65-Y64  0 ]
 %                                                     [ Y22-Y21   Y73-Y72   Y74-Y73   Y75-Y74  0 ]
-R1= zeros(n,n); R1(1:n-1, 1:n-1) = -eye(n-1);
-R2= zeros(n,n); R2(2:n  , 1:n-1) =  eye(n-1);
-OP_DYF= R1+R2;
+R1= -eye(n,n); 
+R2=[zeros(1,n); eye(n-1,n)];
+R3=zeros(n,n); R3(n,n)=1;
+OP_DYF=(R1+R2+R3);
 
 % OP_DYB1_XY=[  0 -1  0  0  0 ]         Y*OP_DYB1_XY =[ 0  Y12-Y11   Y13-Y12   Y14-Y13   Y15-Y14 ]
 %            [  0  1 -1  0  0 ]                       [ 0  Y22-Y21   Y23-Y22   Y24-Y23   Y15-Y14 ]
@@ -149,18 +133,21 @@ OP_DYF= R1+R2;
 %            [  0  0  0  0  1 ]                       [ 0  Y52-Y51   Y53-Y52   Y54-Y53   Y55-Y54 ]
 %                                                     [ 0  Y62-Y61   Y63-Y62   Y64-Y63   Y65-Y64 ]
 %                                                     [ 0  Y72-Y71   Y73-Y72   Y74-Y73   Y75-Y74 ]
-R1= zeros(n,n); R1(1:n-1, 2:n) = -eye(n-1);
-R2= zeros(n,n); R2(2:n  , 2:n) =  eye(n-1);
-OP_DYB= R1+R2;
+R1= eye(n,n); 
+R2=[zeros(n,1), -eye(n,n-1)];
+R3=zeros(n,n); R3(1,1)=-1;
+OP_DYB=(R1+R2+R3);
 
-R1= zeros(k,k); R1(1:k-1, 1:k-1) = -eye(k-1);
-R2= zeros(k,k); R2(2:k  , 1:k-1) =  eye(k-1);
-OP_DZF= R1+R2;
 
-R1= zeros(k,k); R1(1:k-1, 2:k ) = -eye(k-1);
-R2= zeros(k,k); R2(2:k  , 2:k ) =  eye(k-1);
-OP_DZB= R1+R2;
+R1= -eye(k,k); 
+R2=[zeros(1,k); eye(k-1,k)];
+R3=zeros(k,k); R3(k,k)=1;
+OP_DZF=(R1+R2+R3);
 
+R1= eye(k,k); 
+R2=[zeros(k,1), -eye(k,k-1)];
+R3=zeros(k,k); R3(1,1)=-1;
+OP_DZB=(R1+R2+R3);
 %%%%%%%%%%%%%%%%%%%%%%%% OP_L and OP_R operator %%%%%%%%%%%%%%%%%%
 L=eye(m,m); L(1,1)=0;L(m,m)=0;
 R=eye(n,n); R(1,1)=0;R(n,n)=0;
