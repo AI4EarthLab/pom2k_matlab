@@ -19,12 +19,11 @@ yflux = AYB(dx_3d) .* AYB(dt_3d) .* v;
 %     change made to 2-D volume conservation equation which
 %     calculates elf.
 %
-w(:,:,1)=OP_L_XY * (0.5*(vfluxb+vfluxf)) *OP_R_XY;
-w0=repmat(w(:,:,1),1,1,kb);
+w(:,:,1)=0.5*(vfluxb+vfluxf);
 
-tps=OP_L_XZ*(etf-etb)/dti2;
+tps=(etf-etb)/dti2;
 tps=repmat(tps,1,1,kb);
-w = SUM2(dz_3d .* ( ( DXF(xflux)+DYF(yflux) )./(dx_3d.*dy_3d)+ tps))+w0;
-w(1,:,:) = 0.e0;
+w=SUM2(w+dz_3d .* ( ( DXF(xflux)+DYF(yflux) )./(dx_3d.*dy_3d)+ tps));
+w(1,:,:) = 0.e0; w(im,:,:) = 0.e0;
 
 return
