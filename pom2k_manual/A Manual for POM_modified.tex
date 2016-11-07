@@ -1,0 +1,531 @@
+\documentclass[oribibl]{llncs}
+\usepackage{amsmath}     %math
+\usepackage{algorithm}     %format of algorithm
+\usepackage{algorithmic}  %format of algorithm
+\renewcommand{\algorithmiccomment}[1]{ \hfill {/* #1 */} }
+\usepackage{makeidx}  % allows for indexgeneration
+\usepackage{mathrsfs}
+\usepackage[top=2.0cm, bottom=2.0cm, left=1.5cm, right=1.5cm]{geometry}
+\usepackage{graphicx}
+ \usepackage{color}
+\DeclareGraphicsExtensions{.eps,.mps,.pdf,.jpg,.PNG}
+\DeclareGraphicsRule{*}{PNG}{*}{}
+\graphicspath{{./fig/}}
+\begin{document}
+
+\title{A Manual for the Princeton Ocean Model}
+\author{Xiaomeng Huang \ \ \ \  Xing Huang}
+\institute{Center for Earth System Science\\ \email{}}
+\maketitle
+
+\section{Governing equations}
+
+The governing equations of the Princeton Ocean Model(POM) are the 3D hydrostatic primitive equations
+\begin{eqnarray}
+\frac{\partial U}{\partial t}+U\frac{\partial U}{\partial x}+V\frac{\partial U}{\partial y}+W\frac{\partial U}{\partial z} -fV &=& - \frac{1}{\rho_0} \frac{\partial p}{\partial x} + \frac{\partial}{\partial z}  \left ( K_M \frac{\partial U}{\partial z} \right) +F_x\\ \nonumber \\ 
+\frac{\partial V}{\partial t}+U\frac{\partial V}{\partial x}+V\frac{\partial V}{\partial y}+W\frac{\partial V}{\partial z} +fU&=& - \frac{1}{\rho_0} \frac{\partial p}{\partial y} + \frac{\partial}{\partial z}  \left ( K_M \frac{\partial V}{\partial z} \right) +F_y\\ \nonumber \\ 
+\frac{\partial p}{\partial z} &=& - \rho g \\ \nonumber \\ 
+\frac{\partial U}{\partial x} + \frac{\partial V}{\partial y} + \frac{\partial W}{\partial z} &=& 0 \\ \nonumber \\ 
+\frac{\partial T}{\partial t}+U\frac{\partial T}{\partial x}+V\frac{\partial T}{\partial y}+W\frac{\partial T}{\partial z} &=& \frac{\partial}{\partial z}  \left ( K_H \frac{\partial T}{\partial z} \right) +F_T \\ \nonumber \\ 
+\frac{\partial S}{\partial t}+U\frac{\partial S}{\partial x}+V\frac{\partial S}{\partial y}+W\frac{\partial S}{\partial z} &=& \frac{\partial}{\partial z}  \left ( K_H \frac{\partial S}{\partial z} \right) +F_S\\ \nonumber \\ 
+\rho &=& \rho(T,S,p)
+\end{eqnarray}
+
+where,
+\begin{eqnarray*}
+F_x &=&  \frac{\partial}{\partial x} \left ( 2A_M \frac{\partial U}{\partial x} \right ) + \frac{\partial}{\partial y} \left [ A_M \left ( \frac{\partial U}{\partial y} + \frac{\partial V}{\partial x} \right ) \right ] \\ \nonumber \\ 
+F_y &=&  \frac{\partial}{\partial y} \left ( 2A_M \frac{\partial V}{\partial y} \right ) + \frac{\partial}{\partial x} \left [ A_M \left ( \frac{\partial U}{\partial y} + \frac{\partial V}{\partial x} \right ) \right ] \\ \nonumber \\ 
+F_T &=&  \frac{\partial}{\partial x} \left ( A_H \frac{\partial T}{\partial x} \right ) + \frac{\partial}{\partial y} \left ( A_H \frac{\partial T}{\partial y} \right ) \\ \nonumber \\ 
+F_S &=&  \frac{\partial}{\partial x} \left ( A_H \frac{\partial S}{\partial x} \right ) + \frac{\partial}{\partial y} \left ( A_H \frac{\partial S}{\partial y} \right ) \\ \nonumber \\ 
+\end{eqnarray*}
+
+
+\section{Turbulence Closure}
+
+The governing equations contain parameterized Reynolds stress and flus term which account for the turbulent diffusion of momentum,heat,and salt. The parameterization of turbulence in the model described here is based on the work of Mellor and Yamada[1974].
+
+The vertical mixing coefficients, $K_M$ and $K_H$, in the governing equations are obtained by appealing to a second order turbulence closure scheme [Mellor and Yamada, 1982] which characterizes the turbulence by equations for the turbulence kinetic energy, $q^2/2$ and a turbulence macroscale, $l$, according to,
+\begin{eqnarray}
+\frac{\partial q^2}{\partial t} + U\frac{\partial q^2}{\partial x} +V\frac{\partial q^2}{\partial y} + W\frac{\partial q^2}{\partial z}  &=& \frac{\partial}{\partial z} \left( K_q \frac{\partial q^2}{\partial z} \right)+2K_M\left[ \left( \frac{\partial U}{\partial Z}\right)^2 + \left( \frac{\partial V}{\partial Z}\right)^2 \right] + \frac{2g}{\rho_0}K_H\frac{\partial \rho}{\partial z} - \frac{2q^3}{B_1 l} + F_q \nonumber \\  \label{eq:tc1} \\   
+\frac{\partial q^2 l}{\partial t} + U\frac{\partial q^2 l}{\partial x} +V\frac{\partial q^2 l}{\partial y} + W\frac{\partial q^2 l}{\partial z}   &=& \frac{\partial}{\partial z} \left( K_q \frac{\partial q^2 l}{\partial z} \right)+ l E_1 K_M\left[ \left( \frac{\partial U}{\partial Z}\right)^2 + \left( \frac{\partial V}{\partial Z}\right)^2 \right] + \frac{l E_1 g}{\rho_0}K_H\frac{\partial \rho}{\partial z} - \frac{q^3}{B_1} \widetilde{W} + F_l   \nonumber \\ \nonumber  \label{eq:tc2} \\ 
+\end{eqnarray}
+
+where a wall proximity function is defined as
+\begin{equation}
+\widetilde{W} = 1+E_2 \left( \frac{l}{kL} \right)^2
+\end{equation}
+and where
+\begin{equation}
+L^{-1} = (\eta-z)^{-1} + (H+z)^{-1}
+\end{equation}
+
+Near surfaces it may be shown that both $l/k$ and $L$ are equal to the distance from the surface ($k=0.4$ is the von Karman constant) so that $\widetilde{W}=1+E_2$. Far from the surfaces where $l << L$, $\widetilde{W}^2 \approx 1$. The length scale provided by (\ref{eq:tc2}) is a characteristic length of the turbulent motion at any point in space or time. An alternative to (\ref{eq:tc2}) is to use a transport equation for the dissipation rate [Hanjalic and Launder, 1972]. The former approach according to Mellor and Herring [1973] and Mellor and Yamada [1982] is more consistent since it uses an equation which describes large-scale turbulence to determine the turbulent macroscale. The terms $F_q$ and $F_l$ in  (\ref{eq:tc1}) and  (\ref{eq:tc2}) are the horizontal mixing and are parameterized analogously to temperature and salinity by using the expressions about $F_T$ and $F_S$.
+
+While details of the closure model are rather involved, it is possible to reduce the prescription of the mixing coefficients $K_M$, $K_H$, and $K_q$ to the following expressions,
+\begin{eqnarray}
+K_M &\equiv& l q S_M \\ \nonumber \\
+K_H &\equiv& l q S_H \\ \nonumber \\
+K_q  &\equiv& l q S_q
+\end{eqnarray}
+
+The stability functions, $S_M$, $S_H$, and $S_q$ are analytically derived, algebraic relations functionally dependent upon $\frac{\partial U}{\partial z}$, $\frac{\partial V}{\partial z}$,$\frac{g}{\rho_0} \frac{\partial \rho}{\partial z}$, $q$ and $l$. These relations derive form closure hypotheses described by Mellor [1973] and recently summarized by Mellor and Yamada [1982].
+
+It is convenient to define
+\begin{eqnarray}
+G_M &\equiv& \frac{l^2}{q^2} \left[ \left( \frac{\partial U}{\partial Z}\right)^2 + \left( \frac{\partial V}{\partial Z}\right)^2 \right]^{1/2} \\ \nonumber \\
+G_H &\equiv& \frac{l^2}{q^2} \frac{g}{\rho_0}\frac{\partial \rho}{\partial z}
+\end{eqnarray}
+
+Then the stability functions become
+\begin{eqnarray}
+S_M [6 A_1 A_2 G_M] + S_H [1-2 A_2 B_2 G_H - 12 A_1 A_2 G_H] &=&A_2 \\ \nonumber \\
+S_M [1+6 A_1^2 G_M -9 A_1 A_2 G_H] -S_H [12 A_1^2 G_H + 9 A_1 A_2 G_H] &=& A_1 (1-3 C_1)\\ \nonumber \\
+S_q=0.20
+\end{eqnarray}
+which are readily solved for $S_M$ and $S_H$ as function of $G_M$ and $G_H$. By appealing to laboratory data [Mellor and Yamada, 1982] (see section 6 for further practical details), the empirical constants were assigned the values
+
+\begin{equation}
+(A_1,\ A_2,\ B_1,\ B_2,\ C_1) = (0.92,\ 0.74,\ 16.6,\ 10.1,\ 0.08)
+\end{equation}
+and
+\begin{equation}
+(E_1,\ E_2) = (1.8,\ 1.33)
+\end{equation}
+
+
+\section{Boundary Conditions}
+
+The boundary conditions at the free surface, $z=\eta(x,y)$, are
+\begin{eqnarray}
+\rho_0 K_M \left( \frac{\partial U}{\partial z},\  \frac{\partial V}{\partial z} \right) &=& (\tau_{ox}, \tau_{oy})  \label{eq:tbc1}\\ \nonumber \\ 
+\rho_0 K_H \left( \frac{\partial T}{\partial z},\  \frac{\partial S}{\partial z} \right) &=& (\dot{H}, \dot{S}) \label{eq:tbc2}\\ \nonumber \\ 
+q^2 &=& B_l^{2/3} u_{\tau s}^2 \label{eq:tbc3}\\ \nonumber \\ 
+q^2 l &=& 0  \label{eq:tbc4} \\ \nonumber \\ 
+W   &=& U \frac{\partial \eta}{\partial x} + V \frac{\partial \eta}{\partial y} + \frac{\partial \eta}{\partial t} \label{eq:tbc5}
+\end{eqnarray}
+where $(\tau_{ox}, \tau_{oy})$ is the surface wind stress vector with the frictions velocity, $u_{\tau s}$, the magnitude of the vector. It is doubtful that the mixing length goes to zero at a surface containing wind induced waves as suggested by  (\ref{eq:tbc4}). The error is incurred of the wave height. This is an area where further improvement is necessory. The quantity $B_1^{2/3}$ is an empirical constant $(6.51)$ arising from the turbulence closure relations. The net ocean heat flux is $\dot{H}$ and here $\dot{S} \equiv S(0)(\dot{E}-\dot{P})/\rho_0$ where $(\dot{E}-\dot{P})$ is the net evaporation-precipitation fresh water surface mass flux rate and $S(0)$ is the surface salinity. On the side walls and bottom of the basin, the normal gradients of $T$ and $S$ are zero so that there are no advective and diffusive heat and salt fluxes across these boundaries. At the lower boundary (b),
+\begin{eqnarray}
+\rho_0 K_M \left( \frac{\partial U}{\partial z},\  \frac{\partial V}{\partial z} \right) &=& (\tau_{bx}, \tau_{by})  \label{eq:bbc1}\\ \nonumber \\ 
+q^2 &=& B_l^{2/3} u_{\tau b}^2 \label{eq:bbc3}\\ \nonumber \\ 
+q^2 l &=& 0  \label{eq:bbc4} \\ \nonumber \\ 
+W_b   &=& -U_b \frac{\partial H}{\partial x} - V \frac{\partial H}{\partial y} + \frac{\partial \eta}{\partial t} \label{eq:bbc5}
+\end{eqnarray}
+where $H(x,y)$ is the bottom topography and $u_{\tau b}$ is the friction velocity associated with teh bottom frictional stress $(\tau_{bx}, \tau_{by})$. The bottom stress is determined by matching velocities with the logarithmic law of the wall. Specifically,
+\begin{equation} 
+\tau_b=\rho_0 C_D V_b^2 \label{eq:taub}
+\end{equation}
+with value of the dray coefficient $C_D$ given by
+\begin{equation}
+C_D= \left( \frac{1}{k} ln \frac{H+z_b}{z_0} \right)^{-2} \label{eq:CD}
+\end{equation}
+where $z_b$ and $V_b$ are the grid point and corresponding velocity in the grid point nearest the bottom and $k$ is the von Karman constant. The final result of (\ref{eq:taub}) and (\ref{eq:CD}) in conjunction with the turbulent closure derived $K_M$ is that the calculations will yield
+\begin{equation}
+V= \left( \frac{\tau_b}{k u_{\tau b}} \right)  \ln \frac{z}{z_0} \label{eq:v}
+\end{equation}
+ in the lower boundary region if enough resolution is provided. In those instances where the bottom boundary layer is not well resolved it is more appropriate to specify $C_D=0.0025$. The actual algorithm is to set $C_D$ to the larger of the two values given by (\ref{eq:CD}) and $0.0025$. The parameter $z_0$ depends on the local bottom roughness; in the absence of specific information $z_0=1 cm$ is used as suggested by @watherly and Martin[1978].
+ 
+Open lateral boundary conditions are problematic since one must parameterize the environment to the relevant domain. Two types of open boundaries exist, inflow and outflow. Temperature and salinity are prescribed from data at an inflowing boundary, whereas at outflow boundaries,
+ \begin{equation}
+ \frac{\partial}{\partial t}(T, S) + U_n \frac{\partial}{\partial n} (T, S) =0
+ \end{equation}
+ is solved where the subscript $n$ is the coordinate normal to the boundary. Turbulence kinetic energy and the macroscale quantity $(q^2l)$ are calculated with sufficient accuracy at the boundaries by neglecting the advection in comparison with other terms in their respective equations.
+ 
+ The open lateral velocity boundary conditions in some of the applications  are computed by using the available hydrographic data in conjunction with a simplified diagnostic model. This type of model uses only geostrophic plus Ekman dynamics and therefore solves a simplified form of the full equations of motion. It does not require a velocity at a reference level but only along a single transect crossing $f/H$ contours. A detailed description of this model can be found in the work by Kantha et al. [1982]. While the normal component of velocity is specified, a free slip condition is used for the tangential component.
+ 
+ In other applications including those with tidal forcing, either the elevation is prescribed as a function of time and space or a radiation condition of the form
+ \begin{equation}
+ \frac{\partial \eta}{\partial t} + c \frac{\partial \eta}{\partial n}  =F(s,t)
+ \end{equation}
+ is prescribed. Here c is the local shallow water wave speed, $\sqrt{gH}$, and $s$ is the tangential coordinate. The function $F(s,t)$ incorporates the necessary forcing due to tides and the mean calculation as described by Blumberg and Kantha[1985]. The nonlinear terms in the momentum equations are additionally neglected at the open boundary.
+
+
+
+\section{Sigma coordinates}
+For the vertical grid, POM employs sigma coordinates, which are bottom-following coordinates that map the vertical coordinate from $-H < z < \eta$ to $-1 < \sigma < 0$ with $\sigma  = (z-\eta)/(H + \eta)$, where the bottom is defined by $z =-H(x, y)$ and the surface is defined by $z = \eta(x, y, t)$. The governing equations are transformed from z coordinates $(x,y,z,t)$ to $\sigma$ coordinates $(x^*,y^*,z^*,t^*)$ which satisfy
+\begin{equation}
+x^*=x,\ \ y^*=y,\ \ \sigma=\frac{z-\eta}{H+\eta},\ \ t^*=t
+\end{equation}
+
+The derivatives are then given by the chain rule,
+\begin{eqnarray}
+\frac{\partial}{\partial x} = \frac{\partial x^*}{\partial x} \frac{\partial}{\partial x^*} +  \frac{\partial y^*}{\partial x} \frac{\partial}{\partial y^*} +  \frac{\partial \sigma}{\partial x} \frac{\partial}{\partial \sigma} +  \frac{\partial t^*}{\partial x} \frac{\partial}{\partial t^*} \\ \nonumber \\ 
+\frac{\partial}{\partial y} = \frac{\partial x^*}{\partial y} \frac{\partial}{\partial x^*} +  \frac{\partial y^*}{\partial y} \frac{\partial}{\partial y^*} +  \frac{\partial \sigma}{\partial y} \frac{\partial}{\partial \sigma} +  \frac{\partial t^*}{\partial y} \frac{\partial}{\partial t^*} \\ \nonumber \\ 
+\frac{\partial}{\partial z} = \frac{\partial x^*}{\partial z} \frac{\partial}{\partial x^*} +  \frac{\partial y^*}{\partial z} \frac{\partial}{\partial y^*} +  \frac{\partial \sigma}{\partial z} \frac{\partial}{\partial \sigma} +  \frac{\partial t^*}{\partial z} \frac{\partial}{\partial t^*} \\ \nonumber \\ 
+\frac{\partial}{\partial t} = \frac{\partial x^*}{\partial t} \frac{\partial}{\partial x^*} +  \frac{\partial y^*}{\partial t} \frac{\partial}{\partial y^*} +  \frac{\partial \sigma}{\partial t} \frac{\partial}{\partial \sigma} +  \frac{\partial t^*}{\partial t} \frac{\partial}{\partial t^*}
+\end{eqnarray}
+
+Which can be written in matrix form as
+\begin{equation}      
+\left[                 
+  \begin{array}{c}  
+    \frac{\partial}{\partial x}  \\  \nonumber \\ 
+    \frac{\partial}{\partial y}  \\ \nonumber \\ 
+    \frac{\partial}{\partial z}  \\ \nonumber \\ 
+    \frac{\partial}{\partial t} 
+  \end{array}
+\right]
+=  
+\left[             
+  \begin{array}{cccc}  
+    \frac{\partial x^*}{\partial x} & \frac{\partial y^*}{\partial x} & \frac{\partial \sigma}{\partial x} & \frac{\partial t^*}{\partial x}\\   \nonumber \\ 
+    \frac{\partial x^*}{\partial y} & \frac{\partial y^*}{\partial y} & \frac{\partial \sigma}{\partial y} & \frac{\partial t^*}{\partial y}\\   \nonumber \\ 
+    \frac{\partial x^*}{\partial z} & \frac{\partial y^*}{\partial z} & \frac{\partial \sigma}{\partial z} & \frac{\partial t^*}{\partial z}\\   \nonumber \\ 
+    \frac{\partial x^*}{\partial t} & \frac{\partial y^*}{\partial t} & \frac{\partial \sigma}{\partial t} & \frac{\partial t^*}{\partial t}\\  
+  \end{array}
+\right]              
+\left[                 
+  \begin{array}{c}  
+    \frac{\partial}{\partial x^*}  \\  \nonumber \\ 
+    \frac{\partial}{\partial y^*}  \\ \nonumber \\ 
+    \frac{\partial}{\partial \sigma}  \\ \nonumber \\ 
+    \frac{\partial}{\partial t^*} 
+  \end{array}
+\right]
+\end{equation}
+
+Supposing $s$ is one the the independent variables $x,y,t$ and $D=H+\eta$, we can get
+\begin{eqnarray}
+\frac{\partial \sigma}{\partial s} &=& \frac{\partial }{\partial s}\left( \frac{z-\eta}{H+\eta} \right)  \nonumber\\
+&=& -\frac{(z-\eta)}{(H+\eta)^2 }\frac{\partial}{\partial s}(H+\eta) - \frac{1}{H+\eta}\frac{\partial \eta}{\partial s} \nonumber\\
+&=& -\frac{\sigma}{(H+\eta)}\frac{\partial}{\partial s}(H+\eta) - \frac{1}{H+\eta}\frac{\partial \eta}{\partial s} \nonumber\\
+&=& -\frac{\sigma}{D}\frac{\partial D}{\partial s} - \frac{1}{D}\frac{\partial \eta}{\partial s}
+\end{eqnarray}
+
+And then we have,
+\begin{equation}      
+\left[                 
+  \begin{array}{c}  
+    \frac{\partial}{\partial x}  \\  \nonumber \\ 
+    \frac{\partial}{\partial y}  \\ \nonumber \\ 
+    \frac{\partial}{\partial z}  \\ \nonumber \\ 
+    \frac{\partial}{\partial t} 
+  \end{array}
+\right]
+=  
+\left[             
+  \begin{array}{cccc}  
+   1\  & 0\ & -\left( \frac{\sigma}{D} \frac{\partial D}{\partial x} + \frac{1}{D}\frac{\partial \eta}{\partial x} \right)\ & 0\ \\   \nonumber \\ 
+   0\  & 1\ & -\left(\frac{\sigma}{D} \frac{\partial D}{\partial y} + \frac{1}{D}\frac{\partial \eta}{\partial y} \right)\ & 0\ \\   \nonumber \\ 
+   0\  & 0\ & \frac{1}{D} \													        & 0 \ \\   \nonumber \\ 
+   0\  & 0\ & -\left(\frac{\sigma}{D} \frac{\partial D}{\partial t} + \frac{1}{D}\frac{\partial \eta}{\partial t} \right)\   & 1\ \\  
+  \end{array}
+\right]              
+\left[                 
+  \begin{array}{c}  
+    \frac{\partial}{\partial x^*}  \\  \nonumber \\ 
+    \frac{\partial}{\partial y^*}  \\ \nonumber \\ 
+    \frac{\partial}{\partial \sigma}  \\ \nonumber \\ 
+    \frac{\partial}{\partial t^*} 
+  \end{array}
+\right]
+\end{equation}
+
+Transforming the continuity equation gives
+\begin{eqnarray}\label{eq:coneq2}
+&& \frac{\partial U}{\partial x} + \frac{\partial V}{\partial y} + \frac{\partial W}{\partial z} = 0  \nonumber \\ \nonumber \\ 
+&=>&  \frac{\partial U}{\partial x^*} - \left(  \frac{\sigma}{D} \frac{\partial D}{\partial x^*} + \frac{1}{D}\frac{\partial \eta}{\partial x^*}\right) \frac{\partial U}{\partial \sigma}  + \frac{\partial V}{\partial y^*} - \left(  \frac{\sigma}{D} \frac{\partial D}{\partial y^*} + \frac{1}{D}\frac{\partial \eta}{\partial y^*}\right) \frac{\partial V}{\partial \sigma}  +  \frac{1}{D}\frac{\partial W}{\partial \sigma} = 0  \nonumber \\ \nonumber \\ 
+&=>&  \frac{\partial U}{\partial x^*} +  \frac{\partial V}{\partial y^*}  - \frac{\partial}{\partial \sigma} \left[   \left(  \frac{\sigma}{D} \frac{\partial D}{\partial x^*} + \frac{1}{D}\frac{\partial \eta}{\partial x^*}\right) U + \left(  \frac{\sigma}{D} \frac{\partial D}{\partial y^*} + \frac{1}{D}\frac{\partial \eta}{\partial y^*}\right)  V - \frac{1}{D}W \right] +\frac{U}{D}\frac{\partial D}{\partial x^*} +\frac{V}{D}\frac{\partial D}{\partial y^*} = 0   \nonumber \\ \nonumber \\
+&=>& D\frac{\partial U}{\partial x^*} +  U\frac{\partial D}{\partial x^*} + D\frac{\partial V}{\partial y^*} +  V\frac{\partial D}{\partial y^*} + \frac{\partial}{\partial \sigma} \left[  -\sigma U \frac{\partial D}{\partial x^*} - U \frac{\partial \eta}{x^*} - \sigma V \frac{\partial D}{\partial y^*} -V\frac{\partial \eta}{\partial y^*} +W \right] = 0  \nonumber \\ \nonumber \\ 
+&=>&  \frac{\partial}{\partial x^*}(DU) +\frac{\partial}{\partial y^*}(DV) + \frac{\partial}{\partial \sigma} \left[  W - U \left( \sigma \frac{\partial D}{\partial x^*} + \frac{\partial \eta}{\partial x^*}\right)  -V \left( \sigma \frac{\partial D}{\partial y^*} + \frac{\partial \eta}{\partial y^*}\right) \right] = 0
+\end{eqnarray}
+
+From the definition of $\sigma$, we have
+\begin{equation}  
+D\sigma=z-\eta
+\end{equation}  
+Taking the material derivative of both sides, we have 
+\begin{eqnarray}  
+&&\sigma \frac{d D}{d t} + D\frac{d \sigma}{dt} = \frac{d z}{d t} -\frac{d \eta}{d t}  \nonumber \\ \nonumber \\ 
+&=>& D\frac{d \sigma}{dt} = \frac{d z}{d t} - \sigma \frac{d D}{d t} -\frac{d \eta}{d t}   \nonumber \\ \nonumber \\ 
+&=>& w = W- \sigma \frac{d D}{d t} -\frac{d \eta}{d t}  
+\end{eqnarray}  
+where the $w$ is  the Lagrangian velocity of $\sigma$-layers, the $W$ is the Eulerian velocity of fluid, the $\frac{d D}{d t}$ is the stretching of water column, and the $\frac{d \eta}{d t} $ is the free surface material velocity.
+
+At the free surface, $W=\frac{d \eta}{dt}$ and $\sigma=0$, so
+\begin{equation}  
+w = 0 \ \ at \ \ \sigma = 0
+\end{equation}  
+
+At the bottom, $z=-H$, $\sigma=-1$
+\begin{eqnarray}  
+w &=& W+ \frac{d D}{d t} -\frac{d \eta}{d t}  \nonumber \\ \nonumber \\ 
+&=& W+ \frac{d (H+\eta)}{d t} -\frac{d \eta}{d t}  \nonumber \\ \nonumber \\ 
+&=& W+ \frac{d H}{d t} 
+\end{eqnarray}  
+
+But at the bottom, the kinematic free-slip condition requires that
+\begin{equation}  
+W = - \frac{d H}{d t} 
+\end{equation}  
+therefore, $w=0$ at $\sigma=-1$.
+
+How does $\frac{d}{dt}$ relate to $\frac{d}{d t^*}$? Let
+\begin{eqnarray}  
+\frac{d}{dt} &=& \frac{\partial}{\partial t} + U\frac{\partial}{\partial x} +V\frac{\partial}{\partial  y}  \nonumber \\ \nonumber \\ 
+&=& \frac{\partial}{\partial t^*} - \left(  \frac{\sigma}{D} \frac{\partial D}{\partial t^*} + \frac{1}{D}\frac{\partial \eta}{\partial t^*}\right) \frac{\partial}{\partial \sigma} + U \frac{\partial}{\partial x^*} - U \left(  \frac{\sigma}{D} \frac{\partial D}{\partial x^*} + \frac{1}{D}\frac{\partial \eta}{\partial x^*}\right) \frac{\partial}{\partial \sigma} \nonumber \\ \nonumber \\ 
+&& + V \frac{\partial}{\partial y^*} - V \left(  \frac{\sigma}{D} \frac{\partial D}{\partial y^*} + \frac{1}{D}\frac{\partial \eta}{\partial y^*}\right) \frac{\partial}{\partial \sigma}  \nonumber \\ \nonumber \\
+&=&\frac{d}{dt^*} -\frac{1}{D} \left( \sigma \frac{dD}{dt^*} +\frac{d \eta}{dt^*} \right) \frac{\partial}{\partial \sigma}
+\end{eqnarray}  
+
+In the definition of $w$, we need $\frac{dD}{dt}$ and $\frac{d \eta}{dt}$
+\begin{eqnarray}  
+\frac{d D}{d t} &=&\frac{dD}{dt^*} -\frac{1}{D}\left( \sigma \frac{dD}{dt^*} +\frac{d \eta}{dt^*} \right) \frac{d D}{d \sigma} \nonumber \\ \nonumber \\
+\frac{d \eta}{d t} &=&\frac{d\eta}{dt^*} -\frac{1}{D}\left( \sigma \frac{dD}{dt^*} +\frac{d \eta}{dt^*} \right) \frac{d \eta}{d \sigma}
+\end{eqnarray}  
+
+Therefore, 
+\begin{eqnarray}  
+w &=& W - \sigma \frac{dD}{dt} - \frac{d \eta}{d t} \nonumber \\ \nonumber \\
+    &=& W - \sigma \frac{dD}{dt^*} +\frac{\sigma}{D}  \left( \sigma \frac{dD}{dt^*} +\frac{d \eta}{dt^*} \right) \frac{d D}{d \sigma}  - \frac{d\eta}{dt^*}  +\frac{1}{D} \left( \sigma \frac{dD}{dt^*} +\frac{d \eta}{dt^*} \right) \frac{d \eta}{d \sigma} \nonumber \\ \nonumber \\
+    &=& W - \sigma \frac{dD}{dt^*} - \frac{d \eta}{d t^*}+  \frac{1}{D} \left( \sigma \frac{dD}{dt^*} +\frac{d \eta}{dt^*} \right)  \left( \sigma \frac{dD}{d\sigma} + \frac{d\eta}{d\sigma}\right)\nonumber \\ \nonumber \\
+     &=& W - \sigma \frac{dD}{dt^*} - \frac{d \eta}{d t^*}+  \frac{1}{D} \left( \sigma \frac{dD}{dt^*} +\frac{d \eta}{dt^*} \right)  \left(\frac{d (\sigma D+\eta)}{d\sigma} -D \frac{d\sigma}{d\sigma}\right)\nonumber \\ \nonumber \\
+     &=& W - \sigma \frac{dD}{dt^*} - \frac{d \eta}{d t^*}+  \frac{1}{D} \left( \sigma \frac{dD}{dt^*} +\frac{d \eta}{dt^*} \right)  \left(\frac{dz}{d\sigma} -D \right)\nonumber \\ \nonumber \\
+     &=& W - \sigma \frac{dD}{dt^*} - \frac{d \eta}{d t^*}+  \frac{1}{D} \left( \sigma \frac{dD}{dt^*} +\frac{d \eta}{dt^*} \right)  \left(D -D \right)\nonumber \\ \nonumber \\     
+     &=& W - \sigma \frac{dD}{dt^*} - \frac{d \eta}{d t^*} \nonumber \\ \nonumber \\  
+     &=& W - \sigma \left( \frac{\partial D}{\partial t^*} + U\frac{\partial D}{\partial x^*}+V\frac{\partial D}{\partial y^*} \right) -\left( \frac{\partial \eta}{\partial t^*} + U\frac{\partial \eta}{\partial x^*}+V\frac{\partial \eta}{\partial y^*} \right) \nonumber \\ \nonumber \\  
+     &=& W -  U\left( \sigma\frac{\partial D}{\partial x^*} +\frac{\partial \eta}{\partial x^*} \right) -V \left(\sigma \frac{\partial D}{\partial y^*}+\frac{\partial \eta}{\partial y^*} \right) -\sigma \frac{\partial D}{\partial t^*} - \frac{\partial \eta}{\partial t^*}
+\end{eqnarray}  
+
+Substituting into the transformed continuity equation (\ref{eq:coneq2}), we have
+\begin{eqnarray}\label{eq:coneq3}
+&&\frac{\partial}{\partial x^*}(DU) +\frac{\partial}{\partial y^*}(DV) + \frac{\partial}{\partial \sigma} \left[w+ \sigma \frac{\partial D}{\partial t^*} + \frac{\partial \eta}{\partial t^*} \right] = 0 \nonumber \\ \nonumber \\  
+&=>& \frac{\partial}{\partial x^*}(DU) +\frac{\partial}{\partial y^*}(DV) + \frac{\partial w}{\partial \sigma} +\frac{\partial D}{\partial t^*} + \frac{\partial}{\partial \sigma} \frac{\partial \eta}{\partial t^*} = 0  \nonumber \\ \nonumber \\ 
+&=>& \frac{\partial}{\partial x^*}(DU) +\frac{\partial}{\partial y^*}(DV) + \frac{\partial w}{\partial \sigma} +\frac{\partial D}{\partial t^*} = 0
+\end{eqnarray}
+
+Since $D=H+\eta$ and $\frac{\partial H}{\partial t^*}=0$,  dropping the (*)  we have
+\begin{equation}\label{eq:coneq4}
+\frac{\partial \eta}{\partial t}+\frac{\partial}{\partial x}(DU) +\frac{\partial}{\partial y}(DV) + \frac{\partial w}{\partial \sigma}= 0 
+\end{equation}
+
+To transform the momentum equations, we have
+\begin{eqnarray}
+\frac{\partial}{\partial t}+U\frac{\partial}{\partial x} + V\frac{\partial}{\partial y}+W\frac{\partial}{\partial z} &=& \frac{d}{dt}+W\frac{\partial}{\partial z} \nonumber \\ \nonumber \\ 
+&=&\frac{d}{dt^*} -\frac{1}{D}\left( \sigma \frac{dD}{dt^*} +\frac{d\eta}{dt^*}   \right) \frac{\partial}{\partial \sigma} + \frac{W}{D}\frac{\partial}{\partial \sigma}  \nonumber \\ \nonumber \\ 
+&=&\frac{d}{dt^*} -\frac{1}{D}\left( \sigma \frac{dD}{dt^*} +\frac{d\eta}{dt^*}   \right) \frac{\partial}{\partial \sigma}  +\frac{1}{D}\left( w+ \sigma \frac{dD}{dt^*} +\frac{d\eta}{dt^*} \right) \frac{\partial}{\partial \sigma}  \nonumber \\ \nonumber \\ 
+&=&\frac{d}{dt^*} - \frac{w}{D} \frac{\partial}{\partial \sigma}
+\end{eqnarray}
+
+Therefore, if $\phi=U,V,T$, or $S$,
+\begin{eqnarray}
+\frac{\partial \phi}{\partial t}+U\frac{\partial \phi}{\partial x} + V\frac{\partial \phi}{\partial y}+W\frac{\partial \phi}{\partial z} &=& \frac{\partial \phi}{\partial t^*}+U\frac{\partial \phi}{\partial x^*} + V\frac{\partial \phi}{\partial y^*}+\frac{w}{D}\frac{\partial \phi}{\partial \sigma} \nonumber \\ \nonumber \\ 
+&=& \frac{1}{D} \left[  D\frac{\partial \phi}{\partial t^*}+DU\frac{\partial \phi}{\partial x^*} + DV\frac{\partial \phi}{\partial y^*}+w\frac{\partial \phi}{\partial \sigma}  \right]  \nonumber \\ \nonumber \\ 
+&=& \frac{1}{D} \left[  \frac{\partial (D\phi)}{\partial t^*}+\frac{\partial (DU\phi)}{\partial x^*} + \frac{\partial (DV\phi)}{\partial y^*}+\frac{\partial (w\phi)}{\partial \sigma}  \right]   \nonumber \\ \nonumber \\ 
+&& - \left[ \phi \left( \frac{\partial D}{\partial t^*}+\frac{\partial}{\partial x^*}(DU) + V\frac{\partial }{\partial y^*}(DV)+\frac{\partial w}{\partial \sigma} \right) \right] 
+\end{eqnarray}
+
+
+Based on the transformed continuity equation (\ref{eq:coneq3}), we drop the (*) and obtain
+\begin{equation}
+\frac{\partial \phi}{\partial t}+U\frac{\partial \phi}{\partial x} + V\frac{\partial \phi}{\partial y}+W\frac{\partial}{\partial z} =  \frac{1}{D} \left[  \frac{\partial (D\phi)}{\partial t}+\frac{\partial (DU\phi)}{\partial x} + \frac{\partial (DV\phi)}{\partial y}+\frac{\partial (w\phi)}{\partial \sigma}  \right] 
+\end{equation}
+
+In POM, the pressure is integrated to obtained (from z to  $\eta $)
+\begin{eqnarray}
+&&\int_{p(z)}^{p(\eta)} dp = \int_z^\eta -(\rho_0 + \rho' )g dz \nonumber \\ \nonumber \\ 
+&=>& p(\eta)-p(z) =-\rho_0 g (\eta - z) -g \int_z^\eta \rho'(z') dz' \nonumber \\ \nonumber \\ 
+&=>& p(z) = p_{atm}+\rho_0 g (\eta - z) +g \int_z^\eta \rho'(z') dz'
+\end{eqnarray}
+Thus, the pressure gradient in Cartesian coordinate is 
+\begin{equation}\label{eq:p1}
+\nabla p(z) = \rho_0 g \nabla \eta  +g\int_z^\eta \nabla \rho'(z') dz'
+\end{equation}
+
+This integral is transformed with $\sigma=\frac{z-\eta}{D} \rightarrow d\sigma=\frac{dz}{D} $ to give
+\begin{equation}
+\nabla p(z) = \rho_0 g \nabla\eta +g D\int_\sigma^0 \nabla\rho'(\sigma') d\sigma'
+\end{equation}
+If $\nabla = \nabla^* -\left( \frac{\sigma}{D}\nabla^*D +\frac{1}{D}\nabla^*\eta \right)\frac{\partial}{\partial \sigma}$, then $\nabla\eta$ and $\nabla\rho'(\sigma')$ in equation (58) can be transformed into $\sigma$-coordinate 
+\begin{equation}\label{eq:p1}
+\nabla p = \rho_0 g \nabla^*\eta  + g D\int_\sigma^0 \nabla^* \rho' d\sigma' - gD \int_\sigma^0(\frac{\sigma'}{D}\nabla^*D +\frac{1}{D}\nabla^*\eta) \frac{\partial \rho'}{\partial \sigma'} d\sigma'
+\end{equation}
+Based on the pressure equation (\ref{eq:p1}), we have 
+\begin{equation}
+\nabla p = \rho_0 g \nabla^* \eta  + gD\nabla^*\int_\sigma^0\rho' d\sigma' -  g\int_\sigma^0\sigma'\nabla^*D\frac{\partial \rho'}{\partial \sigma'} d\sigma'  -g\nabla^* \eta \int_{\rho'(\sigma)}^{\rho'(0)} d\rho' 
+\end{equation}
+Where, ${\rho'(0)=0}$, ${\frac{\rho_0+\rho'}{\rho_0} \approx 1}$,the fourth term on the right side can be integrated with ${\rho_0g \nabla^*\eta}$ so that
+\begin{equation}
+\frac{1}{\rho_0}\nabla p = g \nabla^* \eta  +\frac{gD}{\rho_0}\nabla^*\int_\sigma^0\rho'd\sigma'  -\frac{g\nabla^*D}{\rho_0}\int_\sigma^0\sigma'\frac{\partial \rho'}{\partial \sigma'} d\sigma'
+\end{equation}
+The governing equations may now be written as(all * will be dropped for notational convenience)
+\begin{eqnarray}
+&&\frac{\partial \eta}{\partial t} + \frac{\partial UD}{\partial x}+ \frac{\partial VD}{\partial y}+ \frac{\partial w}{\partial \sigma}=0  \label{eq:final1}\\ 
+\nonumber \\ 
+&&\frac{\partial UD}{\partial t}  +\frac{\partial U^2D}{\partial x} +\frac{\partial UVD}{\partial y}+ \frac{\partial Uw}{\partial \sigma}-fVD+gD\frac{\partial \eta}{\partial x} = \frac{\partial}{\partial \sigma}\left( \frac{K_M}{D}\frac{\partial U}{\partial \sigma} \right) - \frac{gD^2}{\rho_0} \frac{\partial}{\partial x} \int_\sigma^0 \rho' d \sigma' + \frac{gD}{\rho_0}\frac{\partial D}{\partial x} \int_\sigma^0 \sigma' \frac{\partial \rho'}{\partial \sigma'} d \sigma' + DF_x  \label{eq:final2}\nonumber \\  
+\\ 
+&&\frac{\partial VD}{\partial t}  +\frac{\partial UVD}{\partial x} +\frac{\partial V^2D}{\partial y} + \frac{\partial Vw}{\partial \sigma} +fUD+gD\frac{\partial \eta}{\partial y} = \frac{\partial}{\partial \sigma}\left( \frac{K_M}{D}\frac{\partial V}{\partial \sigma} \right) - \frac{gD^2}{\rho_0} \frac{\partial}{\partial y} \int_\sigma^0 \rho' d \sigma' + \frac{gD}{\rho_0}\frac{\partial D}{\partial y} \int_\sigma^0 \sigma' \frac{\partial \rho'}{\partial \sigma'} d \sigma' + DF_y  \label{eq:final3}\nonumber \\  
+\\  
+&&\frac{\partial TD}{\partial t}+\frac{\partial TUD}{\partial x}+\frac{\partial TVD}{\partial y}+\frac{\partial Tw}{\partial \sigma} = \frac{\partial}{\partial \sigma}  \left ( K_H \frac{\partial T}{\partial \sigma} \right) +D F_T  \label{eq:final4}\\ 
+\nonumber \\ 
+&&\frac{\partial SD}{\partial t}+\frac{\partial SUD}{\partial x}+\frac{\partial SVD}{\partial y}+\frac{\partial Sw}{\partial \sigma} = \frac{\partial}{\partial \sigma}  \left ( K_H \frac{\partial S}{\partial \sigma} \right) +D F_S \label{eq:final5} \\ 
+\nonumber \\ 
+&&\frac{\partial q^2D}{\partial t} + \frac{\partial Uq^2D}{\partial x} +\frac{\partial Vq^2D}{\partial y} + \frac{\partial wq^2}{\partial \sigma}  = \frac{\partial}{\partial \sigma} \left( \frac{K_q}{D}  \frac{\partial q^2}{\partial \sigma} \right)+\frac{2K_M}{D}\left[ \left( \frac{\partial U}{\partial \sigma}\right)^2 + \left( \frac{\partial V}{\partial \sigma}\right)^2 \right] + \frac{2g}{\rho_0}K_H\frac{\partial \rho}{\partial \sigma} - \frac{2D q^3}{B_1 l} + D F_q  \label{eq:final6}\nonumber \\  
+\\   
+&&\frac{\partial q^2 l D}{\partial t} + \frac{\partial U q^2 l D}{\partial x} +\frac{\partial V q^2 l D}{\partial y} + \frac{\partial w q^2 l}{\partial \sigma}   = \frac{\partial}{\partial \sigma} \left( \frac{K_q}{D} \frac{\partial q^2 l}{\partial \sigma} \right)+ E_1  l \left\{ \frac{K_M}{D}\left[ \left( \frac{\partial U}{\partial \sigma}\right)^2 + \left( \frac{\partial V}{\partial \sigma}\right)^2 \right] + \frac{q E_3}{\rho_0}K_H\frac{\partial \rho}{\partial \sigma} \right\} - \frac{D q^3}{B_1} \widetilde{W} + D F_l    \label{eq:final7}\nonumber \\ 
+\nonumber  \\ 
+\end{eqnarray}
+
+The horizontal viscosity and diffusion terms are defined according to:
+\begin{eqnarray}
+DF_x \equiv \frac{\partial \tau_{xx}}{\partial x} -\frac{\partial}{\partial \sigma} \left[ \left(  \frac{\sigma}{D} \frac{\partial D}{\partial x} + \frac{1}{D} \frac{\partial \eta}{\partial x} \right) \tau_{xx}  \right] +  \frac{\partial \tau_{yx}}{\partial y} -\frac{\partial}{\partial \sigma} \left[ \left(  \frac{\sigma}{D} \frac{\partial D}{\partial y} + \frac{1}{D} \frac{\partial \eta}{\partial y} \right) \tau_{yx}  \right]   \\ 
+\nonumber \\ 
+DF_y \equiv \frac{\partial \tau_{yy}}{\partial y} -\frac{\partial}{\partial \sigma} \left[ \left(  \frac{\sigma}{D} \frac{\partial D}{\partial y} + \frac{1}{D} \frac{\partial \eta}{\partial y} \right) \tau_{yy}  \right] +  \frac{\partial \tau_{xy}}{\partial x} -\frac{\partial}{\partial \sigma} \left[ \left(  \frac{\sigma}{D} \frac{\partial D}{\partial x} + \frac{1}{D} \frac{\partial \eta}{\partial x} \right) \tau_{xy}  \right]   
+\end{eqnarray}
+with
+\begin{eqnarray}
+\tau_{xx} &=& 2 A_M \left[ \frac{\partial UD}{\partial x} -\frac{\partial}{\partial \sigma} \left( \sigma \frac{\partial D}{\partial x} + \frac{\partial \eta}{\partial x} \right)U \right] \\
+\nonumber \\
+\tau_{yy} &=& 2 A_M \left[ \frac{\partial VD}{\partial y} -\frac{\partial}{\partial \sigma} \left( \sigma \frac{\partial D}{\partial x} + \frac{\partial \eta}{\partial x} \right)V \right] \\
+\nonumber \\
+\tau_{xy} = \tau_{yx} &=& \ \ A_M  \left[ \frac{\partial UD}{\partial y} -\frac{\partial}{\partial \sigma} \left( \sigma \frac{\partial D}{\partial x} + \frac{\partial \eta}{\partial x} \right)U +  \frac{\partial VD}{\partial x} -\frac{\partial}{\partial \sigma} \left( \sigma \frac{\partial D}{\partial x} + \frac{\partial \eta}{\partial x} \right)V \right]
+\end{eqnarray}
+Also,
+\begin{eqnarray}
+DF_\phi &\equiv& \frac{\partial q_{x}}{\partial x} -\frac{\partial}{\partial \sigma} \left[ \left(  \frac{\sigma}{D} \frac{\partial D}{\partial x} + \frac{1}{D} \frac{\partial \eta}{\partial x} \right) q_{x}  \right] +  \frac{\partial q_{y}}{\partial y} -\frac{\partial}{\partial \sigma} \left[ \left(  \frac{\sigma}{D} \frac{\partial D}{\partial y} + \frac{1}{D} \frac{\partial \eta}{\partial y} \right) q_{y}  \right]   \\ 
+\nonumber \\ 
+q_x &=&  A_H \left[ \frac{\partial \phi D}{\partial x} - \frac{\partial}{\partial \sigma} \left( \sigma \frac{\partial D}{\partial x} + \frac{\partial \eta}{\partial x}  \right) \phi \right]   \\ 
+\nonumber \\ 
+q_y &=&  A_H \left[ \frac{\partial \phi D}{\partial y} - \frac{\partial}{\partial \sigma} \left( \sigma \frac{\partial D}{\partial y} + \frac{\partial \eta}{\partial y}  \right) \phi \right] 
+\end{eqnarray}
+where $\phi$ now represents $T$, $S$, $q^2$ and $q^2 l$.
+
+Since the time this paper was accepted for publication, Mellor and Blumberg [1985] have shown that the conventional model for horizontal diffusion is incorrect when bottom topographical slopes are large. A new formulation has been suggested which is simpler than the $DF_x$, $DF_y$ and $DF_\phi$ equations. They makes it possible to model realistically bottom boundary layers over sharply sloping bottoms. They are defined according to:
+\begin{eqnarray}
+DF_x &\equiv& \frac{\partial}{\partial x} (H\tau_{xx}) + \frac{\partial}{\partial y} (H\tau_{xy}) \\
+DF_y &\equiv& \frac{\partial}{\partial x} (H\tau_{yx}) + \frac{\partial}{\partial y} (H\tau_{yy}) \\
+\tau_{xx} &=& 2A_M\frac{\partial U}{\partial x}  \\
+\tau_{xy} &=& \tau_{yx} = A_M(\frac{\partial U}{\partial y}+\frac{\partial V}{\partial x})  \\
+\tau_{yy} &=& 2A_M \frac{\partial V}{\partial y} 
+\end{eqnarray}
+Also,
+\begin{eqnarray}
+DF_\phi &\equiv& \frac{\partial}{\partial x}(Hq_x) + \frac{\partial}{\partial y}(Hq_y) \\
+q_x &\equiv& A_H\frac{\partial \phi}{\partial x} \\
+q_y &\equiv& A_H\frac{\partial \phi}{\partial y}
+\end{eqnarray}
+where $\phi$ represents $T$, $S$, $q^2$ and $q^2 l$. 
+
+\section{Model Splitting Technique}
+ 
+The equations governing the dynamics of coastal circulation contain propagation of fast moving external gravity waves and slow moving internal gravity waves. It is desirable in terms of computer economy to separate out vertically integrated equations (external mode) from the vertical structure equations (internal mode). This technique, known as mode splitting permits the calculations of the free surface elevation with little sacrifice in computational time by solving the volume transport separately from the vertical velocity shear.
+
+The volume transport, external mode equations are obtained by integrating the internal mode equations over the depth, thereby eliminating all vertical structure. By integrating (\ref{eq:final1}) from $\sigma=-1$ to $\sigma=0$ and using the boundary conditions, an equation for the surface elevation can be written as
+
+\begin{equation}
+\frac{\partial \eta}{\partial t} + \frac{\partial \overline{U}D}{\partial x} + \frac{\partial \overline{V}D}{\partial y} =0
+\end{equation}
+
+After integration, the momentum equations become
+\begin{eqnarray}
+\frac{\partial \overline{U} D}{\partial t} + \frac{\partial \overline{U}^2 D}{\partial x} +\frac{\partial \overline{U}\overline{V} D}{\partial y} - \tilde{F_x}-f \overline{V} D + gD \frac{\partial \eta}{\partial x} = -<wu(0)> +<wu(-1)> + G_x- \nonumber \\
+ \frac{gD}{\rho_0} \int_{-1}^0 \int_{\sigma}^0 \left[ D \frac{\partial \rho'}{\partial x}  - \frac{\partial D}{\partial x} \sigma '  \frac{\partial \rho'}{\partial \sigma} \right] d \sigma ' d \sigma \label{eq:intm1} \\
+\nonumber\\
+ \frac{\partial \overline{V} D}{\partial t} + \frac{\partial \overline{U}\overline{V} D}{\partial y} +\frac{\partial \overline{V}^2 D}{\partial y} - \tilde{F_y} + f \overline{U} D + gD \frac{\partial \eta}{\partial y} = -<wv(0)> +<wv(-1)> + G_y- \nonumber \\
+ \frac{gD}{\rho_0} \int_{-1}^0 \int_{\sigma}^0 \left[ D \frac{\partial \rho'}{\partial y}  - \frac{\partial D}{\partial y} \sigma '  \frac{\partial \rho'}{\partial \sigma} \right] d \sigma ' d \sigma  \label{eq:intm2} 
+\end{eqnarray}
+
+The overbars denote vertically integrated velocities such as
+\begin{equation}
+\overline{U} \equiv \int_{-1}^{0} U d \sigma
+\end{equation}
+
+The wind stress components are $-<wu(0)>$  and $-<wv(0)> $, and the bottom stress components are $-<wu(-1)>$  and $-<wv(-1)> $. The quantities are defined according to
+\begin{eqnarray}
+\tilde{F_x}=\frac{\partial}{\partial x} \left[ H2 \overline{A}_M \frac{\partial \overline{U}}{\partial x} \right] +\frac{\partial}{\partial y} \left[ H \overline{A}_M \left( \frac{\partial \overline{U}}{\partial x} + \frac{\partial \overline{V}}{\partial x}\right) \right] \\
+\nonumber\\
+\tilde{F_y}=\frac{\partial}{\partial y} \left[ H2 \overline{A}_M \frac{\partial \overline{U}}{\partial y} \right] +\frac{\partial}{\partial x} \left[ H \overline{A}_M \left( \frac{\partial \overline{U}}{\partial y} + \frac{\partial \overline{V}}{\partial y}\right) \right] \\
+\end{eqnarray}
+
+The so-called dispersion terms are define according to
+\begin{eqnarray}
+G_x=\frac{\partial \overline{U}^2 D}{\partial x} +\frac{\partial \overline{U} \overline{V} D}{\partial y} -  \tilde{F_x} - \frac{\partial \overline{U^2} D}{\partial x} -\frac{\partial \overline{UV} D}{\partial y} + \overline{F_x}\\
+\nonumber\\
+G_y=\frac{\partial \overline{U}\overline{V} D}{\partial x} +\frac{\partial \overline{V} ^2 D}{\partial y} -  \tilde{F_y} - \frac{\partial \overline{UV} D}{\partial x} -\frac{\partial \overline{V^2} D}{\partial y} + \overline{F_y}\\
+\end{eqnarray}
+
+Note that, if$ A_M$ is constant in the vertical, then the ``F" therms in the above equations cancel. However, we account for possible vertical variability in the horizontal diffusivity; such is the case when a Smagorinsky type diffusivity is used. As detailed below, all of the terms on the right side of (\ref{eq:intm1}) and (\ref{eq:intm2}) are evaluated at each internal time step and then held constant throughout the many external time steps. If the external mode is executed $cum sole$, then $G_x=G_y=0$.
+
+\section{Finite Difference Formulation}
+
+\subsection{Spatial and Temporal Finite Differencing}
+
+To derive the finite difference equations, the following sum and difference operations are defined:
+\begin{eqnarray}
+\overline{F(x,y,\sigma,t)}^x \equiv \frac{F(x+\frac{\Delta x}{2}, y, \sigma, t) + F(x-\frac{\Delta x}{2}, y, \sigma, t)}{2} \\
+\nonumber \\
+\delta_x {F(x,y,\sigma,t)} \equiv \frac{F(x+\frac{\Delta x}{2}, y, \sigma, t) - F(x-\frac{\Delta x}{2}, y, \sigma, t)}{\Delta x} \\
+\nonumber \\
+\delta_x \overline{F(x,y,\sigma,t)}^x \equiv \frac{F(x+\Delta x, y, \sigma, t) - F(x-\Delta x, y, \sigma, t)}{2\Delta x} \\
+\nonumber \\
+\overline{F(x,y,\sigma,t)}^{xy} \equiv \overline{\overline{F(x,y,\sigma,t)}^x}^y \equiv \overline{\overline{F(x,y,\sigma,t)}^y}^x\\
+\end{eqnarray}
+
+In current work, we adopt C staggered grid which uses U at points to the east and west of the point where $\eta$ and $H$ are defined and V at points to the north and south of the $\eta$ and $H$ points. This type of grid has been shown by Bateen and Han [1981] to be the most effective grid for high resolution (< 50 km girds) ocean circulation models. The $\Delta x$ and $\Delta y$ are the constant horizontal grid spacings and $\Delta \sigma$ is the vertical increment which varies in thickness to accommodate more resolution near the surface and bottom.
+ 
+ The finite difference equations governing the motion of the baroclinic (internal) modes, (\ref{eq:final1})$\sim$(\ref{eq:final7}) are expressed as
+ \begin{eqnarray}
+&&\delta_t \eta + \delta_x (\overline{D}^x_b U)_f+ \delta_y (\overline{D}^y_b V)_f+ \delta_\sigma (W)_f = 0 \label{eq:fde1} \\ 
+\nonumber \\ 
+&&\delta_t (\overline{ \overline{D}^x_b U}^t) +\delta_x[(\overline{\overline{D}^x_b U)}^x_f \overline{U}_f^x]_b +\delta_y[(\overline{\overline{D}^y_b V)}^x_b \overline{U}_b^y]_f  + \delta_\sigma (\overline{W}_b^x \overline{U}_b^\sigma)_f -\overline {{\tilde {f} \overline {V}^y_f D} }^x_b  -\overline{(f\overline{V}_f^y D)}_b^x + g\overline{D}^x_b\delta_x \eta_b = \delta_\sigma \left[ \frac{\overline{K_M}^x_b}{\overline{D}^x_b} \delta_\sigma(U)^{n+1}_b\right]_f-  \nonumber \\
+&&\ \ \ \ \ \ \ \    \frac{g(\overline{D}^x_b)^2}{\rho_0} \delta_x \left[ \Sigma_{zz=1}^{k} \overline{\rho'_{zz}}^\sigma_b  \overline{\Delta \sigma_{zz}}^\sigma_b \right]_b + \frac{g \overline {D}^x}{\rho_0} \delta_x D_b \{ \Sigma_{zz=1}^{k} \overline{\sigma_{zz}}^\sigma_b {\delta_\sigma [(\overline {\rho'_{zz})}^x_b }]_b \} +  \nonumber \\
+&&\ \ \ \ \ \ \ \  \{\delta_x (2A_MH\delta_x U_f)_b+\delta_y [ \overline{ \overline {A_M}^x_b }^y_b \overline {\overline{H}^x_b }^y_b (\delta_x V_b + \delta_y U_b)]_f\}^{n-1} \label{eq:fde2} \\
+\nonumber \\ 
+\nonumber \\
+&&\delta_t (\overline{ \overline{D}^y_b V}^t) + \delta_x[(\overline{\overline{D}_b^x U}^y)_b \overline{V}_b^x]_f + \delta_y[(\overline{\overline{D}^y_b V)}^y_f \overline{V}_f^y]_b +  \delta_\sigma (\overline{W}_b^y \overline{V}_b^\sigma)_f + \overline {\tilde {f} \overline {U}^x_f D}^y_b  +  \overline{(f\overline{U}_f^x D)_b}^y  + g\overline{D}^y_b\delta_y \eta_b =  \delta_\sigma \left[ \frac{\overline{K_M}^y_b}{\overline{D}^y_b} \delta_\sigma(V)_b^{n+1}\right]_f-  \nonumber \\
+&&\ \ \ \ \ \ \ \  \frac{g(\overline{D}^y_b)^2}{\rho_0} \delta_y \left[ \Sigma_{zz=1}^{k} \overline{\rho'_{zz}}^\sigma_b  \overline{\Delta \sigma_{zz}}^\sigma_b \right]_b + \frac{g \overline {D}^y}{\rho_0} \delta_y D_b \{ \Sigma_{zz=1}^{k} \overline{\sigma_{zz}}^\sigma_b {\delta_\sigma [(\overline {\rho'_{zz})}^y_b }]_b \} +  \nonumber \\
+&&\ \ \ \ \ \ \ \  \{\delta_x [ \overline{ \overline {A_M}^x_b }^y_b \overline {\overline{H}^x_b }^y_b (\delta_x V_b + \delta_y U_b)]_f + \delta_y (2A_MH\delta_y V_f)_b \}^{n-1}  \label{eq:fde3}\\
+\nonumber \\ 
+\nonumber \\
+&&\delta_t(\overline{T D})^t + \delta_x (\overline{T}^x_b U \overline{D}^x_b)_f + \delta_y (\overline{T}^y_b V \overline{D}^y_b)_f + \delta_\sigma (\overline{T}_b^\sigma  W)_f =  \delta_\sigma ( \frac{K_H}{D} \delta_{\sigma} T_b )_f^{n+1}  + \delta_\sigma R_f +  \{\delta_x (\overline{A_H}^x_b \overline{ H}^x_b\delta_x T_b)_f  +  \nonumber \\
+&&\ \ \ \ \ \ \ \delta_y (\overline{A_H}^y_b \overline{H}^y_b \delta_y T_b)_f \}^{n-1} \label{eq:fde4}\\
+\nonumber \\ 
+\nonumber \\
+&&\delta_t(\overline{S D})^t + \delta_x (\overline{S}^x_b U \overline{D}^x_b)_f + \delta_y (\overline{S}^y_b V \overline{D}^y_b)_f + \delta_\sigma (\overline{S}_b^\sigma W)_f =  \delta_\sigma ( \frac{K_H}{D} \delta_{\sigma} S_b )_f^{n+1} + \{\delta_x (\overline{A_H}^x_b \overline{H}^x_b \delta_x S_b)_f + \nonumber \\
+&&\ \ \ \ \ \ \ \  \delta_y (\overline{A_H}^y_b \overline{H}^y_b\delta_y S_b)_f \}^{n-1}  \label{eq:fde5}\\
+\nonumber \\
+&&\overline{\delta_t (q^2 D)}^t + \delta_x (\overline{U}^\sigma_b \overline{q^2}^x_b \overline{D}^x_b)_f + \delta_y (\overline{V}^\sigma_b \overline{q^2}^y_b \overline{D}^y_b)_f +  \delta_\sigma (W q^2)_c  =  \delta_\sigma ( \frac{\overline {K_q}^\sigma_b}{D} \delta_\sigma q^2_b)^{n+1}_f +\frac{2K_M}{D} \left[ (\delta_\sigma \overline{U}^x_f)^2_b + (\delta_\sigma \overline{V}^y_f)^2_b  \right] \nonumber \\ 
+&&\ \ \ \ \ \ \ \  + \frac{2g}{\rho_0} K_H \delta_\sigma \rho_b - \frac{2Dq^3}{B_1 l} + \{ \delta_x ( \overline{ \overline {A_M}^x_b }^\sigma_b {\overline{H}^x_b } \delta_x q^2_b)_f + \delta_y ( \overline{ \overline {A_M}^y_b }^\sigma_b {\overline{H}^y_b } \delta_y q^2_b)_f \}^{n-1} \label{eq:fde6} \\
+\nonumber \\
+&&\overline{\delta_t (q^2 l D)}^t + \delta_x (\overline{U}^\sigma_b \overline{q^2 l}^x_b \overline{D}^x_b) + \delta_y (\overline{V}^\sigma_b \overline{q^2 l}^y_b \overline{D}^y_b) +  \delta_\sigma (Wq^2 l)_c  =  \delta_\sigma ( \frac{\overline {K_q}^\sigma_b}{D} \delta_\sigma q^2 l_b)^{n+1}_f +l E_1 \frac{K_M}{D} \left[ (\delta_\sigma \overline{U}^x_f)^2_b + (\delta_\sigma \overline{V}^y_f)^2_b  \right] \nonumber \\ 
+&&\ \ \ \ \ \ \ \  + \frac{l E_1 g}{\rho_0} K_H \delta_\sigma \rho_b - \frac{Dq^3}{B_1} \left\{ 1+ E_2  \left[ \frac{l}{\kappa D} \left( \frac{-1}{\sigma} +\frac{1}{1+\sigma} \right) \right]^2 \right\} + \{\delta_x [ \overline{ \overline {A_M}^x_b }^\sigma_b {\overline{H}^x_b} \delta_x (q^2l)_b]_f + \delta_y [ \overline{ \overline {A_M}^y_b }^\sigma_b {\overline{H}^y_b } \delta_y (q^2l)_b]_f \}^{n-1} \nonumber \\ 
+\label{eq:fde1}
+\end{eqnarray}
+where
+\begin{eqnarray}
+&&\tilde {f} = \frac{1}{\Delta x \Delta y} [ \overline {V}^y_f \delta_x(\Delta y)_c - \overline {U}^x_f \delta_y(\Delta x)_c ]  \\
+&&A_M = \frac{1}{2} C \Delta x \Delta y \sqrt{  (\delta_xU_f)^2 + \frac{1}{2}[\delta_y (\overline{U_f}^x)_c+\delta_x (\overline{V_f}^y)_c]^2 + (\delta_yV_f)^2  } 
+\end{eqnarray}
+\begin{eqnarray}
+&&A_H = A_M * TPRNI \\
+&&K_M = qlS_M \\
+&&K_H = qlS_H \\
+&&K_q = qlS_q 
+\end{eqnarray}
+where b, c, f stand for backward, central, forward difference, respectively. ${\delta_\sigma}$ and ${\delta_{\sigma_{zz}}}$ stand for vertical difference on z-level and zz-level in sigma coordinate, respectively. 
+ 
+The advective characteristics of the equations \ref{eq:fde4} and \ref{eq:fde5}, evaluated by Kerr and Blumberg [1979], can produce nonphysical behavior if discontinuities in the property, $T$ or $S$, exist. The scheme introduces no artificial horizontal (or vertical) diffusion so that small scale noise generated at a discontinuity must be controlled with the explicit diffusion as is preferred.
+
+The implicit treatment of the vertical diffusion terms is used to accommodate the small vertical spacing required to resolve the important top and bottom boundary layers without drastically reducing the time step as would be the case with the more usual explicit schemes. 
+
+The external mode equations are entirely explicit and are differenced for the continuity equation,
+\begin{equation}
+\delta_t \overline{\eta}^t + \delta_x (\overline{D}^x_b \overline{U})_f + \delta_y (\overline{D}^y_b \overline{V})_f = 0
+\end{equation}
+
+and for the momentum equations
+\begin{eqnarray}
+&&\delta_t \overline{(\overline{D}^x_b \overline{U})}^t + \delta_x (\overline{\overline{D}^x_b \overline{U}}^x_f \overline{\overline{U}}^x_f)_b +  \delta_y (\overline{\overline{D}^y_b \overline{V}}^x_b \overline{\overline{U}}^y_b)_f - \overline {\tilde{f}\overline {\overline {V}}^y_f D}^x_b - \overline{f \overline{\overline{V}}^y_f D}^x_b + g\overline{D}^x_b \delta_x \eta_b = \nonumber \\
+&&\ \ \ \ \ \ \ \  \{\delta_x (2 \overline {A_M}H\delta_x \overline{U}_f)_b+\delta_y [ \overline{ \overline {\overline{A_M}}^x_b }^y_b \overline {\overline{H}^x_b }^y_b (\delta_x \overline{V}_b + \delta_y \overline{U}_b)]_f\}^{n-1} + \phi_x  \\
+\nonumber \\
+&&\delta_t \overline{(\overline{D}^y_b \overline{V})}^t + \delta_x (\overline{\overline{D}^x_b \overline{U}}^y_b \overline{\overline{V}}^x_b)_f +  \delta_y (\overline{\overline{D}^y_b \overline{V}}^y_f \overline{\overline{V}}^y_f)_b + \overline{ \tilde {f}\overline{\overline{U}}^x_f D}^y_b + \overline{f \overline{\overline{U}}^x_f D}^y_b + g\overline{D}^y_b \delta_y \eta_b = \nonumber \\
+&&\ \ \ \ \ \ \ \  \{\delta_x [ \overline{ \overline {\overline {A_M}}^x_b }^y_b \overline {\overline{H}^x_b }^y_b (\delta_x \overline{V_b} + \delta_y \overline {U_b})]_f + \delta_y (2 \overline{A_M}H\delta_y \overline{V_f})_b \}^{n-1} + \phi_y
+ \end{eqnarray}
+
+Where
+\begin{eqnarray}
+&&\tilde {f} = \frac{1}{\Delta x \Delta y} [ \overline {\overline {V}}^y_f \delta_x(\Delta y)_c - \overline {\overline {U}}^x_f \delta_y(\Delta x)_c ]
+\end{eqnarray} 
+\\ \nonumber
+More detailed finite difference equations governing the motion of the baroclinic (internal) modes and baroclinic (internal) modes can be seen in Appendix difference equation.
+
+ \end{document} 

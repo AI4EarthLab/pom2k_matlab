@@ -1,0 +1,262 @@
+\documentclass[oribibl]{llncs}
+\usepackage{amsmath}     %math
+\usepackage{amssymb}
+\usepackage{algorithm}     %format of algorithm
+\usepackage{algorithmic}  %format of algorithm
+\renewcommand{\algorithmiccomment}[1]{ \hfill {/* #1 */} }
+\usepackage{makeidx}  % allows for indexgeneration
+\usepackage{mathrsfs}
+\usepackage[top=2.0cm, bottom=2.0cm, left=1.5cm, right=1.5cm]{geometry}
+\usepackage{graphicx}
+ \usepackage{color}
+\DeclareGraphicsExtensions{.eps,.mps,.pdf,.jpg,.PNG}
+\DeclareGraphicsRule{*}{PNG}{*}{}
+\graphicspath{{./fig/}}
+\begin{document}
+
+\title{A Small Part of POM's RBF}
+\author{Zheng Fang \ \ \ Huang Xing}
+\institute{Center for Earth System Science\\ \email{}}
+\maketitle
+
+\section{Original Equations}
+
+The original equations of the Princeton Ocean Model(POM) are listed following:
+\begin{eqnarray}
+\frac{\partial U}{\partial t}+U\frac{\partial U}{\partial x}+V\frac{\partial U}{\partial y}+W\frac{\partial U}{\partial z}-fV &=& - \frac{1}{\rho_0} \frac{\partial p}{\partial x} + \frac{\partial}{\partial z}  \left ( K_M \frac{\partial U}{\partial z} \right) +F_x\label{eqPOM1}\\ \nonumber \\ 
+\frac{\partial V}{\partial t}+U\frac{\partial V}{\partial x}+V\frac{\partial V}{\partial y}+W\frac{\partial V}{\partial z}+fU &=& - \frac{1}{\rho_0} \frac{\partial p}{\partial y} + \frac{\partial}{\partial z}  \left ( K_M \frac{\partial V}{\partial z} \right) +F_y
+\label{eqPOM2}\\ \nonumber \\ 
+\frac{\partial p}{\partial z} &=& - \rho g \\ \nonumber \\ 
+\frac{\partial U}{\partial x} + \frac{\partial V}{\partial y} + \frac{\partial W}{\partial z} &=& 0 \label{eqPOM4}\\ \nonumber \\ 
+\frac{\partial T}{\partial t}+U\frac{\partial T}{\partial x}+V\frac{\partial T}{\partial y}+W\frac{\partial T}{\partial z} &=& \frac{\partial}{\partial z}  \left ( K_H \frac{\partial T}{\partial z} \right) +F_T \\ \nonumber \\ 
+\frac{\partial S}{\partial t}+U\frac{\partial S}{\partial x}+V\frac{\partial S}{\partial y}+W\frac{\partial S}{\partial z} &=& \frac{\partial}{\partial z}  \left ( K_H \frac{\partial S}{\partial z} \right) +F_S\\ \nonumber \\ 
+\rho &=& \rho(T,S,p)
+\end{eqnarray}
+
+where,
+\begin{eqnarray*}
+F_x &=&  \frac{\partial}{\partial x} \left ( 2A_M \frac{\partial U}{\partial x} \right ) + \frac{\partial}{\partial y} \left [ A_M \left ( \frac{\partial U}{\partial y} + \frac{\partial V}{\partial x} \right ) \right ] \\  \\ 
+F_y &=&  \frac{\partial}{\partial y} \left ( 2A_M \frac{\partial V}{\partial y} \right ) + \frac{\partial}{\partial x} \left [ A_M \left ( \frac{\partial U}{\partial y} + \frac{\partial V}{\partial x} \right ) \right ] \\ \nonumber \\ 
+F_T &=&  \frac{\partial}{\partial x} \left ( A_H \frac{\partial T}{\partial x} \right ) + \frac{\partial}{\partial y} \left ( A_H \frac{\partial T}{\partial y} \right ) \\ \nonumber \\ 
+F_S &=&  \frac{\partial}{\partial x} \left ( A_H \frac{\partial S}{\partial x} \right ) + \frac{\partial}{\partial y} \left ( A_H \frac{\partial S}{\partial y} \right ) \\ \nonumber \\ 
+\end{eqnarray*}
+
+\section{From Cartesian Coordinates to Sigma coordinates}
+As we can see, POM employs sigma coordinates, which are bottom-following coordinates that map the vertical coordinate from $-H \leq z \leq \eta$ to $-1 \leq \sigma \leq 0$ with $\sigma  = (z-\eta)/(H + \eta)$, where the bottom is defined by $z =-H(x, y)$ and the surface is defined by $z = \eta(x, y, t)$. The governing equations are transformed from cartesian coordinates $(x,y,z,t)$ to sigma coordinates $(x^*,y^*,z^*,t^*)$ which satisfy
+\begin{equation}
+x^*=x,\ \ y^*=y,\ \ \sigma=\frac{z-\eta}{H+\eta},\ \ t^*=t
+\end{equation}
+
+The derivatives are then given by the chain rule,
+\begin{eqnarray}
+\frac{\partial}{\partial x} = \frac{\partial x^*}{\partial x} \frac{\partial}{\partial x^*} +  \frac{\partial y^*}{\partial x} \frac{\partial}{\partial y^*} +  \frac{\partial \sigma}{\partial x} \frac{\partial}{\partial \sigma} +  \frac{\partial t^*}{\partial x} \frac{\partial}{\partial t^*}  \\ \nonumber \\ 
+\frac{\partial}{\partial y} = \frac{\partial x^*}{\partial y} \frac{\partial}{\partial x^*} +  \frac{\partial y^*}{\partial y} \frac{\partial}{\partial y^*} +  \frac{\partial \sigma}{\partial y} \frac{\partial}{\partial \sigma} +  \frac{\partial t^*}{\partial y} \frac{\partial}{\partial t^*} \\ \nonumber \\
+\frac{\partial}{\partial z} = \frac{\partial x^*}{\partial z} \frac{\partial}{\partial x^*} +  \frac{\partial y^*}{\partial z} \frac{\partial}{\partial y^*} +  \frac{\partial \sigma}{\partial z} \frac{\partial}{\partial \sigma} +  \frac{\partial t^*}{\partial z} \frac{\partial}{\partial t^*} \\ \nonumber \\ 
+\frac{\partial}{\partial t} = \frac{\partial x^*}{\partial t} \frac{\partial}{\partial x^*} +  \frac{\partial y^*}{\partial t} \frac{\partial}{\partial y^*} +  \frac{\partial \sigma}{\partial t} \frac{\partial}{\partial \sigma} +  \frac{\partial t^*}{\partial t} \frac{\partial}{\partial t^*}
+\end{eqnarray}
+
+which can be written in matrix form as
+\begin{equation}      
+\left[                 
+  \begin{array}{c}  
+    \frac{\partial}{\partial x}  \\  \nonumber \\ 
+    \frac{\partial}{\partial y}  \\ \nonumber \\ 
+    \frac{\partial}{\partial z}  \\ \nonumber \\ 
+    \frac{\partial}{\partial t} 
+  \end{array}
+\right]
+=  
+\left[             
+  \begin{array}{cccc}  
+    \frac{\partial x^*}{\partial x} & \frac{\partial y^*}{\partial x} & \frac{\partial \sigma}{\partial x} & \frac{\partial t^*}{\partial x}\\   \nonumber \\ 
+    \frac{\partial x^*}{\partial y} & \frac{\partial y^*}{\partial y} & \frac{\partial \sigma}{\partial y} & \frac{\partial t^*}{\partial y}\\   \nonumber \\ 
+    \frac{\partial x^*}{\partial z} & \frac{\partial y^*}{\partial z} & \frac{\partial \sigma}{\partial z} & \frac{\partial t^*}{\partial z}\\   \nonumber \\ 
+    \frac{\partial x^*}{\partial t} & \frac{\partial y^*}{\partial t} & \frac{\partial \sigma}{\partial t} & \frac{\partial t^*}{\partial t}\\  
+  \end{array}
+\right]              
+\left[                 
+  \begin{array}{c}  
+    \frac{\partial}{\partial x^*}  \\ \\
+    \frac{\partial}{\partial y^*}  \\ \\
+    \frac{\partial}{\partial \sigma}  \\ \\
+    \frac{\partial}{\partial t^*} 
+  \end{array}
+\right]
+\end{equation}
+
+Specifically,
+\begin{equation}      
+\left[                 
+  \begin{array}{c}  
+    \frac{\partial}{\partial x}  \\  \nonumber \\ 
+    \frac{\partial}{\partial y}  \\ \nonumber \\ 
+    \frac{\partial}{\partial z}  \\ \nonumber \\ 
+    \frac{\partial}{\partial t} 
+  \end{array}
+\right]
+=  
+\left[             
+  \begin{array}{cccc}  
+   1\  & 0\ & -\left( \frac{\sigma}{D} \frac{\partial D}{\partial x^*} + \frac{1}{D}\frac{\partial \eta}{\partial x^*} \right)\ & 0\ \\   \nonumber \\ 
+   0\  & 1\ & -\left(\frac{\sigma}{D} \frac{\partial D}{\partial y^*} + \frac{1}{D}\frac{\partial \eta}{\partial y^*} \right)\ & 0\ \\   \nonumber \\ 
+   0\  & 0\ & \frac{1}{D} \													        & 0 \ \\   \nonumber \\ 
+   0\  & 0\ & -\left(\frac{\sigma}{D} \frac{\partial D}{\partial t^*} + \frac{1}{D}\frac{\partial \eta}{\partial t^*} \right)\   & 1\ \\  
+  \end{array}
+\right]              
+\left[                 
+  \begin{array}{c}  
+    \frac{\partial}{\partial x^*}  \\  \nonumber \\ 
+    \frac{\partial}{\partial y^*}  \\ \nonumber \\ 
+    \frac{\partial}{\partial \sigma}  \\ \nonumber \\ 
+    \frac{\partial}{\partial t^*} 
+  \end{array}
+\right]
+\end{equation}
+
+where we have used the following expressions already, because $D = H(x,y) + \eta (x,y,t)$ and $\eta = \eta (x,y,t)$ only relating to $x,y,t$
+\begin{eqnarray}
+  \frac{\partial D}{\partial x}&=&\frac{\partial D}{\partial x^*},\ \ \frac{\partial \eta}{\partial x} = \frac{\partial \eta}{\partial x^*} 
+  \nonumber \\
+  \nonumber \\
+  \frac{\partial D}{\partial y}&=&\frac{\partial D}{\partial y^*},\ \ \frac{\partial \eta}{\partial y} = \frac{\partial \eta}{\partial y^*}
+  \nonumber \\
+  \nonumber \\
+  \frac{\partial D}{\partial t}&=&\frac{\partial D}{\partial t^*},\ \ \frac{\partial \eta}{\partial t} = \frac{\partial \eta}{\partial t^*}
+  \nonumber \\
+  \nonumber 
+\end{eqnarray}
+
+\section{Gradient Operator and Divergence Operator}
+Taking equation (\ref{eqPOM1}) (\ref{eqPOM2}) for instance, it can be changed into an operator form
+ \begin{eqnarray}
+ \frac{\partial U}{\partial t} = -(\vec{U}\cdot \nabla)U+fV - \frac{1}{\rho_0} \frac{\partial p}{\partial x} + \frac{\partial}{\partial z}  \left ( K_M \frac{\partial U}{\partial z} \right) + F_x \label{eqLater1} \\ \nonumber \\
+  \frac{\partial V}{\partial t} = -(\vec{U}\cdot \nabla)V-fU - \frac{1}{\rho_0} \frac{\partial p}{\partial y} + \frac{\partial}{\partial z}  \left ( K_M \frac{\partial V}{\partial z} \right) + F_y
+ \end{eqnarray}
+ where
+ \begin{equation}
+\vec{U}=
+\left[
+  \begin{array}{c}
+   U \\ \nonumber \\
+   V \\ \\
+   W \\ 
+   \end{array}
+\right] \nonumber
+ \end{equation}
+\begin{eqnarray}
+F_x &=& \frac{\partial}{\partial x} \left ( 2A_M \frac{\partial U}{\partial x} \right ) + \frac{\partial}{\partial y} \left [ A_M \left ( \frac{\partial U}{\partial y} + \frac{\partial V}{\partial x} \right ) \right ] \nonumber \\ \nonumber \\
+F_y &=& \frac{\partial}{\partial y} \left ( 2A_M \frac{\partial V}{\partial y} \right ) + \frac{\partial}{\partial x} \left [ A_M \left ( \frac{\partial V}{\partial x} + \frac{\partial U}{\partial y} \right ) \right ] \nonumber
+\end{eqnarray}
+Also, equation (\ref{eqPOM4}) can be changed into an operator form
+\begin{equation}
+\nabla \cdot \vec{U}=0 \label{eqLater2} \\ 
+\end{equation}
+we define the operator $P$:
+\begin{eqnarray}
+P
+&=&
+\left[             
+  \begin{array}{ccc}  
+   1\ & 0\  & -\left( \frac{\sigma}{D} \frac{\partial D}{\partial x^*} + \frac{1}{D}\frac{\partial \eta}{\partial x^*} \right)\\   \nonumber \\ 
+   0\  & 1\ & -\left(\frac{\sigma}{D} \frac{\partial D}{\partial y^*} + \frac{1}{D}\frac{\partial \eta}{\partial y^*} \right)\\   \nonumber \\ 
+   0\ & 0\ & \frac{1}{D} \													      \\   
+  \end{array}
+\right]
+=
+\left[                 
+  \begin{array}{c}  
+    P^T_x  \\   \\ 
+    P^T_y  \\  \\ 
+    P^T_z  
+  \end{array}
+\right] 
+\\
+\nabla^*  &=&
+\left[                 
+  \begin{array}{c}  
+    \frac{\partial}{\partial x^*}  \\  \\ 
+    \frac{\partial}{\partial y^*}  \\ \\ 
+    \frac{\partial}{\partial \sigma}  \\ 
+  \end{array}
+\right]\nonumber
+\\
+P^T_t &=&
+\left[
+0 \  0 \  -\left( \frac{\sigma}{D} \frac{\partial D}{\partial t^*} + \frac{1}{D}\frac{\partial \eta}{\partial t^*} \right)
+\right] \nonumber 
+\end{eqnarray}
+Taking $\frac{\partial}{\partial x}$ for example, we have
+\begin{eqnarray*}
+  \frac{\partial}{\partial x}&=& \frac{\partial}{\partial x^*}-(\frac{\sigma}{D}\frac{\partial D}{\partial x^*}+\frac{1}{D}\frac{\partial \eta}{\partial x^*})\frac{\partial}{\partial \sigma}= P^T_x \cdot \nabla^* \\ \\
+   \frac{\partial}{\partial y}&=& P^T_y \cdot \nabla ^* \\ \\
+   \frac{\partial}{\partial z}&=& P^T_z \cdot \nabla ^*\\ \\
+   \frac{\partial}{\partial t}&=& P^T_t \cdot \nabla ^* +   \frac{\partial}{\partial t^*}  
+\\ \nonumber \\
+\omega &=& D\left(\frac{\partial \sigma}{\partial t} + U\frac{\partial \sigma}{\partial x} + V\frac{\partial \sigma}{\partial y} + W\frac{\partial \sigma}{\partial z} \right)
+\end{eqnarray*}
+Where $\omega$ represents vertical velocity in sigma coordinte. 
+Next, the gradient operator appearing in (\ref{eqLater1}) must be constrained so that when it is applied to a scalar, it produces a vector which is in the sigma coordinates. This is done by replacing all occurrences of $\nabla$ in (\ref{eqLater1}) with the operator
+\begin{equation}
+ \nabla=P\nabla^* \nonumber
+\end{equation}
+since P projects vectors into sigma coordinates. The divergence operator appearing in (\ref{eqLater2}) must also be restricted so that it produces the divergence of a vector field in sigma coordinates. This is also accomplished with P by simply taking the dot product of the vector field with the projected gradient operator $P\nabla$.
+
+Follow this way we could get equation (\ref{eqChange1}) from equation (\ref{eqLater1})
+\begin{eqnarray}
+\frac{\partial U}{\partial t^*} = &-&P^T_t\nabla^* U -(\vec{U} \cdot P \nabla^*)U+fV - \frac{1}{\rho_0} P^T_x\nabla^*p + P^T_z\nabla^*\left ( K_M P^T_z\nabla^*U\right) + F^*_x   \label{eqChange1} 
+\end{eqnarray}
+Where 
+\begin{eqnarray}
+F^*_x&=&P^T_x \nabla^* \left(2A_M P^T_x \nabla^* {U} \right) + P^T_y \nabla^* \left[A_M \left(P^T_y \nabla^* {U} + P^T_x \nabla^* {V}\right) \right]  \\ \nonumber \\
+     &=& \frac{\partial \tau_{xx}}{\partial x^*} -\frac{\partial}{\partial \sigma} \left[ \left(  \frac{\sigma}{D} \frac{\partial D}{\partial x^*} + \frac{1}{D} \frac{\partial \eta}{\partial x^*} \right) \tau_{xx}  \right] +  \frac{\partial \tau_{yx}}{\partial y^*} -\frac{\partial}{\partial \sigma} \left[ \left(  \frac{\sigma}{D} \frac{\partial D}{\partial y^*} + \frac{1}{D} \frac{\partial \eta}{\partial y^*} \right) \tau_{yx}  \right]   \nonumber 
+\end{eqnarray}
+with
+\begin{eqnarray}
+\tau_{xx} &=& 2 A_M \left[ \frac{\partial UD}{\partial x^*} -\frac{\partial}{\partial \sigma} \left( \sigma \frac{\partial D}{\partial x^*} + \frac{\partial \eta}{\partial x^*} \right)U \right] \\
+\nonumber \\
+\tau_{yx} &=& \ \ A_M  \left[ \frac{\partial UD}{\partial y^*} -\frac{\partial}{\partial \sigma} \left( \sigma \frac{\partial D}{\partial x^*} + \frac{\partial \eta}{\partial x^*} \right)U +  \frac{\partial VD}{\partial x^*} -\frac{\partial}{\partial \sigma} \left( \sigma \frac{\partial D}{\partial x^*} + \frac{\partial \eta}{\partial x^*} \right)V \right]
+\end{eqnarray}
+Since Mellor and Blumberg [1985] have shown that the conventional model for horizontal diffusion is incorrect when bottom topographical slopes are large. A new formulation has been suggested which is simpler than the $F^*_x$, $F^*_y$ and $F^*_\phi$ equations. They makes it possible to model realistically bottom boundary layers over sharply sloping bottoms. They are defined according to:
+\begin{equation}
+F^*_x = \frac{\partial}{\partial x^*} \left (H*2A_M \frac{\partial U}{\partial x^*} \right) + \frac{\partial}{\partial y^*} \left [ H*A_M \left ( \frac{\partial U}{\partial y^*} + \frac{\partial V}{\partial x^*} \right ) \right ]
+\end{equation}
+Putting all these pieces together, the final equations(We already drop all *) in sigma coordinates is given by
+\begin{eqnarray}
+\frac{\partial U}{\partial t}&=&  - P^T_t\nabla U -(\vec{U} \cdot P \nabla)U+fV - \frac{1}{\rho_0} P^T_x\nabla p + P^T_z\nabla \left ( K_M P^T_z\nabla U\right)+F_x \\ \nonumber \\
+\frac{\partial V}{\partial t}&=& - P^T_t\nabla V -(\vec{U} \cdot P \nabla )V-fU - \frac{1}{\rho_0} P^T_y\nabla p + P^T_z\nabla \left ( K_M P^T_z\nabla V\right)+F_y \\ \nonumber \\
+P\nabla  &\cdot  &\vec{U}=0 \\ \nonumber \\
+\frac{\partial T}{\partial t}&=&- P^T_t\nabla T - \ (\vec{U} \cdot P \nabla)T  + P^T_z\nabla \left ( K_H P^T_z\nabla T \right) + F_T \\ \nonumber \\
+\frac{\partial S}{\partial t}&=&- P^T_t\nabla S - \ (\vec{U} \cdot P \nabla)S  + P^T_z\nabla \left ( K_H P^T_z\nabla S \right)  + F_S  \\ \nonumber \\
+\frac{\partial q^2}{\partial t}&=&- P^T_t\nabla q^2 \ -(\vec{U} \cdot P \nabla)q^2 \ +  P^T_z\nabla \left ( K_q P^T_z\nabla q^2 \right) \ + \ 2K_M \ \left[(P^T_z\nabla U)^2 +(P^T_z\nabla V)^2 \right]+\frac{2g}{\rho_0}K_HP^T_z\nabla \rho + \frac{2q^3}{B_1l} + F_q \nonumber \\
+\\
+\frac{\partial q^2l}{\partial t}&=&- P^T_t\nabla q^2l -(\vec{U} \cdot P \nabla)q^2l + P^T_z\nabla \left ( K_q P^T_z\nabla q^2l \right) +lE_1K_M\left [(P^T_z\nabla U)^2+(P^T_z \nabla V)^2 \right]+ \frac{lE_1g}{\rho_0}K_H P^T_z\nabla \rho - \frac{q^3}{B_1} \tilde W + F_{l} \nonumber \\ 
+\\
+p&=&p_{atm} -\rho_0 g \sigma D - gD \int_\sigma^0 \rho'd \sigma'
+\end{eqnarray}
+Where 
+\begin{eqnarray}
+W&=& \omega +  U\left( \sigma\frac{\partial D}{\partial x^*} +\frac{\partial \eta}{\partial x^*} \right) +V \left(\sigma \frac{\partial D}{\partial y^*}+\frac{\partial \eta}{\partial y^*} \right) + \sigma \frac{\partial D}{\partial t^*} + \frac{\partial \eta}{\partial t^*} \\ \nonumber \\
+DF_x &\equiv& \frac{\partial}{\partial x} (H*2A_M\frac{\partial U}{\partial x}) + \frac{\partial}{\partial y} \left [ H*A_M(\frac{\partial U}{\partial y}+\frac{\partial V}{\partial x}) \right] \\ \nonumber \\
+DF_y &\equiv& \frac{\partial}{\partial y} (H*2A_M \frac{\partial V}{\partial y}) + \frac{\partial}{\partial x} \left[ H*A_M(\frac{\partial U}{\partial y}+\frac{\partial V}{\partial x}) \right] 
+\end{eqnarray}
+Also,
+\begin{eqnarray}
+DF_\phi &\equiv& \frac{\partial}{\partial x}(H*A_H\frac{\partial \phi}{\partial x}) + \frac{\partial}{\partial y}(H*A_H\frac{\partial \phi}{\partial y}) 
+\end{eqnarray}
+where $\phi$ represents $T$, $S$, $q^2$ and $q^2 l$. \\
+\subsection{Continuous formulation of nonhydrostatic primitive equation}
+\begin{eqnarray}
+\frac{\partial {\vec{U}}}{\partial t} &=& -P^T_t \nabla {\vec{U}} - \left(\vec{U} \cdot P \nabla \right) \vec{U} - 2\vec{\Omega} \times \vec{U}-\frac{1}{\rho}P\nabla p+ \vec{G} + P^T_z \nabla \left( K_M P^T_z \nabla {\vec{U}} \right) + \vec{F} \\ \nonumber \\ 
+\frac{\partial {\Phi}}{\partial t}    &=& -P^T_t \nabla \Phi \ - (\vec{U} \cdot P \nabla) \Phi \ + P^T_z \left(K_HP^T_z \nabla \Phi \right)+F_\Phi \\ \nonumber \\ 
+\frac{\partial Q}{\partial t} &=& -P^T_t \nabla Q - \left(\vec{U} \cdot P \nabla \right) Q \ +  P^T_z \left(K_QP^T_z \nabla Q \right) + Q_K \left [(P^T_z\nabla U)^2+(P^T_z \nabla V)^2 \right] + Q_b P^T_z \nabla \rho +Q(B_1)  + F_Q \\ \nonumber \\ 
+P\nabla  &\cdot  &\vec{U}=0  \\ \nonumber \\ 
+\rho &=& \rho(T,S,p)
+\end{eqnarray}
+Where $\Phi$ represents $T$ and $S$, $Q$ represents $q^2$ and $q^2l$. $\vec{U}=(U \widehat{i} \ ,V \widehat{j} \ ,W \widehat{k})$, $\vec{\Omega}=(0 \widehat{i} \ ,2|\Omega|\cos{\theta} \widehat{j} \ ,2|\Omega| \sin{\theta} \widehat{k})$, $\vec{G}=(0 \widehat{i} \ ,0  \widehat{j} \ ,-g \widehat{k})$, $\vec{F}=(F_x \widehat{i} \ ,F_y \widehat{j} \ ,F_z \widehat{k})$
+\section{The RBF Method on Sigma Coordinates}
+
+\section{References}
+
+
+
+ \end{document} 
