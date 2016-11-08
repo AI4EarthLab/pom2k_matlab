@@ -5,6 +5,7 @@
 \renewcommand{\algorithmiccomment}[1]{ \hfill {/* #1 */} }
 \usepackage{makeidx}  % allows for indexgeneration
 \usepackage{mathrsfs}
+\usepackage{typearea}
 \usepackage[top=2.0cm, bottom=2.0cm, left=1.5cm, right=1.5cm]{geometry}
 \usepackage{graphicx}
  \usepackage{color}
@@ -14,7 +15,7 @@
 \begin{document}
 
 \title{A Manual for the Princeton Ocean Model}
-\author{Xiaomeng Huang \ \ \ \  Xing Huang}
+\author{Xiaomeng Huang}
 \institute{Center for Earth System Science\\ \email{}}
 \maketitle
 
@@ -301,14 +302,14 @@ Since $D=H+\eta$ and $\frac{\partial H}{\partial t^*}=0$,  dropping the (*)  we 
 To transform the momentum equations, we have
 \begin{eqnarray}
 \frac{\partial}{\partial t}+U\frac{\partial}{\partial x} + V\frac{\partial}{\partial y}+W\frac{\partial}{\partial z} &=& \frac{d}{dt}+W\frac{\partial}{\partial z} \nonumber \\ \nonumber \\ 
-&=&\frac{d}{dt^*} -\frac{1}{D}\left( \sigma \frac{dD}{dt^*} +\frac{d\eta}{dt^*}   \right) \frac{\partial}{\partial \sigma} + \frac{W}{D}\frac{\partial}{\partial \sigma}  \nonumber \\ \nonumber \\ 
+&=&\frac{d}{dt^*} -\frac{1}{D}\left( \sigma \frac{dD}{dt^*} +\frac{d\eta}{dt^*}   \right) \frac{\partial}{\partial \sigma} +W\frac{\partial}{\partial \sigma}  \nonumber \\ \nonumber \\ 
 &=&\frac{d}{dt^*} -\frac{1}{D}\left( \sigma \frac{dD}{dt^*} +\frac{d\eta}{dt^*}   \right) \frac{\partial}{\partial \sigma}  +\frac{1}{D}\left( w+ \sigma \frac{dD}{dt^*} +\frac{d\eta}{dt^*} \right) \frac{\partial}{\partial \sigma}  \nonumber \\ \nonumber \\ 
 &=&\frac{d}{dt^*} - \frac{w}{D} \frac{\partial}{\partial \sigma}
 \end{eqnarray}
 
 Therefore, if $\phi=U,V,T$, or $S$,
 \begin{eqnarray}
-\frac{\partial \phi}{\partial t}+U\frac{\partial \phi}{\partial x} + V\frac{\partial \phi}{\partial y}+W\frac{\partial \phi}{\partial z} &=& \frac{\partial \phi}{\partial t^*}+U\frac{\partial \phi}{\partial x^*} + V\frac{\partial \phi}{\partial y^*}+\frac{w}{D}\frac{\partial \phi}{\partial \sigma} \nonumber \\ \nonumber \\ 
+\frac{\partial \phi}{\partial t}+U\frac{\partial \phi}{\partial x} + V\frac{\partial \phi}{\partial y}+W\frac{\partial}{\partial z} &=& \frac{\partial \phi}{\partial t^*}+U\frac{\partial \phi}{\partial x^*} + V\frac{\partial \phi}{\partial y^*}+\frac{w}{D}\frac{\partial \phi}{\partial \sigma} \nonumber \\ \nonumber \\ 
 &=& \frac{1}{D} \left[  D\frac{\partial \phi}{\partial t^*}+DU\frac{\partial \phi}{\partial x^*} + DV\frac{\partial \phi}{\partial y^*}+w\frac{\partial \phi}{\partial \sigma}  \right]  \nonumber \\ \nonumber \\ 
 &=& \frac{1}{D} \left[  \frac{\partial (D\phi)}{\partial t^*}+\frac{\partial (DU\phi)}{\partial x^*} + \frac{\partial (DV\phi)}{\partial y^*}+\frac{\partial (w\phi)}{\partial \sigma}  \right]   \nonumber \\ \nonumber \\ 
 && - \left[ \phi \left( \frac{\partial D}{\partial t^*}+\frac{\partial}{\partial x^*}(DU) + V\frac{\partial }{\partial y^*}(DV)+\frac{\partial w}{\partial \sigma} \right) \right] 
@@ -341,27 +342,27 @@ If $\nabla = \nabla^* -\left( \frac{\sigma}{D}\nabla^*D +\frac{1}{D}\nabla^*\eta
 \end{equation}
 Based on the pressure equation (\ref{eq:p1}), we have 
 \begin{equation}
-\nabla p = \rho_0 g \nabla^* \eta  + gD\nabla^*\int_\sigma^0\rho' d\sigma' -  g\int_\sigma^0\sigma'\nabla^*D\frac{\partial \rho'}{\partial \sigma'} d\sigma'  -g\nabla^* \eta \int_{\rho'(\sigma)}^{\rho'(0)} d\rho' 
+\nabla p = \rho_0 g \nabla^* \eta  + gD\nabla^*\int_\sigma^0\rho' d\sigma' -  g\int_\sigma^0\sigma'\nabla^*D\frac{\partial \rho'}{\partial \sigma'} d\sigma'  -g\int_\sigma^0 \nabla^* \eta\frac{\partial \rho'}{\partial \sigma'} d\sigma' 
 \end{equation}
-Where, ${\rho'(0)=0}$, ${\frac{\rho_0+\rho'}{\rho_0} \approx 1}$,the fourth term on the right side can be integrated with ${\rho_0g \nabla^*\eta}$ so that
+The fourth term on the right side can be integrated so that
 \begin{equation}
-\frac{1}{\rho_0}\nabla p = g \nabla^* \eta  +\frac{gD}{\rho_0}\nabla^*\int_\sigma^0\rho'd\sigma'  -\frac{g\nabla^*D}{\rho_0}\int_\sigma^0\sigma'\frac{\partial \rho'}{\partial \sigma'} d\sigma'
+\nabla p = \rho_0 g \nabla^* \eta  +gD\nabla^*\int_\sigma^0\rho'd\sigma'  -g\nabla^*D\int_\sigma^0\sigma'\frac{\partial \rho'}{\partial \sigma'} d\sigma'
 \end{equation}
 The governing equations may now be written as(all * will be dropped for notational convenience)
 \begin{eqnarray}
 &&\frac{\partial \eta}{\partial t} + \frac{\partial UD}{\partial x}+ \frac{\partial VD}{\partial y}+ \frac{\partial w}{\partial \sigma}=0  \label{eq:final1}\\ 
 \nonumber \\ 
-&&\frac{\partial UD}{\partial t}  +\frac{\partial U^2D}{\partial x} +\frac{\partial UVD}{\partial y}+ \frac{\partial Uw}{\partial \sigma}-fVD+gD\frac{\partial \eta}{\partial x} = \frac{\partial}{\partial \sigma}\left( \frac{K_M}{D}\frac{\partial U}{\partial \sigma} \right) - \frac{gD^2}{\rho_0} \frac{\partial}{\partial x} \int_\sigma^0 \rho' d \sigma' + \frac{gD}{\rho_0}\frac{\partial D}{\partial x} \int_\sigma^0 \sigma' \frac{\partial \rho'}{\partial \sigma'} d \sigma' + DF_x  \label{eq:final2}\nonumber \\  
+&&\frac{\partial UD}{\partial t}  +\frac{\partial U^2D}{\partial x} +\frac{\partial UVD}{\partial y}+ \frac{\partial Uw}{\partial \sigma}-fVD+gD\frac{\partial \eta}{\partial x} = \frac{\partial}{\partial \sigma}\left( \frac{K_M}{D}\frac{\partial U}{\partial \sigma} \right) - \frac{gD^2}{\rho_0} \frac{\partial}{\partial x} \int_\sigma^0 \rho d \sigma + \frac{gD}{\rho_0}\frac{\partial D}{\partial x} \int_\sigma^0 \sigma \frac{\partial \rho}{\partial \sigma} d \sigma + DF_x  \label{eq:final2}\nonumber \\  
 \\ 
-&&\frac{\partial VD}{\partial t}  +\frac{\partial UVD}{\partial x} +\frac{\partial V^2D}{\partial y} + \frac{\partial Vw}{\partial \sigma} +fUD+gD\frac{\partial \eta}{\partial y} = \frac{\partial}{\partial \sigma}\left( \frac{K_M}{D}\frac{\partial V}{\partial \sigma} \right) - \frac{gD^2}{\rho_0} \frac{\partial}{\partial y} \int_\sigma^0 \rho' d \sigma' + \frac{gD}{\rho_0}\frac{\partial D}{\partial y} \int_\sigma^0 \sigma' \frac{\partial \rho'}{\partial \sigma'} d \sigma' + DF_y  \label{eq:final3}\nonumber \\  
+&&\frac{\partial VD}{\partial t}  +\frac{\partial UVD}{\partial x} +\frac{\partial V^2D}{\partial y} + \frac{\partial Vw}{\partial \sigma} +fVD+gD\frac{\partial \eta}{\partial y} = \frac{\partial}{\partial \sigma}\left( \frac{K_M}{D}\frac{\partial V}{\partial \sigma} \right) - \frac{gD^2}{\rho_0} \frac{\partial}{\partial y} \int_\sigma^0 \rho d \sigma + \frac{gD}{\rho_0}\frac{\partial D}{\partial y} \int_\sigma^0 \sigma \frac{\partial \rho}{\partial \sigma} d \sigma + DF_y  \label{eq:final3}\nonumber \\  
 \\  
-&&\frac{\partial TD}{\partial t}+\frac{\partial TUD}{\partial x}+\frac{\partial TVD}{\partial y}+\frac{\partial Tw}{\partial \sigma} = \frac{\partial}{\partial \sigma}  \left ( K_H \frac{\partial T}{\partial \sigma} \right) +D F_T  \label{eq:final4}\\ 
+&&\frac{\partial TD}{\partial t}+\frac{\partial TUD}{\partial x}+\frac{\partial TVD}{\partial y}+\frac{\partial Tw}{\partial z} = \frac{\partial}{\partial z}  \left ( K_H \frac{\partial T}{\partial z} \right) +D F_T  \label{eq:final4}\\ 
 \nonumber \\ 
-&&\frac{\partial SD}{\partial t}+\frac{\partial SUD}{\partial x}+\frac{\partial SVD}{\partial y}+\frac{\partial Sw}{\partial \sigma} = \frac{\partial}{\partial \sigma}  \left ( K_H \frac{\partial S}{\partial \sigma} \right) +D F_S \label{eq:final5} \\ 
+&&\frac{\partial SD}{\partial t}+\frac{\partial SUD}{\partial x}+\frac{\partial SVD}{\partial y}+\frac{\partial Sw}{\partial z} = \frac{\partial}{\partial z}  \left ( K_H \frac{\partial S}{\partial z} \right) +D F_S \label{eq:final5} \\ 
 \nonumber \\ 
-&&\frac{\partial q^2D}{\partial t} + \frac{\partial Uq^2D}{\partial x} +\frac{\partial Vq^2D}{\partial y} + \frac{\partial wq^2}{\partial \sigma}  = \frac{\partial}{\partial \sigma} \left( \frac{K_q}{D}  \frac{\partial q^2}{\partial \sigma} \right)+\frac{2K_M}{D}\left[ \left( \frac{\partial U}{\partial \sigma}\right)^2 + \left( \frac{\partial V}{\partial \sigma}\right)^2 \right] + \frac{2g}{\rho_0}K_H\frac{\partial \rho}{\partial \sigma} - \frac{2D q^3}{B_1 l} + D F_q  \label{eq:final6}\nonumber \\  
+&&\frac{\partial q^2D}{\partial t} + \frac{\partial Uq^2D}{\partial x} +\frac{\partial Vq^2D}{\partial y} + \frac{\partial wq^2}{\partial z}  = \frac{\partial}{\partial z} \left( \frac{K_q}{D}  \frac{\partial q^2}{\partial z} \right)+\frac{2K_M}{D}\left[ \left( \frac{\partial U}{\partial Z}\right)^2 + \left( \frac{\partial V}{\partial Z}\right)^2 \right] + \frac{2g}{\rho_0}K_H\frac{\partial \rho}{\partial z} - \frac{2D q^3}{B_1 l} + D F_q  \label{eq:final6}\nonumber \\  
 \\   
-&&\frac{\partial q^2 l D}{\partial t} + \frac{\partial U q^2 l D}{\partial x} +\frac{\partial V q^2 l D}{\partial y} + \frac{\partial w q^2 l}{\partial \sigma}   = \frac{\partial}{\partial \sigma} \left( \frac{K_q}{D} \frac{\partial q^2 l}{\partial \sigma} \right)+ E_1  l \left\{ \frac{K_M}{D}\left[ \left( \frac{\partial U}{\partial \sigma}\right)^2 + \left( \frac{\partial V}{\partial \sigma}\right)^2 \right] + \frac{q E_3}{\rho_0}K_H\frac{\partial \rho}{\partial \sigma} \right\} - \frac{D q^3}{B_1} \widetilde{W} + D F_l    \label{eq:final7}\nonumber \\ 
+&&\frac{\partial q^2 l D}{\partial t} + \frac{\partial U q^2 l D}{\partial x} +\frac{\partial V q^2 l D}{\partial y} + \frac{\partial w q^2 l}{\partial z}   = \frac{\partial}{\partial z} \left( \frac{K_q}{D} \frac{\partial q^2 l}{\partial z} \right)+ E_1  l \left\{ \frac{K_M}{D}\left[ \left( \frac{\partial U}{\partial Z}\right)^2 + \left( \frac{\partial V}{\partial Z}\right)^2 \right] + \frac{q E_3}{\rho_0}K_H\frac{\partial \rho}{\partial z} \right\} - \frac{D q^3}{B_1} \widetilde{W} + D F_l    \label{eq:final7}\nonumber \\ 
 \nonumber  \\ 
 \end{eqnarray}
 
@@ -377,7 +378,7 @@ with
 \nonumber \\
 \tau_{yy} &=& 2 A_M \left[ \frac{\partial VD}{\partial y} -\frac{\partial}{\partial \sigma} \left( \sigma \frac{\partial D}{\partial x} + \frac{\partial \eta}{\partial x} \right)V \right] \\
 \nonumber \\
-\tau_{xy} = \tau_{yx} &=& \ \ A_M  \left[ \frac{\partial UD}{\partial y} -\frac{\partial}{\partial \sigma} \left( \sigma \frac{\partial D}{\partial x} + \frac{\partial \eta}{\partial x} \right)U +  \frac{\partial VD}{\partial x} -\frac{\partial}{\partial \sigma} \left( \sigma \frac{\partial D}{\partial x} + \frac{\partial \eta}{\partial x} \right)V \right]
+\tau_{xy} = \tau_{yx} &=& A_M  \left[ \frac{\partial UD}{\partial y} -\frac{\partial}{\partial \sigma} \left( \sigma \frac{\partial D}{\partial x} + \frac{\partial \eta}{\partial x} \right)U +  \frac{\partial VD}{\partial x} -\frac{\partial}{\partial \sigma} \left( \sigma \frac{\partial D}{\partial x} + \frac{\partial \eta}{\partial x} \right)V \right]
 \end{eqnarray}
 Also,
 \begin{eqnarray}
@@ -427,7 +428,7 @@ After integration, the momentum equations become
 The overbars denote vertically integrated velocities such as
 \begin{equation}
 \overline{U} \equiv \int_{-1}^{0} U d \sigma
-\end{equation}
+\end{equation}	
 
 The wind stress components are $-<wu(0)>$  and $-<wv(0)> $, and the bottom stress components are $-<wu(-1)>$  and $-<wv(-1)> $. The quantities are defined according to
 \begin{eqnarray}
@@ -457,51 +458,29 @@ To derive the finite difference equations, the following sum and difference oper
 \nonumber \\
 \delta_x \overline{F(x,y,\sigma,t)}^x \equiv \frac{F(x+\Delta x, y, \sigma, t) - F(x-\Delta x, y, \sigma, t)}{2\Delta x} \\
 \nonumber \\
-\overline{F(x,y,\sigma,t)}^{xy} \equiv \overline{\overline{F(x,y,\sigma,t)}^x}^y \equiv \overline{\overline{F(x,y,\sigma,t)}^y}^x\\
+\overline{F(x,y,\sigma,t)}^{xy} \equiv \overline{\overline{F(x,y,\sigma,t)}^x}^y \equiv \overline{\overline{F(x,y,\sigma,t)}^y}^x 
 \end{eqnarray}
 
 In current work, we adopt C staggered grid which uses U at points to the east and west of the point where $\eta$ and $H$ are defined and V at points to the north and south of the $\eta$ and $H$ points. This type of grid has been shown by Bateen and Han [1981] to be the most effective grid for high resolution (< 50 km girds) ocean circulation models. The $\Delta x$ and $\Delta y$ are the constant horizontal grid spacings and $\Delta \sigma$ is the vertical increment which varies in thickness to accommodate more resolution near the surface and bottom.
- 
  The finite difference equations governing the motion of the baroclinic (internal) modes, (\ref{eq:final1})$\sim$(\ref{eq:final7}) are expressed as
  \begin{eqnarray}
-&&\delta_t \eta + \delta_x (\overline{D}^x_b U)_f+ \delta_y (\overline{D}^y_b V)_f+ \delta_\sigma (W)_f = 0 \label{eq:fde1} \\ 
+&&\delta_t \eta + \delta_x (\overline{D}^x U)+ \delta_y (\overline{D}^y V)+ \delta_\sigma (w)=0 \label{eq:fde1} \\ 
 \nonumber \\ 
-&&\delta_t (\overline{ \overline{D}^x_b U}^t) +\delta_x[(\overline{\overline{D}^x_b U)}^x_f \overline{U}_f^x]_b +\delta_y[(\overline{\overline{D}^y_b V)}^x_b \overline{U}_b^y]_f  + \delta_\sigma (\overline{W}_b^x \overline{U}_b^\sigma)_f -\overline {{\tilde {f} \overline {V}^y_f D} }^x_b  -\overline{(f\overline{V}_f^y D)}_b^x + g\overline{D}^x_b\delta_x \eta_b = \delta_\sigma \left[ \frac{\overline{K_M}^x_b}{\overline{D}^x_b} \delta_\sigma(U)^{n+1}_b\right]_f-  \nonumber \\
-&&\ \ \ \ \ \ \ \    \frac{g(\overline{D}^x_b)^2}{\rho_0} \delta_x \left[ \Sigma_{zz=1}^{k} \overline{\rho'_{zz}}^\sigma_b  \overline{\Delta \sigma_{zz}}^\sigma_b \right]_b + \frac{g \overline {D}^x}{\rho_0} \delta_x D_b \{ \Sigma_{zz=1}^{k} \overline{\sigma_{zz}}^\sigma_b {\delta_\sigma [(\overline {\rho'_{zz})}^x_b }]_b \} +  \nonumber \\
-&&\ \ \ \ \ \ \ \  \{\delta_x (2A_MH\delta_x U_f)_b+\delta_y [ \overline{ \overline {A_M}^x_b }^y_b \overline {\overline{H}^x_b }^y_b (\delta_x V_b + \delta_y U_b)]_f\}^{n-1} \label{eq:fde2} \\
+&&\delta_t (\overline{ \overline{D}^x U}^t)+\delta_x(\overline{\overline{D}^x U}^x \overline{U}^x)_b +\delta_y(\overline{\overline{D}^y V}^x \overline{U}^y)_f -\overline{f\overline{V}^y D}^x  + \delta_\sigma (\overline{W}^x \overline{U}^\sigma) + g\overline{D}^x\delta_x \eta =  \delta_\sigma \left[ \frac{\overline{K_M}^x}{\overline{D}^x} \delta_\sigma(U)^{n+1}\right]-  \nonumber \\
+&&\ \ \ \ \ \ \ \    \frac{g(\overline{D}^x)^2}{\rho_0} \delta_x \left[ \Sigma_{m=1}^{k} \overline{\rho_{m-\frac{1}{2}}}^\sigma  \overline{\Delta \sigma_{m-\frac{1}{2}}}^\sigma \right] + \{\delta_x (2A_MH\delta_x U_f)_b+\delta_y [A_MH(\delta_x V + \delta_y U)]_f\}^{n-1} \label{eq:fde2} \\
 \nonumber \\ 
-\nonumber \\
-&&\delta_t (\overline{ \overline{D}^y_b V}^t) + \delta_x[(\overline{\overline{D}_b^x U}^y)_b \overline{V}_b^x]_f + \delta_y[(\overline{\overline{D}^y_b V)}^y_f \overline{V}_f^y]_b +  \delta_\sigma (\overline{W}_b^y \overline{V}_b^\sigma)_f + \overline {\tilde {f} \overline {U}^x_f D}^y_b  +  \overline{(f\overline{U}_f^x D)_b}^y  + g\overline{D}^y_b\delta_y \eta_b =  \delta_\sigma \left[ \frac{\overline{K_M}^y_b}{\overline{D}^y_b} \delta_\sigma(V)_b^{n+1}\right]_f-  \nonumber \\
-&&\ \ \ \ \ \ \ \  \frac{g(\overline{D}^y_b)^2}{\rho_0} \delta_y \left[ \Sigma_{zz=1}^{k} \overline{\rho'_{zz}}^\sigma_b  \overline{\Delta \sigma_{zz}}^\sigma_b \right]_b + \frac{g \overline {D}^y}{\rho_0} \delta_y D_b \{ \Sigma_{zz=1}^{k} \overline{\sigma_{zz}}^\sigma_b {\delta_\sigma [(\overline {\rho'_{zz})}^y_b }]_b \} +  \nonumber \\
-&&\ \ \ \ \ \ \ \  \{\delta_x [ \overline{ \overline {A_M}^x_b }^y_b \overline {\overline{H}^x_b }^y_b (\delta_x V_b + \delta_y U_b)]_f + \delta_y (2A_MH\delta_y V_f)_b \}^{n-1}  \label{eq:fde3}\\
+&&\delta_t (\overline{ \overline{D}^y V}^t)+\delta_x(\overline{\overline{D}^x U}^y \overline{V}^x) +\delta_y(\overline{\overline{D}^y V}^y \overline{V}^y) -\overline{f\overline{U}^x D}^y  + \delta_\sigma (\overline{W}^y \overline{V}^\sigma) + g\overline{D}^y\delta_y \eta =  \delta_\sigma \left[ \frac{\overline{K_M}^y}{\overline{D}^y} \delta_\sigma(V)^{n+1}\right]-  \nonumber \\
+&&\ \ \ \ \ \ \ \  \frac{g(\overline{D}^y)^2}{\rho_0} \delta_y \left[ \Sigma_{m=1}^{k} \overline{\rho_{m-\frac{1}{2}}}^\sigma  \overline{\Delta \sigma_{m-\frac{1}{2}}}^\sigma \right] + \{\delta_y (2A_MH\delta_y V_f)_b+\delta_x [A_MH(\delta_x V + \delta_y U)]_f\}^{n-1}  \label{eq:fde3}\\
 \nonumber \\ 
-\nonumber \\
-&&\delta_t(\overline{T D})^t + \delta_x (\overline{T}^x_b U \overline{D}^x_b)_f + \delta_y (\overline{T}^y_b V \overline{D}^y_b)_f + \delta_\sigma (\overline{T}_b^\sigma  W)_f =  \delta_\sigma ( \frac{K_H}{D} \delta_{\sigma} T_b )_f^{n+1}  + \delta_\sigma R_f +  \{\delta_x (\overline{A_H}^x_b \overline{ H}^x_b\delta_x T_b)_f  +  \nonumber \\
-&&\ \ \ \ \ \ \ \delta_y (\overline{A_H}^y_b \overline{H}^y_b \delta_y T_b)_f \}^{n-1} \label{eq:fde4}\\
+&&\delta_t(\overline{T D})^t + \delta_x (\overline{T}^x U \overline{D}^x) + \delta_y (\overline{T}^y V \overline{D}^y) + \delta_\sigma (\overline{T}^\sigma V w) =  \delta_\sigma ( \frac{K_H}{D} \delta_{\sigma} T )^{n+1} + F_{T}^{n-1} \label{eq:fde4}\\
 \nonumber \\ 
+&&\delta_t(\overline{S D})^t + \delta_x (\overline{S}^x U \overline{D}^x) + \delta_y (\overline{S}^y V \overline{D}^y) + \delta_\sigma (\overline{S}^\sigma V w) =  \delta_\sigma ( \frac{K_H}{D} \delta_{\sigma} S )^{n+1} + F_{S}^{n-1} \label{eq:fde5}\\
 \nonumber \\
-&&\delta_t(\overline{S D})^t + \delta_x (\overline{S}^x_b U \overline{D}^x_b)_f + \delta_y (\overline{S}^y_b V \overline{D}^y_b)_f + \delta_\sigma (\overline{S}_b^\sigma W)_f =  \delta_\sigma ( \frac{K_H}{D} \delta_{\sigma} S_b )_f^{n+1} + \{\delta_x (\overline{A_H}^x_b \overline{H}^x_b \delta_x S_b)_f + \nonumber \\
-&&\ \ \ \ \ \ \ \  \delta_y (\overline{A_H}^y_b \overline{H}^y_b\delta_y S_b)_f \}^{n-1}  \label{eq:fde5}\\
-\nonumber \\
-&&\overline{\delta_t (q^2 D)}^t + \delta_x (\overline{U}^\sigma_b \overline{q^2}^x_b \overline{D}^x_b)_f + \delta_y (\overline{V}^\sigma_b \overline{q^2}^y_b \overline{D}^y_b)_f +  \delta_\sigma (W q^2)_c  =  \delta_\sigma ( \frac{\overline {K_q}^\sigma_b}{D} \delta_\sigma q^2_b)^{n+1}_f +\frac{2K_M}{D} \left[ (\delta_\sigma \overline{U}^x_f)^2_b + (\delta_\sigma \overline{V}^y_f)^2_b  \right] \nonumber \\ 
-&&\ \ \ \ \ \ \ \  + \frac{2g}{\rho_0} K_H \delta_\sigma \rho_b - \frac{2Dq^3}{B_1 l} + \{ \delta_x ( \overline{ \overline {A_M}^x_b }^\sigma_b {\overline{H}^x_b } \delta_x q^2_b)_f + \delta_y ( \overline{ \overline {A_M}^y_b }^\sigma_b {\overline{H}^y_b } \delta_y q^2_b)_f \}^{n-1} \label{eq:fde6} \\
-\nonumber \\
-&&\overline{\delta_t (q^2 l D)}^t + \delta_x (\overline{U}^\sigma_b \overline{q^2 l}^x_b \overline{D}^x_b) + \delta_y (\overline{V}^\sigma_b \overline{q^2 l}^y_b \overline{D}^y_b) +  \delta_\sigma (Wq^2 l)_c  =  \delta_\sigma ( \frac{\overline {K_q}^\sigma_b}{D} \delta_\sigma q^2 l_b)^{n+1}_f +l E_1 \frac{K_M}{D} \left[ (\delta_\sigma \overline{U}^x_f)^2_b + (\delta_\sigma \overline{V}^y_f)^2_b  \right] \nonumber \\ 
-&&\ \ \ \ \ \ \ \  + \frac{l E_1 g}{\rho_0} K_H \delta_\sigma \rho_b - \frac{Dq^3}{B_1} \left\{ 1+ E_2  \left[ \frac{l}{\kappa D} \left( \frac{-1}{\sigma} +\frac{1}{1+\sigma} \right) \right]^2 \right\} + \{\delta_x [ \overline{ \overline {A_M}^x_b }^\sigma_b {\overline{H}^x_b} \delta_x (q^2l)_b]_f + \delta_y [ \overline{ \overline {A_M}^y_b }^\sigma_b {\overline{H}^y_b } \delta_y (q^2l)_b]_f \}^{n-1} \nonumber \\ 
-\label{eq:fde1}
+&&\overline{\delta_t (q^2 D)}^t + \delta_x (\overline{U}^\sigma \overline{q^2}^x \overline{D}^x) + \delta_y (\overline{V}^\sigma \overline{q^2}^y \overline{D}^y) +  \delta_\sigma (\overline{U}^\sigma \overline{q^2}^\sigma)  =  \delta_\sigma ( \frac{K_q}{D} \delta_\sigma q^2)^{n+1} +\frac{2K_M}{D} \left[ (\delta_\sigma \overline{U}^x)^2 + (\delta_\sigma \overline{V}^y)^2  \right] \nonumber \\ 
+&&\ \ \ \ \ \ \ \  + \frac{2g}{\rho_0} K_H \delta_\sigma \rho - \frac{2Dq^3}{B_1 l} + F_n^{n-1} \label{eq:fde6} \\
+&&\overline{\delta_t (q^2 l D)}^t + \delta_x (\overline{U}^\sigma \overline{q^2 l}^x \overline{D}^x) + \delta_y (\overline{V}^\sigma \overline{q^2 l}^y \overline{D}^y) +  \delta_\sigma (\overline{U}^\sigma \overline{q^2 l}^\sigma)  =  \delta_\sigma ( \frac{K_q}{D} \delta_\sigma q^2 l)^{n+1} +l E_1 \frac{K_M}{D} \left[ (\delta_\sigma \overline{U}^x)^2 + (\delta_\sigma \overline{V}^y)^2  \right] \nonumber \\ 
+&&\ \ \ \ \ \ \ \  + \frac{l E_1 g}{\rho_0} K_H \delta_\sigma \rho - \frac{Dq^3}{B_1} \left\{ 1+ E_2  \left[ \frac{l}{K_D} \left( \frac{1}{\sigma} +\frac{1}{1+\sigma} \right) \right]^2 \right\} + F_l^{n-1} \label{eq:fde7}
 \end{eqnarray}
-where
-\begin{eqnarray}
-&&\tilde {f} = \frac{1}{\Delta x \Delta y} [ \overline {V}^y_f \delta_x(\Delta y)_c - \overline {U}^x_f \delta_y(\Delta x)_c ]  \\
-&&A_M = \frac{1}{2} C \Delta x \Delta y \sqrt{  (\delta_xU_f)^2 + \frac{1}{2}[\delta_y (\overline{U_f}^x)_c+\delta_x (\overline{V_f}^y)_c]^2 + (\delta_yV_f)^2  } 
-\end{eqnarray}
-\begin{eqnarray}
-&&A_H = A_M * TPRNI \\
-&&K_M = qlS_M \\
-&&K_H = qlS_H \\
-&&K_q = qlS_q 
-\end{eqnarray}
-where b, c, f stand for backward, central, forward difference, respectively. ${\delta_\sigma}$ and ${\delta_{\sigma_{zz}}}$ stand for vertical difference on z-level and zz-level in sigma coordinate, respectively. 
  
 The advective characteristics of the equations \ref{eq:fde4} and \ref{eq:fde5}, evaluated by Kerr and Blumberg [1979], can produce nonphysical behavior if discontinuities in the property, $T$ or $S$, exist. The scheme introduces no artificial horizontal (or vertical) diffusion so that small scale noise generated at a discontinuity must be controlled with the explicit diffusion as is preferred.
 
@@ -509,23 +488,78 @@ The implicit treatment of the vertical diffusion terms is used to accommodate th
 
 The external mode equations are entirely explicit and are differenced for the continuity equation,
 \begin{equation}
-\delta_t \overline{\eta}^t + \delta_x (\overline{D}^x_b \overline{U})_f + \delta_y (\overline{D}^y_b \overline{V})_f = 0
+\delta_t \overline{\eta}^t + \delta_x (\overline{D}^x \overline{U}) + \delta_y (\overline{D}^y \overline{V}) =0
 \end{equation}
 
 and for the momentum equations
 \begin{eqnarray}
-&&\delta_t \overline{(\overline{D}^x_b \overline{U})}^t + \delta_x (\overline{\overline{D}^x_b \overline{U}}^x_f \overline{\overline{U}}^x_f)_b +  \delta_y (\overline{\overline{D}^y_b \overline{V}}^x_b \overline{\overline{U}}^y_b)_f - \overline {\tilde{f}\overline {\overline {V}}^y_f D}^x_b - \overline{f \overline{\overline{V}}^y_f D}^x_b + g\overline{D}^x_b \delta_x \eta_b = \nonumber \\
-&&\ \ \ \ \ \ \ \  \{\delta_x (2 \overline {A_M}H\delta_x \overline{U}_f)_b+\delta_y [ \overline{ \overline {\overline{A_M}}^x_b }^y_b \overline {\overline{H}^x_b }^y_b (\delta_x \overline{V}_b + \delta_y \overline{U}_b)]_f\}^{n-1} + \phi_x  \\
+\delta_t \overline{(\overline{D}^x \overline{U})}^t + \delta_x (\overline{\overline{D}^x \overline{U}}^x \overline{\overline{U}}^x) +  \delta_y (\overline{\overline{D}^y \overline{V}}^x \overline{\overline{U}}^y) - \overline{f \overline{\overline{V}}^y D}^x +g\overline{D}^x \delta_x \eta - \overline{F}_x^{n-1}= \phi_x \nonumber \\
+\delta_t \overline{(\overline{D}^y \overline{V})}^t + \delta_x (\overline{\overline{D}^x \overline{U}}^y \overline{\overline{V}}^x) +  \delta_y (\overline{\overline{D}^y \overline{V}}^y \overline{\overline{V}}^y) + \overline{f \overline{\overline{U}}^x D}^y +g\overline{D}^y \delta_y \eta - \overline{F}_y^{n-1}= \phi_y
+ \end{eqnarray}
+\\ \nonumber
+\\ \nonumber
+\\ \nonumber
+\\ \nonumber
+\\ \nonumber
+\\ \nonumber
+\\ \nonumber
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Landscape A3 pagesize %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\clearpage
+\KOMAoptions{paper=A3, paper=landscape}
+\areaset{\dimexpr \textwidth+.5\paperwidth}{\textheight}
+
+\recalctypearea
+%\newgeometry{margin=0.1cm}
+%\begin{landscape}
+ The finite difference equations governing the motion of the baroclinic (internal) modes, governing equations in POM2K are expressed as
+%\end{landscape}
+%\restoregeometry
+ \begin{eqnarray}
+&&\delta^t_c \eta + \delta^x_f (\overline{D}^x_b U)+ \delta^y_f (\overline{D}^y_b V)+ \delta^\sigma_f (W) = 0 \label{eq:fde1} \\ 
+\nonumber \\ 
+&&\delta^t (\overline{ \overline{D}^x_b U}^t) +\delta^x_b[(\overline{\overline{D}^x_b U)}^x_f \overline{U}_f^x] +\delta^y_f[(\overline{\overline{D}^y_b V)}^x_b \overline{U}_b^y]  + \delta^\sigma_f (\overline{W}_b^x \overline{U}_b^\sigma) -\overline {{\tilde {f} \overline {V}^y_f D} }^x_b  -\overline{(f\overline{V}_f^y D)}_b^x + g\overline{D}^x_b\delta^x_b \eta = \delta^\sigma_b \left[ \overline{K_M}^x_b (\frac{\delta^\sigma_f U}{\overline{D}^x_b})^{n+1}\right]  - \frac{g(\overline{D}^x_b)^2}{\rho_0} \delta^x_b \left[ \Sigma_{zz=1}^{k} (\overline{\rho'_{zz}}^\sigma_b {\Delta^\sigma_b \sigma_{zz}}) \right] + \frac{g \overline {D}^x_b \delta^x_b D}{\rho_0} \left [ \Sigma_{zz=1}^{k} \overline{\sigma_{zz}}^\sigma_b {\delta^\sigma_b (\overline {\rho'_{zz})}^x_b } \right] + \delta^x_b (2A_MD\delta^x_f U^{n-1})+\delta^y_f \left [ \overline{ \overline {A_M}^x_b }^y_b \overline {\overline{D}^x_b }^y_b (\delta^x_b V + \delta^y_b U)^{n-1} \right] \label{eq:fde8} \nonumber \\
+ \\ 
+&&\delta^t (\overline{ \overline{D}^y_b V}^t) +\delta^x_f[(\overline{\overline{D}_b^x U)}^y_b \overline{V}_b^x] + \delta^y_b[(\overline{\overline{D}^y_b V)}^y_f \overline{V}_f^y] +  \delta^\sigma_f (\overline{W}_b^y \overline{V}_b^\sigma) + \overline {\tilde {f} \overline {U}^x_f D}^y_b  +  \overline{(f\overline{U}_f^x D)}_b^y  + g\overline{D}^y_b\delta^y_b \eta =  \delta^\sigma_b \left[ \overline{K_M}^y_b (\frac{\delta^\sigma_f V}{\overline{D}^y_b})^{n+1}\right]- \frac{g(\overline{D}^y_b)^2}{\rho_0} \delta^y_b \left[ \Sigma_{zz=1}^{k} (\overline{\rho'_{zz}}^\sigma_b  {\Delta^\sigma_b \sigma_{zz}}) \right] + \frac{g \overline {D}^y_b \delta^y_b D }{\rho_0} \left[ \Sigma_{zz=1}^{k} \overline{\sigma_{zz}}^\sigma_b {\delta^\sigma_b (\overline {\rho'_{zz})}^y_b } \right]  + \delta^y_b (2A_MD\delta^y_f V^{n-1}) + \delta^x_f \left [ \overline{ \overline {A_M}^x_b }^y_b \overline {\overline{D}^x_b }^y_b (\delta^x_b V + \delta^y_b U)^{n-1} \right]  \label{eq:fde9} \nonumber \\
+ \\ 
+&&\delta^t(\overline{T D})^t + \delta^x_f (\overline{T}^x_b U \overline{D}^x_b) + \delta^y_f (\overline{T}^y_b V \overline{D}^y_b) + \delta^\sigma_f (\overline{T}_b^\sigma  W) =  \delta^\sigma_b (\frac{K_H}{D^{n+1}} \delta^{\sigma}_f T^{n+1} )  +  \delta^x_f \left[ \overline{A_H}^x_b \overline{ H}^x_b\delta^x_b (T^{n-1}-T_{CLIM}) \right]  + \delta^y_f \left[ \overline{A_H}^y_b \overline{H}^y_b \delta^y_b (T^{n-1}-T_{CLIM}) \right] + \delta^\sigma_f R \label{eq:fde10}\\
+\nonumber \\ 
+&&\delta^t(\overline{S D})^t + \delta^x_f (\overline{S}^x_b U \overline{D}^x_b) + \delta^y_f (\overline{S}^y_b V \overline{D}^y_b) + \delta^\sigma _f(\overline{S}_b^\sigma W) =  \delta^\sigma_b ( \frac{K_H}{D^{n+1}} \delta^{\sigma}_f S^{n+1} ) +  \delta^x_f \left[ (\overline{A_H}^x_b \overline{H}^x_b \delta^x_b (S^{n-1}-S_{CLIM}) \right] + \delta^y_f \left[ \overline{A_H}^y_b \overline{H}^y_b\delta^y_b (S^{n-1}-S_{CLIM}) \right]  \label{eq:fde11}\\
 \nonumber \\
-&&\delta_t \overline{(\overline{D}^y_b \overline{V})}^t + \delta_x (\overline{\overline{D}^x_b \overline{U}}^y_b \overline{\overline{V}}^x_b)_f +  \delta_y (\overline{\overline{D}^y_b \overline{V}}^y_f \overline{\overline{V}}^y_f)_b + \overline{ \tilde {f}\overline{\overline{U}}^x_f D}^y_b + \overline{f \overline{\overline{U}}^x_f D}^y_b + g\overline{D}^y_b \delta_y \eta_b = \nonumber \\
-&&\ \ \ \ \ \ \ \  \{\delta_x [ \overline{ \overline {\overline {A_M}}^x_b }^y_b \overline {\overline{H}^x_b }^y_b (\delta_x \overline{V_b} + \delta_y \overline {U_b})]_f + \delta_y (2 \overline{A_M}H\delta_y \overline{V_f})_b \}^{n-1} + \phi_y
+&&\overline{\delta^t (q^2 D)}^t + \delta^x_f (\overline{U}^\sigma_b \overline{q^2}^x_b \overline{D}^x_b) + \delta^y_f (\overline{V}^\sigma_b \overline{q^2}^y_b \overline{D}^y_b) +  \delta^\sigma_c (W q^2)  =  \delta^\sigma_b \left[\overline {K_q}^\sigma_f (\frac{\delta^\sigma_f q^2}{D})^{n+1} \right] +\frac{2K_M}{D} \left[ (\delta^\sigma_b \overline{U}^x_f)^2 + (\delta^\sigma_b \overline{V}^y_f)^2  \right] + \frac{2g}{\rho_0} K_H \delta^\sigma_b \rho - \frac{2Dq^3}{B_1 l} + \delta^x_f  \left [ \overline{ \overline {A_M}^x_b }^\sigma_b {\overline{H}^x_b } \delta^x_b (q^2)^{n-1} \right ] + \delta^y_f  \left[ \overline{ \overline {A_M}^y_b }^\sigma_b {\overline{H}^y_b } \delta^y_b (q^2)^{n-1} \right] \label{eq:fde12} \\
+\nonumber \\
+&&\overline{\delta^t (q^2 l D)}^t + \delta^x_f (\overline{U}^\sigma_b \overline{q^2 l}^x_b \overline{D}^x_b) + \delta^y_f (\overline{V}^\sigma_b \overline{q^2 l}^y_b \overline{D}^y_b) +  \delta^\sigma_c (Wq^2 l)  =  \delta^\sigma_b \left[\overline {K_q}^\sigma_f (\frac{\delta^\sigma_f q^2l}{D})^{n+1} \right] +l E_1 \frac{K_M}{D} \left[ (\delta^\sigma_b \overline{U}^x_f)^2 + (\delta^\sigma_b \overline{V}^y_f)^2  \right] + \frac{l E_1 g}{\rho_0} K_H \delta^\sigma_b \rho - \frac{Dq^3}{B_1} \left\{ 1+ E_2  \left[ \frac{l}{\kappa D} \left( \frac{-1}{\sigma} +\frac{1}{1+\sigma} \right) \right]^2 \right\} + \delta^x_f \left [ \overline{ \overline {A_M}^x_b }^\sigma_b {\overline{H}^x_b} \delta^x_b (q^2l)^{n-1} \right ] + \delta^y_f \left [ \overline{ \overline {A_M}^y_b }^\sigma_b {\overline{H}^y_b } \delta^y_b (q^2l)^{n-1} \right] \label{eq:fde13} \\
+&&\frac{\partial p}{\partial \sigma} = - \rho gD \\ \nonumber \\ 
+&&\rho = \rho(T,S,p) \\ \nonumber 
+\end{eqnarray}
+
+ The finite difference equations governing the motion of the external modes, governing equations in POM2K are expressed as
+\begin{eqnarray}
+&&\delta^t \overline{\eta}^t + \delta^x_f (\overline{D}^x_b \overline{U}) + \delta^y_f (\overline{D}^y_b \overline{V}) = 0  \\
+\nonumber \\
+&&\delta^t \overline{(\overline{D}^x_b \overline{U})}^t + \delta^x_b (\overline{\overline{D}^x_b \overline{U}}^x_f \overline{\overline{U}}^x_f) +  \delta^y_f (\overline{\overline{D}^y_b \overline{V}}^x_b \overline{\overline{U}}^y_b) - \overline {\tilde{\overline{f}}\overline {\overline {V}}^y_f D}^x_b - \overline{f \overline{\overline{V}}^y_f D}^x_b + g\overline{D}^x_b \delta^x_b \eta = \delta^x_b (2 \overline {A_M}D\delta^x_f \overline{U}^{n-1})+\delta^y_f \left [ \overline{ \overline {\overline{A_M}}^x_b }^y_b \overline {\overline{D}^x_b }^y_b (\delta^x_b \overline{V} + \delta^y_b \overline{U})^{n-1} \right] + \phi_x  \\
+\nonumber \\
+&&\delta^t \overline{(\overline{D}^y_b \overline{V})}^t + \delta^x_f (\overline{\overline{D}^x_b \overline{U}}^y_b \overline{\overline{V}}^x_b) +  \delta^y_b (\overline{\overline{D}^y_b \overline{V}}^y_f \overline{\overline{V}}^y_f) + \overline{ \tilde {\overline{f}}\overline{\overline{U}}^x_f D}^y_b + \overline{f \overline{\overline{U}}^x_f D}^y_b + g\overline{D}^y_b \delta^y_b \eta =  \delta^y_b (2 \overline{A_M}D\delta^y_f \overline{V}^{n-1}) + \delta^x_f \left [ \overline{ \overline {\overline {A_M}}^x_b }^y_b \overline {\overline{D}^x_b }^y_b (\delta^x_b \overline{V} + \delta^y_b \overline {U})^{n-1} \right] + \phi_y
  \end{eqnarray}
 
-Where
+where
 \begin{eqnarray}
-&&\tilde {f} = \frac{1}{\Delta x \Delta y} [ \overline {\overline {V}}^y_f \delta_x(\Delta y)_c - \overline {\overline {U}}^x_f \delta_y(\Delta x)_c ]
-\end{eqnarray} 
-\\ \nonumber
-More detailed finite difference equations governing the motion of the baroclinic (internal) modes and baroclinic (internal) modes can be seen in Appendix difference equation.
+&&\tilde {f} = \frac{1}{\Delta x \Delta y} [ \overline {V}^y_f \delta^x_c(\Delta y) - \overline {U}^x_f \delta^y_c(\Delta x) ]  \\
+&&A_M = \frac{1}{2} C \Delta x \Delta y \sqrt{  (\delta^x_f U)^2 + \frac{1}{2}[\delta^y_c (\overline{U}_f^x)_c+\delta^x_c (\overline{V}_f^y)]^2 + (\delta^y_f V)^2  } \\
+&&A_H = A_M * TPRNI \\
+&&K_M = qlS_M \\
+&&K_H = qlS_H \\
+&&K_q = qlS_q 	\\
+&&\tilde {\overline{f}} = \frac{1}{\Delta x \Delta y}  \left [ \overline {\overline {V}}^y_f \delta^x_c(\Delta y) - \overline {\overline {U}}^x_f \delta^y_c(\Delta x) \right]  \\
+&&\phi_x=-WU(0)+WU(-1)-  \frac{g(\overline{D}^x_b)^2}{\rho_0} \Sigma_{z=1}^{k} \left\{ \left[ \Sigma_{zz=1}^{k}  \delta^x_b\overline{\rho'_{zz}}^\sigma_b  {\Delta^\sigma_b \sigma_{zz}} \right]_z\Delta\sigma_z \right\} + \frac{g \overline {D}^x \delta^x_b D}{\rho_0} \Sigma_{z=1}^{k} \left\{ \left [ \Sigma_{zz=1}^{k} \overline{\sigma_{zz}}^\sigma_b {\delta^\sigma_b (\overline {\rho'_{zz})}^x_b } \right]_z \Delta\sigma_z \right\}+ G_x	\\
+\nonumber \\
+&&\phi_y=-WV(0)+WV(-1)- \frac{g(\overline{D}^y_b)^2}{\rho_0} \Sigma_{z=1}^{k} \left\{ \left[ \Sigma_{zz=1}^{k} \delta^y_b\overline{\rho'_{zz}}^\sigma_b  {\Delta^\sigma_b \sigma_{zz}} \right]_z\Delta\sigma_z \right\} + \frac{g \overline {D}^y \delta^y_b D }{\rho_0} \Sigma_{z=1}^{k} \left\{ \left[ \Sigma_{zz=1}^{k} \overline{\sigma_{zz}}^\sigma_b {\delta^\sigma_b (\overline {\rho'_{zz})}^y_b } \right]_z\Delta\sigma_z \right\}+ G_y
+\end{eqnarray}
+
+
+
+
+
 
  \end{document} 

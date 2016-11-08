@@ -6,6 +6,8 @@
 \renewcommand{\algorithmiccomment}[1]{ \hfill {/* #1 */} }
 \usepackage{makeidx}  % allows for indexgeneration
 \usepackage{mathrsfs}
+\usepackage{typearea}
+\usepackage{lscape}
 \usepackage[top=2.0cm, bottom=2.0cm, left=1.5cm, right=1.5cm]{geometry}
 \usepackage{graphicx}
  \usepackage{color}
@@ -190,20 +192,24 @@ Taking $\frac{\partial}{\partial x}$ for example, we have
   \frac{\partial}{\partial x}&=& \frac{\partial}{\partial x^*}-(\frac{\sigma}{D}\frac{\partial D}{\partial x^*}+\frac{1}{D}\frac{\partial \eta}{\partial x^*})\frac{\partial}{\partial \sigma}= P^T_x \cdot \nabla^* \\ \\
    \frac{\partial}{\partial y}&=& P^T_y \cdot \nabla ^* \\ \\
    \frac{\partial}{\partial z}&=& P^T_z \cdot \nabla ^*\\ \\
-   \frac{\partial}{\partial t}&=& P^T_t \cdot \nabla ^* +   \frac{\partial}{\partial t^*}  
-\\ \nonumber \\
-\omega &=& D\left(\frac{\partial \sigma}{\partial t} + U\frac{\partial \sigma}{\partial x} + V\frac{\partial \sigma}{\partial y} + W\frac{\partial \sigma}{\partial z} \right)
+   \frac{\partial}{\partial t}&=& P^T_t \cdot \nabla ^* +   \frac{\partial}{\partial t^*} 
 \end{eqnarray*}
-Where $\omega$ represents vertical velocity in sigma coordinte. 
+
 Next, the gradient operator appearing in (\ref{eqLater1}) must be constrained so that when it is applied to a scalar, it produces a vector which is in the sigma coordinates. This is done by replacing all occurrences of $\nabla$ in (\ref{eqLater1}) with the operator
 \begin{equation}
  \nabla=P\nabla^* \nonumber
 \end{equation}
+W is the vertical velocity in $z$ coordinate, $\omega$ is the vertical velocity in $\sigma$ coordinate.\ $\vec{U}=(U,V,W)$,\ $\vec{U^*}=(U,V,\omega)$.\ The relationship between $W$ and $\omega$ is as below.
+\begin{eqnarray}
+W&=&\omega -DP^T_t \nabla^* \sigma -DUP^T_x \nabla^* \sigma -DVP^T_y \nabla^* \sigma
+\end{eqnarray}
+
 since P projects vectors into sigma coordinates. The divergence operator appearing in (\ref{eqLater2}) must also be restricted so that it produces the divergence of a vector field in sigma coordinates. This is also accomplished with P by simply taking the dot product of the vector field with the projected gradient operator $P\nabla$.
 
 Follow this way we could get equation (\ref{eqChange1}) from equation (\ref{eqLater1})
 \begin{eqnarray}
-\frac{\partial U}{\partial t^*} = &-&P^T_t\nabla^* U -(\vec{U} \cdot P \nabla^*)U+fV - \frac{1}{\rho_0} P^T_x\nabla^*p + P^T_z\nabla^*\left ( K_M P^T_z\nabla^*U\right) + F^*_x   \label{eqChange1} 
+\frac{\partial U}{\partial t^*} &=&-P^T_t\nabla^* U -(\vec{U} \cdot P \nabla^*)U+fV - \frac{1}{\rho_0} P^T_x\nabla^*p + P^T_z\nabla^*\left ( K_M P^T_z\nabla^*U\right) + F^*_x   \label{eqChange1} \\
+&=&  -(\vec{U^*} \cdot P \nabla^*)U + D(UP^T_x \nabla^* \sigma + VP^T_y \nabla^* \sigma)P^T_z \nabla^* U + fV - \frac{1}{\rho_0} P^T_x\nabla^* p + P^T_z\nabla^* \left ( K_M P^T_z\nabla^* U\right)+F_x
 \end{eqnarray}
 Where 
 \begin{eqnarray}
@@ -216,26 +222,30 @@ with
 \nonumber \\
 \tau_{yx} &=& \ \ A_M  \left[ \frac{\partial UD}{\partial y^*} -\frac{\partial}{\partial \sigma} \left( \sigma \frac{\partial D}{\partial x^*} + \frac{\partial \eta}{\partial x^*} \right)U +  \frac{\partial VD}{\partial x^*} -\frac{\partial}{\partial \sigma} \left( \sigma \frac{\partial D}{\partial x^*} + \frac{\partial \eta}{\partial x^*} \right)V \right]
 \end{eqnarray}
+
 Since Mellor and Blumberg [1985] have shown that the conventional model for horizontal diffusion is incorrect when bottom topographical slopes are large. A new formulation has been suggested which is simpler than the $F^*_x$, $F^*_y$ and $F^*_\phi$ equations. They makes it possible to model realistically bottom boundary layers over sharply sloping bottoms. They are defined according to:
 \begin{equation}
 F^*_x = \frac{\partial}{\partial x^*} \left (H*2A_M \frac{\partial U}{\partial x^*} \right) + \frac{\partial}{\partial y^*} \left [ H*A_M \left ( \frac{\partial U}{\partial y^*} + \frac{\partial V}{\partial x^*} \right ) \right ]
 \end{equation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% landscape A4 %%%%%%%%%%%%%%%%%%%%%%
+\clearpage
+\begin{landscape}
 Putting all these pieces together, the final equations(We already drop all *) in sigma coordinates is given by
 \begin{eqnarray}
-\frac{\partial U}{\partial t}&=&  - P^T_t\nabla U -(\vec{U} \cdot P \nabla)U+fV - \frac{1}{\rho_0} P^T_x\nabla p + P^T_z\nabla \left ( K_M P^T_z\nabla U\right)+F_x \\ \nonumber \\
-\frac{\partial V}{\partial t}&=& - P^T_t\nabla V -(\vec{U} \cdot P \nabla )V-fU - \frac{1}{\rho_0} P^T_y\nabla p + P^T_z\nabla \left ( K_M P^T_z\nabla V\right)+F_y \\ \nonumber \\
-P\nabla  &\cdot  &\vec{U}=0 \\ \nonumber \\
-\frac{\partial T}{\partial t}&=&- P^T_t\nabla T - \ (\vec{U} \cdot P \nabla)T  + P^T_z\nabla \left ( K_H P^T_z\nabla T \right) + F_T \\ \nonumber \\
-\frac{\partial S}{\partial t}&=&- P^T_t\nabla S - \ (\vec{U} \cdot P \nabla)S  + P^T_z\nabla \left ( K_H P^T_z\nabla S \right)  + F_S  \\ \nonumber \\
-\frac{\partial q^2}{\partial t}&=&- P^T_t\nabla q^2 \ -(\vec{U} \cdot P \nabla)q^2 \ +  P^T_z\nabla \left ( K_q P^T_z\nabla q^2 \right) \ + \ 2K_M \ \left[(P^T_z\nabla U)^2 +(P^T_z\nabla V)^2 \right]+\frac{2g}{\rho_0}K_HP^T_z\nabla \rho + \frac{2q^3}{B_1l} + F_q \nonumber \\
+\frac{\partial U}{\partial t}&=& -(\vec{U} \cdot P \nabla)U + D \left(UP^T_x \nabla \sigma + VP^T_y \nabla \sigma \right)P^T_z \nabla U + fV - \frac{1}{\rho_0} P^T_x\nabla p + P^T_z\nabla \left ( K_M P^T_z\nabla U\right)+F_x \\ \nonumber \\
+\frac{\partial V}{\partial t}&=& -(\vec{U} \cdot P \nabla )V + D \left(UP^T_x \nabla \sigma + VP^T_y \nabla \sigma \right)P^T_z \nabla V  - fU - \frac{1}{\rho_0} P^T_y\nabla p + P^T_z\nabla \left ( K_M P^T_z\nabla V\right)+F_y \\ \nonumber \\
+p&=&p_{atm} -\rho_0 g \sigma D - gD \int_\sigma^0 \rho'd \sigma' \\ \nonumber \\
+P\nabla  &\cdot  &\vec{U} - D P^T_z \nabla(P^T_t \nabla \sigma + UP^T_x \nabla \sigma + VP^T_y \nabla \sigma)  =0 \\ \nonumber \\
+\frac{\partial T}{\partial t}&=&- \ (\vec{U} \cdot P \nabla)T + D \left(UP^T_x \nabla \sigma + VP^T_y \nabla \sigma \right)P^T_z \nabla T + P^T_z\nabla \left ( K_H P^T_z\nabla T \right) + F_T \\ \nonumber \\
+\frac{\partial S}{\partial t}&=&- \ (\vec{U} \cdot P \nabla)S + D \left(UP^T_x \nabla \sigma + VP^T_y \nabla \sigma \right)P^T_z \nabla S  + P^T_z\nabla \left ( K_H P^T_z\nabla S \right)  + F_S  \\ \nonumber \\
+\frac{\partial q^2}{\partial t}&=&-(\vec{U} \cdot P \nabla)q^2 + D \left(UP^T_x \nabla \sigma + VP^T_y \nabla \sigma \right)P^T_z \nabla q^2 +  P^T_z\nabla \left ( K_q P^T_z\nabla q^2 \right) \ + \ 2K_M \ \left[(P^T_z\nabla U)^2 +(P^T_z\nabla V)^2 \right]+\frac{2g}{\rho_0}K_HP^T_z\nabla \rho + \frac{2q^3}{B_1l} + F_q \nonumber \\
 \\
-\frac{\partial q^2l}{\partial t}&=&- P^T_t\nabla q^2l -(\vec{U} \cdot P \nabla)q^2l + P^T_z\nabla \left ( K_q P^T_z\nabla q^2l \right) +lE_1K_M\left [(P^T_z\nabla U)^2+(P^T_z \nabla V)^2 \right]+ \frac{lE_1g}{\rho_0}K_H P^T_z\nabla \rho - \frac{q^3}{B_1} \tilde W + F_{l} \nonumber \\ 
-\\
-p&=&p_{atm} -\rho_0 g \sigma D - gD \int_\sigma^0 \rho'd \sigma'
+\frac{\partial q^2l}{\partial t}&=&-(\vec{U} \cdot P \nabla)q^2l + D \left(UP^T_x \nabla \sigma + VP^T_y \nabla \sigma \right)P^T_z \nabla q^2l + P^T_z\nabla \left ( K_q P^T_z\nabla q^2l \right) +lE_1K_M\left [(P^T_z\nabla U)^2+(P^T_z \nabla V)^2 \right]+ \frac{lE_1g}{\rho_0}K_H P^T_z\nabla \rho - \frac{q^3}{B_1} \tilde W + F_{l} \nonumber \\ 
 \end{eqnarray}
 Where 
 \begin{eqnarray}
-W&=& \omega +  U\left( \sigma\frac{\partial D}{\partial x^*} +\frac{\partial \eta}{\partial x^*} \right) +V \left(\sigma \frac{\partial D}{\partial y^*}+\frac{\partial \eta}{\partial y^*} \right) + \sigma \frac{\partial D}{\partial t^*} + \frac{\partial \eta}{\partial t^*} \\ \nonumber \\
+\vec{U}&=&\left(U,V,\omega \right) \\ \nonumber \\
+D&=& \frac{1}{P^T_z \nabla \sigma} \\ \nonumber \\
 DF_x &\equiv& \frac{\partial}{\partial x} (H*2A_M\frac{\partial U}{\partial x}) + \frac{\partial}{\partial y} \left [ H*A_M(\frac{\partial U}{\partial y}+\frac{\partial V}{\partial x}) \right] \\ \nonumber \\
 DF_y &\equiv& \frac{\partial}{\partial y} (H*2A_M \frac{\partial V}{\partial y}) + \frac{\partial}{\partial x} \left[ H*A_M(\frac{\partial U}{\partial y}+\frac{\partial V}{\partial x}) \right] 
 \end{eqnarray}
@@ -244,6 +254,9 @@ Also,
 DF_\phi &\equiv& \frac{\partial}{\partial x}(H*A_H\frac{\partial \phi}{\partial x}) + \frac{\partial}{\partial y}(H*A_H\frac{\partial \phi}{\partial y}) 
 \end{eqnarray}
 where $\phi$ represents $T$, $S$, $q^2$ and $q^2 l$. \\
+\end{landscape}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%end landscape A4 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \subsection{Continuous formulation of nonhydrostatic primitive equation}
 \begin{eqnarray}
 \frac{\partial {\vec{U}}}{\partial t} &=& -P^T_t \nabla {\vec{U}} - \left(\vec{U} \cdot P \nabla \right) \vec{U} - 2\vec{\Omega} \times \vec{U}-\frac{1}{\rho}P\nabla p+ \vec{G} + P^T_z \nabla \left( K_M P^T_z \nabla {\vec{U}} \right) + \vec{F} \\ \nonumber \\ 
@@ -253,6 +266,7 @@ P\nabla  &\cdot  &\vec{U}=0  \\ \nonumber \\
 \rho &=& \rho(T,S,p)
 \end{eqnarray}
 Where $\Phi$ represents $T$ and $S$, $Q$ represents $q^2$ and $q^2l$. $\vec{U}=(U \widehat{i} \ ,V \widehat{j} \ ,W \widehat{k})$, $\vec{\Omega}=(0 \widehat{i} \ ,2|\Omega|\cos{\theta} \widehat{j} \ ,2|\Omega| \sin{\theta} \widehat{k})$, $\vec{G}=(0 \widehat{i} \ ,0  \widehat{j} \ ,-g \widehat{k})$, $\vec{F}=(F_x \widehat{i} \ ,F_y \widehat{j} \ ,F_z \widehat{k})$
+
 \section{The RBF Method on Sigma Coordinates}
 
 \section{References}
