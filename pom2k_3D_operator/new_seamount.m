@@ -8,8 +8,10 @@ function[dx,dy,cor,...
     h_3d,art_3d,aru_3d,arv_3d, ...
     fsm_3d,dum_3d,dvm_3d,dt_3d] = new_seamount(e_atmos,aam)
     
-load('grid.mat');
-load('para.mat');
+global im jm kb pi slmax kbm1 zz tbias sbias jmm1 imm1 grav;
+
+%load('grid.mat');
+%load('para.mat');
 
 dx=zeros(im,jm)      ;dy=zeros(im,jm)      ;cor=zeros(im,jm)     ;
 east_c=zeros(im,jm)  ;east_e=zeros(im,jm)  ;east_u=zeros(im,jm)  ;east_v=zeros(im,jm)  ;
@@ -63,6 +65,7 @@ vel=0.2e0;
 %    
 % 	end
 % end
+
 dx=repmat( (delx-delx*sin(pi*[1:im]'/im)/2.0), 1, jm );
 dy=repmat( (delx-delx*sin(pi*[1:jm]/jm)/2.0), im, 1  );
 cor(:,:)=1.e-4;
@@ -392,14 +395,22 @@ elw(2:jmm1)=(elw(2:jmm1)-elw(jmm1/2)).*fsm(2, 2:jmm1);
 %     boundary conditions are set equal to the initial conditions and
 %     are held constant thereafter - users may, of course, create
 %     variable boundary conditions):
-for k=1:kbm1
-    tbe(:,k)=tb(im,:,k);
-    tbw(:,k)=tb(1 ,:,k);
-    sbe(:,k)=sb(im,:,k);
-    sbw(:,k)=sb(1 ,:,k);
-
-    tbn(:,k)=tb(:,jm,k);
-    tbs(:,k)=tb(:,1 ,k);
-    sbn(:,k)=sb(:,jm,k);
-    sbs(:,k)=sb(:,1 ,k);
-end
+% for k=1:kbm1
+%     tbe(:,k)=tb(im,:,k);
+%     tbw(:,k)=tb(1 ,:,k);
+%     sbe(:,k)=sb(im,:,k);
+%     sbw(:,k)=sb(1 ,:,k);
+% 
+%     tbn(:,k)=tb(:,jm,k);
+%     tbs(:,k)=tb(:,1 ,k);
+%     sbn(:,k)=sb(:,jm,k);
+%     sbs(:,k)=sb(:,1 ,k);
+% end
+tbe(:,1:kbm1) = tb(im,:,1:kbm1);
+tbw(:,1:kbm1) = tb(1,:,1:kbm1);
+sbe(:,1:kbm1) = sb(im,:,1:kbm1);
+sbw(:,1:kbm1) = sb(1,:,1:kbm1);
+tbn(:,1:kbm1) = tb(:,jm,1:kbm1);
+tbs(:,1:kbm1) = tb(:,1,1:kbm1);
+sbn(:,1:kbm1) = sb(:,jm,1:kbm1);
+sbs(:,1:kbm1) = sb(:,1,1:kbm1);

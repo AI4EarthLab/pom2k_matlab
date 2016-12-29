@@ -17,11 +17,12 @@ function [rhoo]=new_dens(si,ti,h_3d,fsm_3d)
 % *       in profq must be changed (see note in profq)                 *
 % *                                                                    *
 % **********************************************************************
-load('grid.mat');
-load('para.mat');
+
+%load('grid.mat');
+%load('para.mat');
+global im jm kb tbias sbias rhor rhoref grav zz_3d 
 
 rhoo=zeros(im,jm,kb);
-
 
 tr=ti+tbias;
 sr=si+sbias;

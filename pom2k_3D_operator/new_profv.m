@@ -14,38 +14,36 @@ function [vf,wvbot] = new_profv(vf,etf,h,km,wvsurf,cbc,ub,vb)
 % *                speed.                                              *
 % *                                                                    *
 % **********************************************************************
-load('grid.mat'); load('operator.mat'); load('para.mat');
-a=zeros(im,jm,kb);
-ee=zeros(im,jm,kb); 
-gg=zeros(im,jm,kb);
-dh = AYB(h+etf); dh(1,:)=1.e0; dh(:,1)=1.e0;
-c = AYB(km); c(1,:,:)=0.e0;
+global im  jm kb dz_3d dzz_3d kbm1 dti2 umol kbm2 dz dvm
 
+a=zeros(im,jm,kb);
+dh = AYB(h+etf); dh(1,:)=1.e0; dh(:,1)=1.e0;
+dh_3d=repmat(dh,1,1,kb);
+c = AYB(km); c(1,:,:)=0.e0;c(:,1,:)=0.e0;
+la=zeros(kbm1);d=zeros(im,jm,kb);
 %
-for k=2:kbm1
-    a(:,:,k-1) = -dti2 * (c(:,:,k)+umol) ./ (dz(k-1)*dzz(k-1)*dh.^2);
-    c(:,:,k) = -dti2 * (c(:,:,k)+umol) ./ (dz(k)*dzz(k-1)*dh.^2);
-end
-%
-ee(:,:,1) = a(:,:,1) ./ (a(:,:,1)-1.e0);
-gg(:,:,1) = (-dti2*wvsurf./(-dz(1)*dh)-vf(:,:,1)) ./ (a(:,:,1)-1.e0);
-%
-for k=2:kbm2
-    gg(:,:,k) = 1.e0 ./ (a(:,:,k)+c(:,:,k).*(1.e0-ee(:,:,k-1))-1.e0);
-    ee(:,:,k) = a(:,:,k) .* gg(:,:,k);
-    gg(:,:,k) = (c(:,:,k) .* gg(:,:,k-1)-vf(:,:,k)) .* gg(:,:,k);
-end
-%
+    d(:,:,1:kbm2)=-dti2*(c(:,:,2:kbm1)+umol);
+    a=DIVISION(d,dz_3d.*dzz_3d.*dh_3d.*dh_3d);
+    a(:,:,kbm1)= 0.e0;
+
+    d(:,:,2:kbm1)=dzz_3d(:,:,1:kbm2);
+    c=DIVISION(-dti2*(c+umol),dz_3d.*d.*dh_3d.*dh_3d);
+    c(:,:,1)  =0.e0;
+
 tps = AYB(cbc) .* sqrt( AYB( AXF( ub(:,:,kbm1) ) ).^2 + vb(:,:,kbm1).^2 );
-tps(1,:) = 0.e0;
-vf(:,:,kbm1) = (c(:,:,kbm1) .* gg(:,:,kbm2) - vf(:,:,kbm1))  ...
-               ./(tps * dti2./(-dz(kbm1) * dh)-1.e0 - (ee(:,:,kbm2)-1.e0) .* c(:,:,kbm1)) .* dvm;
-%
-for k=2:kbm1
-    ki=kb-k;
-    vf(:,:,ki) = (ee(:,:,ki) .* vf(:,:,ki+1) + gg(:,:,ki)) .* dvm;
-end
-%
+    d=-vf;
+    d(:,:,1)= -vf(:,:,1) + dti2 .* wvsurf(:,:) ./ (dh(:,:) .* dz(1));
+    d(:,:,kbm1)=-vf(:,:,kbm1)+tps.*dti2./(dz(kbm1)*dh); 
+
+  for j=2:jm
+      for i=2:im
+   la=diag(reshape(a(i,j,1:kbm1)+c(i,j,1:kbm1)-1,kbm1,1),0) ...
+      - diag(reshape(a(i,j,1:kbm2),kbm2,1),1) ...
+      - diag(reshape(c(i,j,2:kbm1),kbm2,1),-1);
+   vf(i,j,1:kbm1)=la\reshape(d(i,j,1:kbm1),kbm1,1); 
+      end
+  end
+   vf=vf.*repmat(dvm,1,1,kb);
 wvbot=-tps .* vf(:,:,kbm1);
 
 return

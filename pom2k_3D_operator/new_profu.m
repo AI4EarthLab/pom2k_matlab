@@ -15,35 +15,39 @@ function [uf,wubot] = new_profu(uf,etf,h,km,wusurf,cbc,ub,vb)
 % *                speed.                                              *
 % *                                                                    *
 % **********************************************************************
-load('grid.mat');load('operator.mat');load('para.mat');
+%load('grid.mat');load('operator.mat');load('para.mat');
+global im  jm kb dz_3d dzz_3d kbm1 dti2 umol kbm2 dz dum
+
 dh = AXB(h+etf);dh(1,:)=1.e0;dh(:,1)=1.e0;
+dh_3d=repmat(dh,1,1,kb);
 a=zeros(im,jm,kb);ee=zeros(im,jm,kb);gg=zeros(im,jm,kb);
-c = AXB(km);
-%
-for k=2:kbm1
-    a(:,:,k-1) = DIVISION( -dti2*(c(:,:,k)+umol),(dz(k-1)*dzz(k-1)*dh.^2) );
-    c(:,:,k) = DIVISION( -dti2*(c(:,:,k)+umol),(dz(k)*dzz(k-1)*dh.^2) );
-end
-%
-ee(:,:,1)=a(:,:,1) ./ (a(:,:,1)-1.e0);
-gg(:,:,1)=(-dti2*wusurf./(-dz(1)*dh)-uf(:,:,1)) ./ (a(:,:,1)-1.e0);
-%
-for k=2:kbm2
-    gg(:,:,k)=1.e0 ./ (a(:,:,k)+c(:,:,k).*(1.e0-ee(:,:,k-1))-1.e0);
-    ee(:,:,k)=a(:,:,k).* gg(:,:,k);
-    gg(:,:,k)=(c(:,:,k).*gg(:,:,k-1)-uf(:,:,k)).*gg(:,:,k);
-end
-%
+c = AXB(km); c(1,:,:)=0.e0; c(:,1,:)=0.e0;
+la=zeros(kbm1);d=zeros(im,jm,kb);
+
+    d(:,:,1:kbm2)=-dti2*(c(:,:,2:kbm1)+umol);
+    a=DIVISION(d,dz_3d.*dzz_3d.*dh_3d.*dh_3d);
+    a(:,:,kbm1)= 0.e0;
+
+    d(:,:,2:kbm1)=dzz_3d(:,:,1:kbm2);
+    c=DIVISION(-dti2*(c+umol),dz_3d.*d.*dh_3d.*dh_3d);
+    c(:,:,1)  =0.e0;
+   
 tps = AXB(cbc) .* sqrt( ub(:,:,kbm1).^2 + AXB( AYF( vb(:,:,kbm1) ) ).^2 );
-uf(:,:,kbm1) = (c(:,:,kbm1).* gg(:,:,kbm2)-uf(:,:,kbm1))...
-               ./(tps*dti2./(-dz(kbm1)*dh)-1.e0-(ee(:,:,kbm2)-1.e0).*c(:,:,kbm1)).*dum;
-%
-for k=2:kbm1
-    ki=kb-k;
-    uf(:,:,ki)=(ee(:,:,ki).*uf(:,:,ki+1)+gg(:,:,ki)).*dum;
-end
-%
-wubot=-tps.*uf(:,:,kbm1);
+
+    d=-uf;
+    d(:,:,1)= -uf(:,:,1) + dti2 .* wusurf(:,:) ./ (dh(:,:) .* dz(1));
+    d(:,:,kbm1)=-uf(:,:,kbm1)+tps.*dti2./(dz(kbm1)*dh); 
+
+  for j=2:jm
+      for i=2:im
+   la=diag(reshape(a(i,j,1:kbm1)+c(i,j,1:kbm1)-1,kbm1,1),0) ...
+      - diag(reshape(a(i,j,1:kbm2),kbm2,1),1) ...
+      - diag(reshape(c(i,j,2:kbm1),kbm2,1),-1);
+   uf(i,j,1:kbm1)=la\reshape(d(i,j,1:kbm1),kbm1,1); 
+      end
+  end
+   uf=uf.*repmat(dum,1,1,kb);
+   wubot=-tps.*uf(:,:,kbm1);
 
 return
 

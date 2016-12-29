@@ -7,7 +7,9 @@ function [ff]=new_advt1(fb,f,dt,u,v,aam,tprni,w,etb,etf,h)
 % *                POM (previously called advt).                       *
 % *                                                                    *
 % **********************************************************************
-load('grid.mat');load('para.mat');
+%load('grid.mat');load('para.mat');
+global im jm kb dum_3d dvm_3d dx_3d dy_3d dz_3d art_3d dti2;
+
 xflux=zeros(im,jm,kb); yflux=zeros(im,jm,kb); zflux=zeros(im,jm,kb); ff=zeros(im,jm,kb);
 dt_3d=repmat(dt,1,1,kb);
 h_3d=repmat(h,1,1,kb);

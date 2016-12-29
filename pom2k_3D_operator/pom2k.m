@@ -1,7 +1,17 @@
 clear all;
 
-%im=7; jm=5; kb=6;
- im=65; jm=49; kb=21;
+global im jm kb imm1 imm2 jmm1 jmm2 kbm1 kbm2 kl1 kl2 ...
+    z zz dz dzz z_3d zz_3d dz_3d dzz_3d ...
+    dx dy art aru arv  fsm dum dvm ...
+    dx_3d dy_3d art_3d aru_3d arv_3d fsm_3d dum_3d dvm_3d;
+
+global small pi netcdf_file iproblem mode nadv nitera ...
+     sw nread dte isplit days prtd1 prtd2 swtch iskp jskp ...
+     lramp rhoref tbias sbias grav kappa z0b cbcmin cbcmax...
+     horcon tprni umol hmax vmaxl slmax ntp nbct nbcs ispadv...
+     smoth alpha dti dte2 dti2 iend iprint iswtch ispi isp2i;
+ 
+im=65; jm=49; kb=21;
 imm1=im-1; imm2=im-2; jmm1=jm-1; jmm2=jm-2; kbm1=kb-1; kbm2=kb-2;
 
 alpha          =0.0;dte            =0.0;dti            =0.0;dti2           =0.0;
@@ -250,35 +260,35 @@ vabn=zeros(1,im)     ;vabs=zeros(1,im)     ;vbn=zeros(im,kb)     ;vbs=zeros(im,k
 
 d_3d=zeros(im,jm,kb) ;dt_3d=zeros(im,jm,kb);
 
-save('grid.mat','im','jm','kb','imm1','imm2','jmm1','jmm2','kbm1','kbm2','kl1','kl2');
-
 if(iproblem ~= 3)
-    [z,zz,dz,dzz,z_3d,zz_3d,dz_3d,dzz_3d]=new_depth();
+    [z,zz,dz,dzz,z_3d,zz_3d,dz_3d,dzz_3d]=new_depth(im, jm, kb, kl1, kl2);
 end
 
-[OP_AXF, OP_AXB, OP_AYF, OP_AYB, OP_AZF, OP_AZB, ...
- OP_DXF, OP_DXB, OP_DYF, OP_DYB, OP_DZF, OP_DZB, ...
- OP_L_XY,   OP_L_XZ,   OP_L_YZ, ...
- OP_R_XY,   OP_R_XZ,   OP_R_YZ, ...
- OP_SUMZ1, OP_SUMZ2] = new_operator(im,jm,kb);
+global OP
+OP = new_operator(im,jm,kb);
 
-save('grid.mat','im','jm','kb','imm1','imm2','jmm1','jmm2','kbm1','kbm2','kl1','kl2',...
-                'z','zz','dz','dzz','z_3d','zz_3d','dz_3d','dzz_3d');
-            
-save('para.mat','small','pi','netcdf_file','iproblem','mode','nadv','nitera',...
-     'sw','nread','dte','isplit','days','prtd1','prtd2','swtch','iskp','jskp',...
-     'lramp','rhoref','tbias','sbias','grav','kappa','z0b','cbcmin','cbcmax',...
-     'horcon','tprni','umol','hmax','vmaxl','slmax','ntp','nbct','nbcs','ispadv',...
-     'smoth','alpha','dti','dte2','dti2','iend','iprint','iswtch','ispi','isp2i');
+% [OP_AXF, OP_AXB, OP_AYF, OP_AYB, OP_AZF, OP_AZB, ...
+%  OP_DXF, OP_DXB, OP_DYF, OP_DYB, OP_DZF, OP_DZB, ...
+%  OP_L_XY,   OP_L_XZ,   OP_L_YZ, ...
+%  OP_R_XY,   OP_R_XZ,   OP_R_YZ, ...
+%  OP_SUMZ1, OP_SUMZ2] = new_operator(im,jm,kb);
 
-save('operator.mat',...
-'OP_AXF', 'OP_AXB', 'OP_AYF', 'OP_AYB', 'OP_AZF', 'OP_AZB', ...
-'OP_DXF', 'OP_DXB', 'OP_DYF', 'OP_DYB', 'OP_DZF', 'OP_DZB', ...
-'OP_L_XY',    'OP_L_XZ',   'OP_L_YZ', ...                  
-'OP_R_XY',    'OP_R_XZ',   'OP_R_YZ', ...                  
-'OP_SUMZ1',   'OP_SUMZ2');
+% save('grid.mat','im','jm','kb','imm1','imm2','jmm1','jmm2','kbm1','kbm2','kl1','kl2',...
+%                 'z','zz','dz','dzz','z_3d','zz_3d','dz_3d','dzz_3d');
+% save('para.mat','small','pi','netcdf_file','iproblem','mode','nadv','nitera',...
+%      'sw','nread','dte','isplit','days','prtd1','prtd2','swtch','iskp','jskp',...
+%      'lramp','rhoref','tbias','sbias','grav','kappa','z0b','cbcmin','cbcmax',...
+%      'horcon','tprni','umol','hmax','vmaxl','slmax','ntp','nbct','nbcs','ispadv',...
+%      'smoth','alpha','dti','dte2','dti2','iend','iprint','iswtch','ispi','isp2i');
 
-                
+% save('operator.mat',...
+% 'OP_AXF', 'OP_AXB', 'OP_AYF', 'OP_AYB', 'OP_AZF', 'OP_AZB', ...
+% 'OP_DXF', 'OP_DXB', 'OP_DYF', 'OP_DYB', 'OP_DZF', 'OP_DZB', ...
+% 'OP_L_XY',    'OP_L_XZ',   'OP_L_YZ', ...                  
+% 'OP_R_XY',    'OP_R_XZ',   'OP_R_YZ', ...                  
+% 'OP_SUMZ1',   'OP_SUMZ2');
+
+
 if(iproblem == 1)
     [dx,dy,cor,...
         east_c,north_c,east_e,north_e,east_u,north_u,east_v,north_v,...
@@ -323,10 +333,10 @@ else
     return
 end
 
-save('grid.mat','im','jm','kb','imm1','imm2','jmm1','jmm2','kbm1','kbm2','kl1','kl2',...
-                'z','zz','dz','dzz','z_3d','zz_3d','dz_3d','dzz_3d',...
-                'dx','dy','dz','art','aru','arv','art','aru','arv','fsm','dum','dvm',...
-                'dx_3d','dy_3d','art_3d','aru_3d','arv_3d','art_3d','aru_3d','arv_3d','fsm_3d','dum_3d','dvm_3d');
+% save('grid.mat','im','jm','kb','imm1','imm2','jmm1','jmm2','kbm1','kbm2','kl1','kl2',...
+%                 'z','zz','dz','dzz','z_3d','zz_3d','dz_3d','dzz_3d',...
+%                 'dx','dy','dz','art','aru','arv','art','aru','arv','fsm','dum','dvm',...
+%                 'dx_3d','dy_3d','art_3d','aru_3d','arv_3d','art_3d','aru_3d','arv_3d','fsm_3d','dum_3d','dvm_3d');
 
 %     Inertial period for temporal filter:
 period=(2.0*pi)/abs(cor(floor(im/2),floor(jm/2)))/86400.0;
@@ -509,19 +519,25 @@ for iint=1:iend
         %     Form vertical averages of 3-D fields for use in external (2-D)
         %     mode:
         
-        adx2d=zeros(im,jm);
-        ady2d=zeros(im,jm);
-        drx2d=zeros(im,jm);
-        dry2d=zeros(im,jm);
-        aam2d=zeros(im,jm);
-        
-        for k=1:kb
-            adx2d=adx2d+advx(:,:,k)*dz(k);
-            ady2d=ady2d+advy(:,:,k)*dz(k);
-            drx2d=drx2d+drhox(:,:,k)*dz(k);
-            dry2d=dry2d+drhoy(:,:,k)*dz(k);
-            aam2d=aam2d+aam(:,:,k)*dz(k);
-        end
+%         adx2d=zeros(im,jm);
+%         ady2d=zeros(im,jm);
+%         drx2d=zeros(im,jm);
+%         dry2d=zeros(im,jm);
+%         aam2d=zeros(im,jm);
+%         
+%         for k=1:kb
+%             adx2d=adx2d+advx(:,:,k)*dz(k);
+%             ady2d=ady2d+advy(:,:,k)*dz(k);
+%             drx2d=drx2d+drhox(:,:,k)*dz(k);
+%             dry2d=dry2d+drhoy(:,:,k)*dz(k);
+%             aam2d=aam2d+aam(:,:,k)*dz(k);
+%         end
+
+        adx2d = sum(advx.*dz_3d, 3);
+        ady2d = sum(advy.*dz_3d, 3);
+        drx2d = sum(drhox.*dz_3d, 3);
+        dry2d = sum(drhoy.*dz_3d, 3);
+        aam2d = sum(aam.*dz_3d, 3);
         
         %[tps2,advua,advva,fluxua,fluxva,wubot,wvbot,tps0] = advave(tps,advua,advva,fluxua,fluxva,wubot,wvbot,tps,...
         %    mode,im,jm,imm1,jmm1,aam2d,...
@@ -545,7 +561,7 @@ for iint=1:iend
         %   
         elf= elb+dte2.*(-(DXF( AXB(d).*AXB(dy).*ua)+DYF(AYB(d).*AYB(dx).*va))./ art-vfluxf);  
         
-        [elf,uaf,vaf,uf,vf,w] = bcond(1,elf,uaf,vaf,uf,vf,w,...
+        [elf,uaf,vaf,uf,vf,w] = new_bcond(1,elf,uaf,vaf,uf,vf,w,...
             im,jm,kb,imm1,jmm1,kbm1,...
             fsm,grav,ramp,rfe,h,uabe,ele,el,uabw,rfw,elw,rfn,eln,vabs,rfs,els,...
             dum,dvm,hmax,u,v,t,s,tbn,sbn,dti,tbs,sbs,q2,q2l,small,vabn,dx,dy,dt,tbe,sbe,tbw,sbw,zz);
@@ -569,7 +585,7 @@ for iint=1:iend
                  .*( (1.0-2.0*alpha) .* DYB(el) + alpha* (DYB(elb)+ DYB(elf)) + DYB(e_atmos) ) ...
                + dry2d + arv .* (wvsurf-wvbot))) , (2.0*AYB(h+elf) .* arv));  
 
-        [elf,uaf,vaf,uf,vf,w] = bcond(2,elf,uaf,vaf,uf,vf,w,...
+        [elf,uaf,vaf,uf,vf,w] = new_bcond(2,elf,uaf,vaf,uf,vf,w,...
             im,jm,kb,imm1,jmm1,kbm1,...
             fsm,grav,ramp,rfe,h,uabe,ele,el,uabw,rfw,elw,rfn,eln,vabs,rfs,els,...
             dum,dvm,hmax,u,v,t,s,tbn,sbn,dti,tbs,sbs,q2,q2l,small,vabn,dx,dy,dt,tbe,sbe,tbw,sbw,zz);
@@ -584,17 +600,23 @@ for iint=1:iend
          
         % Stop if velocity condition violated (generally due to CFL
         % criterion not being satisfied):   
-        vamax=0.0;
         
-        for j=1:jm
-            for i=1:im
-                if(abs(vaf(i,j))>=vamax)
-                    vamax=abs(vaf(i,j));
-                    imax=i;
-                    jmax=j;
-                end
-            end
-        end
+%        vamax=0.0;       
+%         for j=1:jm
+%             for i=1:im
+%                 if(abs(vaf(i,j))>=vamax)
+%                     vamax=abs(vaf(i,j));
+%                     imax=i;
+%                     jmax=j;
+%                 end
+%             end
+%         end
+        
+        [vamax, vapos]=max(abs(vaf(:)));
+        [imax, jmax]=ind2sub(size(vaf), vapos);
+%         fprintf('diff_vmax:%.18f\n', vamax-vamax);
+%         fprintf('diff_imax:%d\n', imax1-imax);
+%         fprintf('diff_jmax:%d\n', jmax1-jmax);
         
         if(vamax<=vmaxl)
             %
@@ -631,31 +653,50 @@ for iint=1:iend
             %
             %     Adjust u(z) and v(z) such that depth average of (u,v) = (ua,va):
             %
-            tps=zeros(im,jm);
-            for k=1:kbm1
-                tps=tps+u(:,:,k)*dz(k);
-            end
+%             tps=zeros(im,jm);
+%             for k=1:kbm1
+%                 tps=tps+u(:,:,k)*dz(k);
+%             end
+%?
+            tps=sum(u(:,:,1:kbm1).*dz_3d(:,:,1:kbm1), 3);
             
-            for k=1:kbm1
-                u(:,:,k)=(u(:,:,k)-tps)+   DIVISION((utb+utf), 2.0*AXB(dt));
-            end
+%             for k=1:kbm1
+%                 u(:,:,k)=(u(:,:,k)-tps)+   DIVISION((utb+utf), 2.0*AXB(dt));
+%             end
             
-            tps =zeros(im,jm);
-            for k=1:kbm1
-                tps=tps+v(:,:,k)*dz(k);
-            end
+            utb_3d = repmat(utb, 1, 1, kbm1);
+            utf_3d = repmat(utf, 1, 1, kbm1);
+            tps_3d = repmat(tps, 1, 1, kbm1);
+            dt_3d1 = repmat(dt, 1, 1, kbm1);
+            dt_axb = 2.0 * AXB(dt_3d1);
+            u(:,:,1:kbm1) = u(:,:,1:kbm1)-tps_3d + (utb_3d+utf_3d) ./ dt_axb;
+            
+% 
+%             tps =zeros(im,jm);
+%             for k=1:kbm1
+%                 tps=tps+v(:,:,k)*dz(k);
+%             end
+%?
+            tps = sum(v(:,:,1:kbm1) .* dz_3d(:,:,1:kbm1), 3);
+            
+%             for k=1:kbm1
+%                 v(:,:,k)=(v(:,:,k)-tps) + DIVISION((vtb+vtf), 2.0*AYB(dt));
+%             end
+           
+            vtb_3d = repmat(vtb, 1, 1, kbm1);
+            vtf_3d = repmat(vtf, 1, 1, kbm1);
+            tps_3d = repmat(tps, 1, 1, kbm1);
+            dt_ayb = 2.0 * AYB(dt_3d1);
+            v(:,:,1:kbm1) = v(:,:,1:kbm1) - tps_3d + (vtb_3d+vtf_3d) ./ dt_ayb;
+            
 
-            for k=1:kbm1
-                v(:,:,k)=(v(:,:,k)-tps)+   DIVISION((vtb+vtf), 2.0*AYB(dt));
-            end
-            
             %     vertvl calculates w from u, v, dt (h+et), etf and etb:
             %
             
             [a,c,w]=vertvl(a,c,w,dx,dy,dz,dt,u,v,vfluxb,vfluxf,etf,etb,dti2,im,jm,imm1,jmm1,kbm1);  
             %[a0,c0,w0]=new_vertvl(a,c,w,dx,dy,dz,dt,u,v,vfluxb,vfluxf,etf,etb,dti2,im,jm,imm1,jmm1,kbm1);  
 
-            [elf,uaf,vaf,uf,vf,w] = bcond(5,elf,uaf,vaf,uf,vf,w,...
+            [elf,uaf,vaf,uf,vf,w] = new_bcond(5,elf,uaf,vaf,uf,vf,w,...
                 im,jm,kb,imm1,jmm1,kbm1,...
                 fsm,grav,ramp,rfe,h,uabe,ele,el,uabw,rfw,elw,rfn,eln,vabs,rfs,els,...
                 dum,dvm,hmax,u,v,t,s,tbn,sbn,dti,tbs,sbs,q2,q2l,small,vabn,dx,dy,dt,tbe,sbe,tbw,sbw,zz);
@@ -679,7 +720,7 @@ for iint=1:iend
                 h,etf,dti2,umol,dzz,grav,rho,kappa,u,v,dt,small,fsm,im,jm,kb,imm1,jmm1,kbm1,tbias,sbias,dz,...
                 wusurf,wubot,wvsurf,wvbot,t,s,rhoref,zz,z);
             
-            [elf,uaf,vaf,uf,vf,w] = bcond(6,elf,uaf,vaf,uf,vf,w,...
+            [elf,uaf,vaf,uf,vf,w] = new_bcond(6,elf,uaf,vaf,uf,vf,w,...
                 im,jm,kb,imm1,jmm1,kbm1,...
                 fsm,grav,ramp,rfe,h,uabe,ele,el,uabw,rfw,elw,rfn,eln,vabs,rfs,els,...
                 dum,dvm,hmax,u,v,t,s,tbn,sbn,dti,tbs,sbs,q2,q2l,small,vabn,dx,dy,dt,tbe,sbe,tbw,sbw,zz);
@@ -720,7 +761,7 @@ for iint=1:iend
                 [uf] = new_proft(uf,wtsurf,tsurf,nbct,h,etf,swrad,kh);
                 [vf] = new_proft(vf,wssurf,ssurf,nbcs,h,etf,swrad,kh);
                 
-                [elf,uaf,vaf,uf,vf,w] = bcond(4,elf,uaf,vaf,uf,vf,w,...
+                [elf,uaf,vaf,uf,vf,w] = new_bcond(4,elf,uaf,vaf,uf,vf,w,...
                     im,jm,kb,imm1,jmm1,kbm1,...
                     fsm,grav,ramp,rfe,h,uabe,ele,el,uabw,rfw,elw,rfn,eln,vabs,rfs,els,...
                     dum,dvm,hmax,u,v,t,s,tbn,sbn,dti,tbs,sbs,q2,q2l,small,vabn,dx,dy,dt,tbe,sbe,tbw,sbw,zz);
@@ -743,53 +784,61 @@ for iint=1:iend
             [uf,wubot] = new_profu(uf,etf,h,km,wusurf,cbc,ub,vb);           
             [vf,wvbot] = new_profv(vf,etf,h,km,wvsurf,cbc,ub,vb);
             
-            [elf,uaf,vaf,uf,vf,w] = bcond(3,elf,uaf,vaf,uf,vf,w,...
+            [elf,uaf,vaf,uf,vf,w] = new_bcond(3,elf,uaf,vaf,uf,vf,w,...
                 im,jm,kb,imm1,jmm1,kbm1,...
                 fsm,grav,ramp,rfe,h,uabe,ele,el,uabw,rfw,elw,rfn,eln,vabs,rfs,els,...
                 dum,dvm,hmax,u,v,t,s,tbn,sbn,dti,tbs,sbs,q2,q2l,small,vabn,dx,dy,dt,tbe,sbe,tbw,sbw,zz);
             
-            tps = zeros(im,jm);
-
-            for k=1:kbm1
-                for j=1:jm
-                    for i=1:im
-                        tps(i,j)=tps(i,j)     ...
-                            +(uf(i,j,k)+ub(i,j,k)-2.e0*u(i,j,k))*dz(k);
-                    end
-                end
-            end
+%             tps = zeros(im,jm);
+% 
+%             for k=1:kbm1
+%                 for j=1:jm
+%                     for i=1:im
+%                         tps(i,j)=tps(i,j)     ...
+%                             +(uf(i,j,k)+ub(i,j,k)-2.e0*u(i,j,k))*dz(k);
+%                     end
+%                 end
+%             end
+            tps = sum((uf+ub-2.e0*u).*dz_3d, 3);
             %
-            for k=1:kbm1
-                for j=1:jm
-                    for i=1:im
-                        u(i,j,k)=u(i,j,k)     ...
-                            +.5e0*smoth*(uf(i,j,k)+ub(i,j,k)     ...
-                            -2.e0*u(i,j,k)-tps(i,j));
-                    end
-                end
-            end
+%             for k=1:kbm1
+%                 for j=1:jm
+%                     for i=1:im
+%                         u(i,j,k)=u(i,j,k)     ...
+%                             +.5e0*smoth*(uf(i,j,k)+ub(i,j,k)     ...
+%                             -2.e0*u(i,j,k)-tps(i,j));
+%                     end
+%                 end
+%             end
+            tps_3d = repmat(tps, 1, 1, kbm1);
+            u(:,:,1:kbm1)=u(:,:,1:kbm1)+ ...
+                .5e0*smoth*(uf(:,:,1:kbm1)+ub(:,:,1:kbm1)-2.e0*u(:,:,1:kbm1)-tps_3d);
             %
-            tps = zeros(im,jm);
+%           tps = zeros(im,jm);
+%             for k=1:kbm1
+%                 for j=1:jm
+%                     for i=1:im
+%                         tps(i,j)=tps(i,j)     ...
+%                             +(vf(i,j,k)+vb(i,j,k)-2.e0*v(i,j,k))*dz(k);
+%                     end
+%                 end
+%             end
+            tps = sum((vf+vb-2.e0*v).*dz_3d, 3);
+            
             %
-            for k=1:kbm1
-                for j=1:jm
-                    for i=1:im
-                        tps(i,j)=tps(i,j)     ...
-                            +(vf(i,j,k)+vb(i,j,k)-2.e0*v(i,j,k))*dz(k);
-                    end
-                end
-            end
+%             for k=1:kbm1
+%                 for j=1:jm
+%                     for i=1:im
+%                         v(i,j,k)=v(i,j,k)     ...
+%                             +.5e0*smoth*(vf(i,j,k)+vb(i,j,k)     ...
+%                             -2.e0*v(i,j,k)-tps(i,j));
+%                     end
+%                 end
+%             end
             %
-            for k=1:kbm1
-                for j=1:jm
-                    for i=1:im
-                        v(i,j,k)=v(i,j,k)     ...
-                            +.5e0*smoth*(vf(i,j,k)+vb(i,j,k)     ...
-                            -2.e0*v(i,j,k)-tps(i,j));
-                    end
-                end
-            end
-            %
+            tps_3d = repmat(tps,1,1,kbm1);
+            v(:,:,1:kbm1) = v(:,:,1:kbm1)+ ...
+                .5e0*smoth*(vf(:,:,1:kbm1)+vb(:,:,1:kbm1)-2.e0*v(:,:,1:kbm1)-tps_3d);
             
             ub=u;
             u=uf;
@@ -832,26 +881,41 @@ for iint=1:iend
         taver=0.e0;
         saver=0.e0;
         eaver=0.e0;
-        for k=1:kbm1
-            for j=1:jm
-                for i=1:im
-                    darea=dx(i,j)*dy(i,j)*fsm(i,j);
-                    dvol=darea*dt(i,j)*dz(k);
-                    vtot=vtot+dvol;
-                    taver=taver+tb(i,j,k)*dvol;
-                    saver=saver+sb(i,j,k)*dvol;
-                end
-            end
-        end
+%         for k=1:kbm1
+%             for j=1:jm
+%                 for i=1:im
+%                     darea=dx(i,j)*dy(i,j)*fsm(i,j);
+%                     dvol=darea*dt(i,j)*dz(k);
+%                     vtot=vtot+dvol;
+%                     taver=taver+tb(i,j,k)*dvol;
+%                     saver=saver+sb(i,j,k)*dvol;
+%                 end
+%             end
+%         end
+        
+        dt_3d1 = repmat(dt, 1, 1, kb);
+        tmp_dvol = dx_3d(:,:,1:kbm1).*dy_3d(:,:,1:kbm1).*fsm_3d(:,:,1:kbm1).*dt_3d1(:,:,1:kbm1).*dz_3d(:,:,1:kbm1);
+        vtot=sum(tmp_dvol(:));
+        taver=sum(reshape(tb(:,:,1:kbm1).*tmp_dvol,[],1));
+        saver=sum(reshape(sb(:,:,1:kbm1).*tmp_dvol,[],1));
+
+%         fprintf('diff_vtot:%.18f\n', vtot1-vtot);
+%         fprintf('diff_taver:%.18f\n', taver1-taver);
+%         fprintf('diff_saver:%.18f\n', saver1-saver);
+        
         %
-        for j=1:jm
-            for i=1:im
-                darea=dx(i,j)*dy(i,j)*fsm(i,j);
-                atot=atot+darea;
-                eaver=eaver+et(i,j)*darea;
-            end
-        end
+%         for j=1:jm
+%             for i=1:im
+%                 darea=dx(i,j)*dy(i,j)*fsm(i,j);
+%                 atot=atot+darea;
+%                 eaver=eaver+et(i,j)*darea;
+%             end
+%         end
         %
+        darea = dx.*dy.*fsm;
+        atot = sum(darea(:));
+        eaver = sum(reshape(et.*darea,[],1));
+        
         taver=taver/vtot;
         saver=saver/vtot;
         eaver=eaver/atot;

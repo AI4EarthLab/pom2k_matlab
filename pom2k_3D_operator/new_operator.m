@@ -1,8 +1,11 @@
-function [OP_AXF, OP_AXB, OP_AYF, OP_AYB, OP_AZF, OP_AZB, ...
-          OP_DXF, OP_DXB, OP_DYF, OP_DYB, OP_DZF, OP_DZB, ...
-          OP_L_XY,   OP_L_XZ,   OP_L_YZ, ...
-          OP_R_XY,   OP_R_XZ,   OP_R_YZ, ...
-          OP_SUMZ1, OP_SUMZ2] = new_operator(m,n,k)
+% function [OP_AXF, OP_AXB, OP_AYF, OP_AYB, OP_AZF, OP_AZB, ...
+%           OP_DXF, OP_DXB, OP_DYF, OP_DYB, OP_DZF, OP_DZB, ...
+%           OP_L_XY,   OP_L_XZ,   OP_L_YZ, ...
+%           OP_R_XY,   OP_R_XZ,   OP_R_YZ, ...
+%           OP_SUMZ1, OP_SUMZ2] = new_operator(m,n,k)
+      
+function [OP] = new_operator(m,n,k)
+      OP = Operator();
 % Computing the basic averaging and differencing operators to smplify
 % code.
 
@@ -38,8 +41,12 @@ function [OP_AXF, OP_AXB, OP_AYF, OP_AYB, OP_AZF, OP_AZB, ...
 L1= eye(m,m); 
 L2=[zeros(m,1) eye(m,m-1)];
 L3=zeros(m,m); L3(m,m)=1;
-OP_AXF=0.5*(L1+L2+L3);
+OP.OP_AXF=0.5*(L1+L2+L3);
 
+L1= eye(n,n); 
+L2=[zeros(n,1) eye(n,n-1)];
+L3=zeros(n,n); L3(n,n)=1;
+OP.OP_AXF1=0.5*(L1+L2+L3);
 %  OP_AXB= 0.5*[2  0  0  0  0  0  0]   OP_AXB*X= 0.5*[    2X11     2X12     2X13     2X14     2X15 ]
 %              [1  1  0  0  0  0  0]                 [ X11+X21  X12+X22  X13+X23  X14+X24  X15+X25 ]
 %              [0  1  1  0  0  0  0]                 [ X21+X31  X22+X32  X23+X33  X24+X34  X25+X35 ]
@@ -50,9 +57,12 @@ OP_AXF=0.5*(L1+L2+L3);
 L1= eye(m,m); 
 L2=[zeros(1,m); eye(m-1,m)];
 L3=zeros(m,m); L3(1,1)=1;
-OP_AXB=0.5*(L1+L2+L3);
+OP.OP_AXB=0.5*(L1+L2+L3);
 
-
+L1= eye(n,n); 
+L2=[zeros(1,n); eye(n-1,n)];
+L3=zeros(n,n); L3(1,1)=1;
+OP.OP_AXB1=0.5*(L1+L2+L3);
 % OP_AYF= 0.5*[1  0  0  0  0]        Y*OP_AYF= 0.5*[ Y11+Y12  Y12+Y13  Y13+Y14  Y14+Y15  2Y15 ]
 %             [1  1  0  0  0]                      [ Y21+Y22  Y22+Y23  Y23+Y24  Y24+Y25  2Y25 ]
 %             [0  1  1  0  0]                      [ Y31+Y32  Y32+Y33  Y33+Y34  Y34+Y35  2Y35 ]
@@ -63,7 +73,7 @@ OP_AXB=0.5*(L1+L2+L3);
 R1= eye(n,n); 
 R2=[zeros(1,n); eye(n-1,n)];
 R3=zeros(n,n); R3(n,n)=1;
-OP_AYF=0.5*(R1+R2+R3);
+OP.OP_AYF=0.5*(R1+R2+R3);
 
 
 
@@ -77,21 +87,23 @@ OP_AYF=0.5*(R1+R2+R3);
 R1= eye(n,n); 
 R2=[zeros(n,1), eye(n,n-1)];
 R3=zeros(n,n); R3(1,1)=1;
-OP_AYB=0.5*(R1+R2+R3);
-
-
+OP.OP_AYB=0.5*(R1+R2+R3);
 
 %%%%%%%%%%%%%%%%%%%%%%%% A operator in XZ plate %%%%%%%%%%%%%%%%%%
 R1= eye(k,k); 
 R2=[zeros(1,k); eye(k-1,k)];
 R3=zeros(k,k); R3(k,k)=1;
-OP_AZF=0.5*(R1+R2+R3);
+OP.OP_AZF=0.5*(R1+R2+R3);
 
 R1= eye(k,k); 
 R2=[zeros(k,1), eye(k,k-1)];
 R3=zeros(k,k); R3(1,1)=1;
-OP_AZB=0.5*(R1+R2+R3);
+OP.OP_AZB=0.5*(R1+R2+R3);
 
+
+R1 = [zeros(k,1), eye(k, k-1)];
+R2 = [zeros(1,k); -eye(k-1, k)];
+OP.OP_Rk = R1 + R2;
 
 %%%%%%%%%%%%%%%%%%%%%%%% D operator in XY plate %%%%%%%%%%%%%%%%%%
 % OP_DXF1_XY=[ -1  1  0  0  0  0  0]    OP_DXF1_XY*X =[ X21-X11  X22-X12   X23-X13   X24-X14   X25-X15 ]
@@ -104,7 +116,7 @@ OP_AZB=0.5*(R1+R2+R3);
 L1= -eye(m,m); 
 L2=[zeros(m,1) eye(m,m-1)];
 L3=zeros(m,m); L3(m,m)=1;
-OP_DXF=(L1+L2+L3);
+OP.OP_DXF=(L1+L2+L3);
 
 % OP_DXB1_XY=[  0  0  0  0  0  0  0]    OP_DXB1_XY*X =[       0        0         0         0         0 ]
 %            [ -1  1  0  0  0  0  0]                  [ X21-X11  X22-X12   X23-X13   X24-X14   X25-X15 ]
@@ -116,11 +128,11 @@ OP_DXF=(L1+L2+L3);
 L1=eye(m,m); 
 L2=[zeros(1,m); -eye(m-1,m)];
 L3=zeros(m,m); L3(1,1)=-1;
-OP_DXB=(L1+L2+L3);
+OP.OP_DXB=(L1+L2+L3);
 
 % OP_DYF1_XY=[ -1  0  0  0  0 ]         Y*OP_DYF1_XY =[ Y12-Y11   Y13-Y12   Y14-Y13   Y15-Y14  0 ]
 %            [  1 -1  0  0  0 ]                       [ Y22-Y21   Y23-Y22   Y24-Y23   Y25-Y24  0 ]
-%            [  0  1 -1  0  0 ]                       [ Y22-Y21   Y33-Y32   Y34-Y33   Y35-Y34  0 ]
+%            [  0  1 -1  0  0 ]                        [ Y22-Y21   Y33-Y32   Y34-Y33   Y35-Y34  0 ]
 %            [  0  0  1 -1  0 ]                       [ Y22-Y21   Y43-Y42   Y44-Y43   Y45-Y44  0 ]
 %            [  0  0  0  1  0 ]                       [ Y22-Y21   Y53-Y52   Y54-Y53   Y55-Y54  0 ]
 %                                                     [ Y22-Y21   Y63-Y62   Y64-Y63   Y65-Y64  0 ]
@@ -128,7 +140,7 @@ OP_DXB=(L1+L2+L3);
 R1= -eye(n,n); 
 R2=[zeros(1,n); eye(n-1,n)];
 R3=zeros(n,n); R3(n,n)=1;
-OP_DYF=(R1+R2+R3);
+OP.OP_DYF=(R1+R2+R3);
 
 % OP_DYB1_XY=[  0 -1  0  0  0 ]         Y*OP_DYB1_XY =[ 0  Y12-Y11   Y13-Y12   Y14-Y13   Y15-Y14 ]
 %            [  0  1 -1  0  0 ]                       [ 0  Y22-Y21   Y23-Y22   Y24-Y23   Y15-Y14 ]
@@ -140,33 +152,33 @@ OP_DYF=(R1+R2+R3);
 R1= eye(n,n); 
 R2=[zeros(n,1), -eye(n,n-1)];
 R3=zeros(n,n); R3(1,1)=-1;
-OP_DYB=(R1+R2+R3);
+OP.OP_DYB=(R1+R2+R3);
 
 
 R1= -eye(k,k); 
 R2=[zeros(1,k); eye(k-1,k)];
 R3=zeros(k,k); R3(k,k)=1;
-OP_DZF=(R1+R2+R3);
+OP.OP_DZF=(R1+R2+R3);
 
 R1= eye(k,k); 
 R2=[zeros(k,1), -eye(k,k-1)];
 R3=zeros(k,k); R3(1,1)=-1;
-OP_DZB=(R1+R2+R3);
+OP.OP_DZB=(R1+R2+R3);
 %%%%%%%%%%%%%%%%%%%%%%%% OP_L and OP_R operator %%%%%%%%%%%%%%%%%%
 L=eye(m,m); L(1,1)=0;L(m,m)=0;
 R=eye(n,n); R(1,1)=0;R(n,n)=0;
-OP_L_XY = L;
-OP_R_XY = R;
+OP.OP_L_XY = L;
+OP.OP_R_XY = R;
 
 L=eye(m,m); L(1,1)=0;L(m,m)=0;
 R=eye(k,k); R(1,1)=0;R(k,k)=0;
-OP_L_XZ = L;
-OP_R_XZ = R;
+OP.OP_L_XZ = L;
+OP.OP_R_XZ = R;
 
 L=eye(n,n); L(1,1)=0;L(n,n)=0;
 R=eye(k,k); R(1,1)=0;R(k,k)=0;
-OP_L_YZ = L;
-OP_R_YZ = R;
+OP.OP_L_YZ = L;
+OP.OP_R_YZ = R;
 
 %%%%%%%%%%%%%%%%%%%%%%%% OP_SUM operator %%%%%%%%%%%%%%%%%%
 % Define sum operator along with X and Y directions. 
@@ -178,10 +190,10 @@ OP_R_YZ = R;
 %      [0 0 0 0 0 0]        [0 0 0 0 0 0]
 
 R1=triu(ones(k,k)); R1(:,k)=0;
-OP_SUMZ1= R1;
+OP.OP_SUMZ1= R1;
 
 R2=triu(ones(k,k))-eye(k);
-OP_SUMZ2= R2;
+OP.OP_SUMZ2= R2;
 
 end
 

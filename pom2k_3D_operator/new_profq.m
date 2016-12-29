@@ -3,6 +3,11 @@
          ee,gg,l,kq,km,kh,uf,vf,q2,q2b,q2lb,a,c,...
          h,etf,dti2,umol,dzz,grav,rho,kappa,u,v,dt,small,fsm,im,jm,kb,imm1,jmm1,kbm1,tbias,sbias,dz,...
          wusurf,wubot,wvsurf,wvbot,t,s,rhoref,zz,z)
+%       function [sm,sh,dh,cc,ee,gg,l,kq,km,kh,...
+%          uf,vf,q2b,q2lb,a,c]=profq(sm,sh,dh,cc,...
+%          ee,gg,l,kq,km,kh,uf,vf,q2,q2b,q2lb,a,c,...
+%          h,etf,dti2,umol,dzz,grav,rho,kappa,u,v,dt,small,fsm,im,jm,kb,imm1,jmm1,kbm1,tbias,sbias,dz,...
+%          wusurf,wubot,wvsurf,wvbot,t,s,rhoref,zz,z)
 % **********************************************************************
 % *                                        Updated: Sep. 24, 2003      *
 % * FUNCTION    :  Solves for q2 (twice the turbulent kinetic energy), *
@@ -36,7 +41,10 @@
 % *     roughness length. J. Phys. Oceanogr., 29, 1363-1367, 1999.     *
 % *                                                                    *
 % **********************************************************************
-load('grid.mat');load('operator.mat');load('para.mat');
+
+%load('grid.mat');load('operator.mat');load('para.mat');
+
+global dzz_3d kbm2 dz_3d zz_3d;
 
 a1=0.92; b1=16.6 ; a2=0.74 ; b2=10.1    ; c1=0.08;
 e1=1.8 ; e2=1.33 ; sef=1.0 ; cbcnst=100.; surfl=2.e5 ; shiw=0.0;
@@ -58,6 +66,8 @@ for k=2:kbm1
     tmp1(:,:,k)=dzz(k-1)*dz(k);
     tmp2(:,:,k)=dzz(k-1)*dz(k-1);
 end
+tmp1(:,:,2:kbm1)=dzz_3d(:,:,1:kbm2).*dz_3d(:,:,2:kbm1);
+tmp2(:,:,2:kbm1)=dzz_3d(:,:,1:kbm2).*dz_3d(:,:,1:kbm2);
 
 a= DIVISION(-dti2 .* (AZF(kq)+umol) , (tmp1 .* dh_3d .* dh_3d));
 c= DIVISION(-dti2 .* (AZB(kq)+umol) , (tmp2 .* dh_3d .* dh_3d));
@@ -154,16 +164,41 @@ for k=1:kb-2
     vf(:,:,ki)=ee(:,:,ki).*vf(:,:,ki+1)+gg(:,:,ki);
 end
 
-for k=2:kbm1
-    for j=1:jm
-        for i=1:im
-            if(uf(i,j,k)<=small || vf(i,j,k)<=small) 
-                uf(i,j,k)=small;
-                vf(i,j,k)=0.1*dt(i,j)*small;
-            end
-        end
-    end
-end
+% for k=2:kbm1
+%     for j=1:jm
+%         for i=1:im
+%             if(uf(i,j,k)<=small || vf(i,j,k)<=small) 
+%                 uf(i,j,k)=small;
+%                 vf(i,j,k)=0.1*dt(i,j)*small;
+%             end
+%         end
+%     end
+% end
+
+dt_3d=repmat(dt,1,1,kb);
+
+filter = (uf<=small | vf<=small);
+filter(:,:,1) = false;
+filter(:,:,kb) = false;
+uf(filter) = small;
+vf(filter) = 0.1 * dt_3d(filter) * small;
+
+% uf1 = uf;
+% vf1 = vf;
+% 
+% dt_3d=repmat(dt,1,1,kb);
+% 
+% filter = (uf1<=small | vf1<=small);
+% filter(:,:,1) = false;
+% filter(:,:,kb) = false;
+% uf1(filter) = small;
+% vf1(filter) = 0.1 * dt_3d(filter) * small;
+% diff_uf = abs(uf1 - uf);
+% diff_vf = abs(vf1 - vf);
+% fprintf('Max diff_uf=%d\n', max(diff_uf(:)));
+% fprintf('Max diff_vf=%d\n', max(diff_vf(:)));
+
+
 %-----------------------------------------------------------------------
 %     The following section solves for km and kh:
     coef4=18.e0*a1*a1+9.e0*a1*a2;
@@ -180,20 +215,71 @@ end
     kq=(kn.*.41e0.*sh+kq)*.5e0;
     km=(kn.*sm+km)*.5e0;
     kh=(kn.*sh+kh)*.5e0;
-% cosmetics: make boundr. values as interior
-% (even if not used: printout otherwise may show strange values)
-      for k=1:kb
-        for i=1:im
-           km(i,jm,k)=km(i,jmm1,k)*fsm(i,jm);
-           kh(i,jm,k)=kh(i,jmm1,k)*fsm(i,jm);
-           km(i,1,k)=km(i,2,k)*fsm(i,1);
-           kh(i,1,k)=kh(i,2,k)*fsm(i,1);
-        end
-        for j=1:jm
-           km(im,j,k)=km(imm1,j,k)*fsm(im,j);
-           kh(im,j,k)=kh(imm1,j,k)*fsm(im,j);
-           km(1,j,k)=km(2,j,k)*fsm(1,j);
-           kh(1,j,k)=kh(2,j,k)*fsm(1,j);
-        end
-      end
+  
+%    fsm_3d = repmat(fsm, 1, 1, kb);
+%     km1 = km;
+%     kh1 = kh;
+%     km1(:,jm,:)=km1(:,jmm1,:).*fsm_3d(:,jm,:);
+%     kh1(:,jm,:)=km1(:,jmm1,:).*fsm_3d(:,jm,:);
+%     km1(:,1,:)=km1(:,2,:).*fsm_3d(:,1,:);
+%     kh1(:,1,:)=kh1(:,2,:).*fsm_3d(:,1,:);
+%     
+%     km1(im,:,:)=km1(imm1,:,:).*fsm_3d(im,:,:);
+%     kh1(im,:,:)=kh1(imm1,:,:).*fsm_3d(im,:,:);
+%     km1(1,:,:)=km1(2,:,:).*fsm_3d(1,:,:);
+%     kh1(1,:,:)=kh1(2,:,:).*fsm_3d(1,:,:);
+%       
+% % cosmetics: make boundr. values as interior
+% % (even if not used: printout otherwise may show strange values)
+%       for k=1:kb
+%         for i=1:im
+%            km(i,jm,k)=km(i,jmm1,k)*fsm(i,jm);
+%            kh(i,jm,k)=kh(i,jmm1,k)*fsm(i,jm);
+%            km(i,1,k)=km(i,2,k)*fsm(i,1);
+%            kh(i,1,k)=kh(i,2,k)*fsm(i,1);
+%         end
+%         for j=1:jm
+%            km(im,j,k)=km(imm1,j,k)*fsm(im,j);
+%            kh(im,j,k)=kh(imm1,j,k)*fsm(im,j);
+%            km(1,j,k)=km(2,j,k)*fsm(1,j);
+%            kh(1,j,k)=kh(2,j,k)*fsm(1,j);
+%         end
+%       end
+%       
+%       diff_km = abs(km1 - km);
+%       diff_kh = abs(kh1 - kh);
+%       fprintf('max_diff_km=%d\n', max(diff_km(:)));
+%       fprintf('max_diff_kh=%d\n', max(diff_kh(:)));
+      
+      fsm_3d = repmat(fsm, 1, 1, kb);
+      km(:,jm,:)=km(:,jmm1,:).*fsm_3d(:,jm,:);
+      kh(:,jm,:)=km(:,jmm1,:).*fsm_3d(:,jm,:);
+      km(:,1,:)=km(:,2,:).*fsm_3d(:,1,:);
+      kh(:,1,:)=kh(:,2,:).*fsm_3d(:,1,:);
+      
+      km(im,:,:)=km(imm1,:,:).*fsm_3d(im,:,:);
+      kh(im,:,:)=kh(imm1,:,:).*fsm_3d(im,:,:);
+      km(1,:,:)=km(2,:,:).*fsm_3d(1,:,:);
+      kh(1,:,:)=kh(2,:,:).*fsm_3d(1,:,:);
+      
+
  end
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 

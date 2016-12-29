@@ -1,5 +1,8 @@
 function [art,aru,arv,fsm,dum,dvm]=new_areas_masks(dx,dy,h)
-load('grid.mat');
+%load('grid.mat');
+
+global im jm;
+
 % Set to zero
 art=zeros(im,jm); aru=zeros(im,jm); arv=zeros(im,jm); 
 fsm=zeros(im,jm); dum=zeros(im,jm); dvm=zeros(im,jm);

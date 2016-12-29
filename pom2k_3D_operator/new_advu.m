@@ -1,5 +1,7 @@
 function [uf] = new_advu(advx,cor,dt,e_atmos,drhox,h,ub,u,v,w,egf,egb,etf,etb)
-load('grid.mat');load('para.mat');load('operator.mat');
+%load('grid.mat');load('para.mat');load('operator.mat');
+
+global im jm kb aru_3d dti2 grav dy_3d dz_3d;
 
 h_3d = repmat(h,1,1,kb); 
 dt_3d = repmat(dt,1,1,kb); 

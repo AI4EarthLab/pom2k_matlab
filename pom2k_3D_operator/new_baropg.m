@@ -4,7 +4,9 @@ function [rho,drhox,drhoy] = new_baropg(rho, rmean, dt, ramp)
 % * FUNCTION    :  Calculates  baroclinic pressure gradient.           *
 % *                                                                    *
 % **********************************************************************
-load('grid.mat'); load('para.mat');
+
+%load('grid.mat'); load('para.mat');
+global im jm kb zz_3d dx_3d dy_3d grav dum_3d dvm_3d;
 
 rho = rho - rmean;
 drhox=zeros(im,jm,kb); drhoy=zeros(im,jm,kb);
