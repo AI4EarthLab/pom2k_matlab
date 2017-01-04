@@ -1,13 +1,8 @@
  function [sm,sh,dh,cc,ee,gg,l,kq,km,kh,...
-         uf,vf,q2b,q2lb,a,c]=profq(sm,sh,dh,cc,...
+         uf,vf,q2b,q2lb,a,c]=sx_profq(sm,sh,dh,cc,...
          ee,gg,l,kq,km,kh,uf,vf,q2,q2b,q2lb,a,c,...
          h,etf,dti2,umol,dzz,grav,rho,kappa,u,v,dt,small,fsm,im,jm,kb,imm1,jmm1,kbm1,tbias,sbias,dz,...
          wusurf,wubot,wvsurf,wvbot,t,s,rhoref,zz,z)
-%       function [sm,sh,dh,cc,ee,gg,l,kq,km,kh,...
-%          uf,vf,q2b,q2lb,a,c]=profq(sm,sh,dh,cc,...
-%          ee,gg,l,kq,km,kh,uf,vf,q2,q2b,q2lb,a,c,...
-%          h,etf,dti2,umol,dzz,grav,rho,kappa,u,v,dt,small,fsm,im,jm,kb,imm1,jmm1,kbm1,tbias,sbias,dz,...
-%          wusurf,wubot,wvsurf,wvbot,t,s,rhoref,zz,z)
 % **********************************************************************
 % *                                        Updated: Sep. 24, 2003      *
 % * FUNCTION    :  Solves for q2 (twice the turbulent kinetic energy), *
@@ -41,9 +36,7 @@
 % *     roughness length. J. Phys. Oceanogr., 29, 1363-1367, 1999.     *
 % *                                                                    *
 % **********************************************************************
-
 %load('grid.mat');load('operator.mat');load('para.mat');
-
 global dzz_3d kbm2 dz_3d zz_3d;
 
 a1=0.92; b1=16.6 ; a2=0.74 ; b2=10.1    ; c1=0.08;
@@ -54,23 +47,22 @@ kn = zeros(im,jm,kb);
 boygr=zeros(im,jm,kb);
 gh=zeros(im,jm,kb);
 stf=zeros(im,jm,kb);
+la=zeros(kb);
       
 dh = h + etf;
 dh_3d=repmat(dh,1,1,kb);
 
 a = zeros(im,jm,kb);
 c = zeros(im,jm,kb);
-tmp1 = zeros(im,jm,kb);
-tmp2 = zeros(im,jm,kb);
-for k=2:kbm1
-    tmp1(:,:,k)=dzz(k-1)*dz(k);
-    tmp2(:,:,k)=dzz(k-1)*dz(k-1);
-end
-tmp1(:,:,2:kbm1)=dzz_3d(:,:,1:kbm2).*dz_3d(:,:,2:kbm1);
-tmp2(:,:,2:kbm1)=dzz_3d(:,:,1:kbm2).*dz_3d(:,:,1:kbm2);
+d = zeros(im,jm,kb);
 
-a= DIVISION(-dti2 .* (AZF(kq)+umol) , (tmp1 .* dh_3d .* dh_3d));
-c= DIVISION(-dti2 .* (AZB(kq)+umol) , (tmp2 .* dh_3d .* dh_3d));
+a(:,:,2:kbm1)=dzz_3d(:,:,1:kbm2).*dz_3d(:,:,2:kbm1);
+c(:,:,2:kbm1)=dzz_3d(:,:,1:kbm2).*dz_3d(:,:,1:kbm2);
+
+a= DIVISION(-dti2 .* (AZF(kq)+umol) , (a .* dh_3d .* dh_3d));
+c= DIVISION(-dti2 .* (AZB(kq)+umol) , (c .* dh_3d .* dh_3d));
+a(:,:,1)=0.e0;         c(:,:,1)=0.e0;       
+a(:,:,kb)=0.e0;        c(:,:,kb)=0.e0;
 %-----------------------------------------------------------------------
 %     The following section solves the equation:
 %
@@ -82,15 +74,11 @@ const1=(16.6e0^(2.e0/3.e0))*sef;
 
 % initialize fields that are not calculated on all boundaries
 % but are later used there
-ee(:,jm,1)=0; ee(im,:,1)=0; 
-gg(:,jm,1)=0; gg(im,:,1)=0; 
 l0(:,jm)  =0; l0(im,:)=0;
 kn(:,:,:)=0;
       
 utau2 = sqrt( AXF(wusurf).^2 +AYF(wvsurf).^2 );
 % Wave breaking energy- a variant of Craig & Banner (1994), see Mellor and Blumberg, 2003.
-ee(:,:,1)=zeros(im,jm);
-gg(:,:,1)=(15.8*cbcnst)^(2./3.)*utau2;
  % Surface length scale following Stacey (1999).
 l0 = surfl*utau2/grav;                     
 uf(:,:,kb) = sqrt( AXF(wubot).^2 +AYF(wvbot).^2 ) .* const1;
@@ -110,9 +98,10 @@ for k=2:kbm1
     tmp(:,:,k)=dzz(k-1);
 end
 boygr=DIVISION(-grav* DZB(rho) , tmp .* h_3d ) + DIVISION(grav^2 , AZB(cc.^2));
-
+boygr(:,:,1)=0.e0; boygr(:,:,kb)=0.e0;
 l=q2lb ./ q2b;
-l=max(l, repmat(kappa*l0,1,1,kb));
+%l=max(l, repmat(kappa*l0,1,1,kb));
+l=(z_3d>-0.5) .* max(l, repmat(kappa*l0,1,1,kb))+(z_3d<=-0.5) .* l;
 gh=l.^2 .* boygr ./q2b;
 gh=min(gh, 0.028);
 
@@ -131,49 +120,47 @@ stf=ones(im,jm,kb);
 %    ...        stf(i,j,k)=1.0e0-0.9e0*(gh(i,j,k)/ghc)**1.5e0
 %           if(gh(i,j,k).lt.ghc) stf(i,j,k)=0.1e0
 dtef=sqrt(q2b).*stf./(b1.*l+small);
+dtef(:,:,1)=0.e0;dtef(:,:,kb)=0.e0;
 
-%
-for k=2:kbm1
-    gg(:,:,k)=1.e0./(a(:,:,k)+c(:,:,k).*(1.e0-ee(:,:,k-1))-(2.e0*dti2.*dtef(:,:,k)+1.e0));
-    ee(:,:,k)=a(:,:,k).*gg(:,:,k);
-    gg(:,:,k)=(-2.e0*dti2*kn(:,:,k)+c(:,:,k).*gg(:,:,k-1)-uf(:,:,k)).*gg(:,:,k);
-end
+    d=-uf-2.e0*dti2*kn;
+    d(:,:,1)=-(15.8*cbcnst)^(2./3.).*utau2;
+    d(:,jm,1)=0; d(im,:,1)=0; d(:,:,kb)=-uf(:,:,kb);
 
-for k=1:kbm1
-    ki=kb-k;
-    uf(:,:,ki)=ee(:,:,ki).*uf(:,:,ki+1)+gg(:,:,ki);
-end      
+  for j=2:jm
+      for i=2:im
+   la=diag(reshape(a(i,j,1:kb)+c(i,j,1:kb)-1-2.e0*dti2.*dtef(i,j,1:kb),kb,1),0) ...
+      - diag(reshape(a(i,j,1:kbm1),kbm1,1),1) ...
+      - diag(reshape(c(i,j,2:kb),kbm1,1),-1);
+   uf(i,j,1:kb)=la\reshape(d(i,j,1:kb),kb,1); 
+      end
+  end
+    
 %-----------------------------------------------------------------------
 %     The following section solves the equation:
 %
 %       dti2(kq*q2l')' - q2l*(dti2*dtef+1.) = -q2lb
-ee(:,:,2)=0.e0;
-gg(:,:,2)=0.e0;
+
 vf(:,:,kb)=0.e0;
 
 for k=2:kbm1
     dtef(:,:,k)=dtef(:,:,k).*(1.e0+e2.*((1.e0/abs(z(k)-z(1))+1.e0./abs(z(k)-z(kb)))     ...
                         .*l(:,:,k)./(dh(:,:)*kappa)).^2);
-    gg(:,:,k)=1.e0./(a(:,:,k)+c(:,:,k).*(1.e0-ee(:,:,k-1))-(dti2*dtef(:,:,k)+1.e0));
-    ee(:,:,k)=a(:,:,k).*gg(:,:,k);
-    gg(:,:,k)=(dti2*(-kn(:,:,k).*l(:,:,k).*e1)+c(:,:,k).*gg(:,:,k-1)-vf(:,:,k)).*gg(:,:,k);
 end
 
-for k=1:kb-2
-    ki=kb-k;
-    vf(:,:,ki)=ee(:,:,ki).*vf(:,:,ki+1)+gg(:,:,ki);
-end
+    d=-vf-dti2*kn.*l.*e1;
+    d(:,:,1)=-(15.8*cbcnst)^(2./3.).*utau2;
+    d(:,jm,1)=0.e0; d(im,:,1)=0.e0; d(:,:,kb)=0.e0;
+    temp=vf(:,:,1);
 
-% for k=2:kbm1
-%     for j=1:jm
-%         for i=1:im
-%             if(uf(i,j,k)<=small || vf(i,j,k)<=small) 
-%                 uf(i,j,k)=small;
-%                 vf(i,j,k)=0.1*dt(i,j)*small;
-%             end
-%         end
-%     end
-% end
+  for j=2:jm
+      for i=2:im
+   la=diag(reshape(a(i,j,1:kb)+c(i,j,1:kb)-1-dti2.*dtef(i,j,1:kb),kb,1),0) ...
+      - diag(reshape(a(i,j,1:kbm1),kbm1,1),1) ...
+      - diag(reshape(c(i,j,2:kb),kbm1,1),-1);
+   vf(i,j,1:kb)=la\reshape(d(i,j,1:kb),kb,1); 
+      end
+  end
+   vf(:,:,1)=temp;
 
 dt_3d=repmat(dt,1,1,kb);
 
@@ -182,22 +169,6 @@ filter(:,:,1) = false;
 filter(:,:,kb) = false;
 uf(filter) = small;
 vf(filter) = 0.1 * dt_3d(filter) * small;
-
-% uf1 = uf;
-% vf1 = vf;
-% 
-% dt_3d=repmat(dt,1,1,kb);
-% 
-% filter = (uf1<=small | vf1<=small);
-% filter(:,:,1) = false;
-% filter(:,:,kb) = false;
-% uf1(filter) = small;
-% vf1(filter) = 0.1 * dt_3d(filter) * small;
-% diff_uf = abs(uf1 - uf);
-% diff_vf = abs(vf1 - vf);
-% fprintf('Max diff_uf=%d\n', max(diff_uf(:)));
-% fprintf('Max diff_vf=%d\n', max(diff_vf(:)));
-
 
 %-----------------------------------------------------------------------
 %     The following section solves for km and kh:
@@ -215,42 +186,7 @@ vf(filter) = 0.1 * dt_3d(filter) * small;
     kq=(kn.*.41e0.*sh+kq)*.5e0;
     km=(kn.*sm+km)*.5e0;
     kh=(kn.*sh+kh)*.5e0;
-  
-%    fsm_3d = repmat(fsm, 1, 1, kb);
-%     km1 = km;
-%     kh1 = kh;
-%     km1(:,jm,:)=km1(:,jmm1,:).*fsm_3d(:,jm,:);
-%     kh1(:,jm,:)=km1(:,jmm1,:).*fsm_3d(:,jm,:);
-%     km1(:,1,:)=km1(:,2,:).*fsm_3d(:,1,:);
-%     kh1(:,1,:)=kh1(:,2,:).*fsm_3d(:,1,:);
-%     
-%     km1(im,:,:)=km1(imm1,:,:).*fsm_3d(im,:,:);
-%     kh1(im,:,:)=kh1(imm1,:,:).*fsm_3d(im,:,:);
-%     km1(1,:,:)=km1(2,:,:).*fsm_3d(1,:,:);
-%     kh1(1,:,:)=kh1(2,:,:).*fsm_3d(1,:,:);
-%       
-% % cosmetics: make boundr. values as interior
-% % (even if not used: printout otherwise may show strange values)
-%       for k=1:kb
-%         for i=1:im
-%            km(i,jm,k)=km(i,jmm1,k)*fsm(i,jm);
-%            kh(i,jm,k)=kh(i,jmm1,k)*fsm(i,jm);
-%            km(i,1,k)=km(i,2,k)*fsm(i,1);
-%            kh(i,1,k)=kh(i,2,k)*fsm(i,1);
-%         end
-%         for j=1:jm
-%            km(im,j,k)=km(imm1,j,k)*fsm(im,j);
-%            kh(im,j,k)=kh(imm1,j,k)*fsm(im,j);
-%            km(1,j,k)=km(2,j,k)*fsm(1,j);
-%            kh(1,j,k)=kh(2,j,k)*fsm(1,j);
-%         end
-%       end
-%       
-%       diff_km = abs(km1 - km);
-%       diff_kh = abs(kh1 - kh);
-%       fprintf('max_diff_km=%d\n', max(diff_km(:)));
-%       fprintf('max_diff_kh=%d\n', max(diff_kh(:)));
-      
+       
       fsm_3d = repmat(fsm, 1, 1, kb);
       km(:,jm,:)=km(:,jmm1,:).*fsm_3d(:,jm,:);
       kh(:,jm,:)=km(:,jmm1,:).*fsm_3d(:,jm,:);
@@ -262,24 +198,5 @@ vf(filter) = 0.1 * dt_3d(filter) * small;
       km(1,:,:)=km(2,:,:).*fsm_3d(1,:,:);
       kh(1,:,:)=kh(2,:,:).*fsm_3d(1,:,:);
       
-
  end
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
  

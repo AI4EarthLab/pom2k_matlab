@@ -24,16 +24,16 @@ la=zeros(kbm1);d=zeros(im,jm,kb);
 %
     d(:,:,1:kbm2)=-dti2*(c(:,:,2:kbm1)+umol);
     a=DIVISION(d,dz_3d.*dzz_3d.*dh_3d.*dh_3d);
-    a(:,:,kbm1)= 0.e0;
 
     d(:,:,2:kbm1)=dzz_3d(:,:,1:kbm2);
     c=DIVISION(-dti2*(c+umol),dz_3d.*d.*dh_3d.*dh_3d);
     c(:,:,1)  =0.e0;
 
-tps = AYB(cbc) .* sqrt( AYB( AXF( ub(:,:,kbm1) ) ).^2 + vb(:,:,kbm1).^2 );
+    tps = AYB(cbc) .* sqrt( AYB( AXF( ub(:,:,kbm1) ) ).^2 + vb(:,:,kbm1).^2 );
+    tps(1,:) = 0.e0;
+    a(:,:,kbm1)=-tps(:,:) * dti2./(dz(kbm1) .* dh(:,:));
     d=-vf;
     d(:,:,1)= -vf(:,:,1) + dti2 .* wvsurf(:,:) ./ (dh(:,:) .* dz(1));
-    d(:,:,kbm1)=-vf(:,:,kbm1)+tps.*dti2./(dz(kbm1)*dh); 
 
   for j=2:jm
       for i=2:im
