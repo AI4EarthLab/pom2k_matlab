@@ -125,13 +125,14 @@ dtef(:,:,1)=0.e0;dtef(:,:,kb)=0.e0;
     d=-uf-2.e0*dti2*kn;
     d(:,:,1)=-(15.8*cbcnst)^(2./3.).*utau2;
     d(:,jm,1)=0; d(im,:,1)=0; d(:,:,kb)=-uf(:,:,kb);
+    temp1=a(:,:,1:kbm1);    temp2=c(:,:,2:kb);
 
   for j=2:jm
       for i=2:im
-   la=diag(reshape(a(i,j,1:kb)+c(i,j,1:kb)-1-2.e0*dti2.*dtef(i,j,1:kb),kb,1),0) ...
-      - diag(reshape(a(i,j,1:kbm1),kbm1,1),1) ...
-      - diag(reshape(c(i,j,2:kb),kbm1,1),-1);
-   uf(i,j,1:kb)=la\reshape(d(i,j,1:kb),kb,1); 
+   la=diag(reshape(a(i,j,:)+c(i,j,:)-1-2.e0*dti2.*dtef(i,j,:),kb,1),0) ...
+      - diag(reshape(temp1(i,j,:),kbm1,1),1) ...
+      - diag(reshape(temp2(i,j,:),kbm1,1),-1);
+   uf(i,j,:)=la\reshape(d(i,j,:),kb,1); 
       end
   end
     
@@ -154,10 +155,10 @@ end
 
   for j=2:jm
       for i=2:im
-   la=diag(reshape(a(i,j,1:kb)+c(i,j,1:kb)-1-dti2.*dtef(i,j,1:kb),kb,1),0) ...
-      - diag(reshape(a(i,j,1:kbm1),kbm1,1),1) ...
-      - diag(reshape(c(i,j,2:kb),kbm1,1),-1);
-   vf(i,j,1:kb)=la\reshape(d(i,j,1:kb),kb,1); 
+   la=diag(reshape(a(i,j,:)+c(i,j,:)-1-dti2.*dtef(i,j,:),kb,1),0) ...
+      - diag(reshape(temp1(i,j,:),kbm1,1),1) ...
+      - diag(reshape(temp2(i,j,:),kbm1,1),-1);
+   vf(i,j,:)=la\reshape(d(i,j,:),kb,1); 
       end
   end
    vf(:,:,1)=temp;
