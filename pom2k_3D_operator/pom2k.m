@@ -10,7 +10,10 @@ global small pi netcdf_file iproblem mode nadv nitera ...
      lramp rhoref tbias sbias grav kappa z0b cbcmin cbcmax...
      horcon tprni umol hmax vmaxl slmax ntp nbct nbcs ispadv...
      smoth alpha dti dte2 dti2 iend iprint iswtch ispi isp2i;
- 
+
+global MASK_KB REV_MASK_KB MASK_K1 REV_MASK_K1 MASK_I1 MASK_IM REV_MASK_I1 REV_MASK_IM
+global MASK_J1 REV_MASK_J1 MASK_JM REV_MASK_JM
+
 im=65; jm=49; kb=21;
 imm1=im-1; imm2=im-2; jmm1=jm-1; jmm2=jm-2; kbm1=kb-1; kbm2=kb-2;
 
@@ -267,6 +270,7 @@ end
 global OP
 OP = new_operator(im,jm,kb);
 
+create_masks();
 % [OP_AXF, OP_AXB, OP_AYF, OP_AYB, OP_AZF, OP_AZB, ...
 %  OP_DXF, OP_DXB, OP_DYF, OP_DYB, OP_DZF, OP_DZB, ...
 %  OP_L_XY,   OP_L_XZ,   OP_L_YZ, ...
@@ -382,10 +386,13 @@ v  =vb;
 %[rho,drhox,drhoy] =baropg(rho,drhox,drhoy,im,jm,imm1,jmm1,kb,kbm1,grav,zz,dt,dum,dvm,ramp,rmean,dx,dy);                       
 [rho,drhox,drhoy] = new_baropg(rho, rmean, dt, ramp);
 
-for k=1:kbm1
-    drx2d=drx2d+drhox(:,:,k)*dz(k);
-    dry2d=dry2d+drhoy(:,:,k)*dz(k);
-end
+% for k=1:kbm1
+%     drx2d=drx2d+drhox(:,:,k)*dz(k);
+%     dry2d=dry2d+drhoy(:,:,k)*dz(k);
+% end
+
+drx2d = sum(drhox .* dz_3d .* REV_MASK_KB, 3);
+dry2d = sum(drhoy .* dz_3d .* REV_MASK_KB, 3);
 
 %     Calculate bottom friction coefficient:
 cbc=(kappa./log((1.0+zz(kbm1))*h/z0b)).^2;
@@ -664,12 +671,19 @@ for iint=1:iend
 %                 u(:,:,k)=(u(:,:,k)-tps)+   DIVISION((utb+utf), 2.0*AXB(dt));
 %             end
             
-            utb_3d = repmat(utb, 1, 1, kbm1);
-            utf_3d = repmat(utf, 1, 1, kbm1);
-            tps_3d = repmat(tps, 1, 1, kbm1);
-            dt_3d1 = repmat(dt, 1, 1, kbm1);
+%             utb_3d = repmat(utb, 1, 1, kbm1);
+%             utf_3d = repmat(utf, 1, 1, kbm1);
+%             tps_3d = repmat(tps, 1, 1, kbm1);
+%             dt_3d1 = repmat(dt, 1, 1, kbm1);
+%             dt_axb = 2.0 * AXB(dt_3d1);
+%             u(:,:,1:kbm1) = u(:,:,1:kbm1)-tps_3d + (utb_3d+utf_3d) ./ dt_axb;
+            
+            utb_3d = repmat(utb, 1, 1, kb);
+            utf_3d = repmat(utf, 1, 1, kb);
+            tps_3d = repmat(tps, 1, 1, kb);
+            dt_3d1 = repmat(dt,  1, 1, kb);
             dt_axb = 2.0 * AXB(dt_3d1);
-            u(:,:,1:kbm1) = u(:,:,1:kbm1)-tps_3d + (utb_3d+utf_3d) ./ dt_axb;
+            u = u - (tps_3d - (utb_3d+utf_3d) ./ dt_axb) .* REV_MASK_KB;
             
 % 
 %             tps =zeros(im,jm);
@@ -683,11 +697,18 @@ for iint=1:iend
 %                 v(:,:,k)=(v(:,:,k)-tps) + DIVISION((vtb+vtf), 2.0*AYB(dt));
 %             end
            
-            vtb_3d = repmat(vtb, 1, 1, kbm1);
-            vtf_3d = repmat(vtf, 1, 1, kbm1);
-            tps_3d = repmat(tps, 1, 1, kbm1);
+%             vtb_3d = repmat(vtb, 1, 1, kbm1);
+%             vtf_3d = repmat(vtf, 1, 1, kbm1);
+%             tps_3d = repmat(tps, 1, 1, kbm1);
+%             dt_ayb = 2.0 * AYB(dt_3d1);
+%             v(:,:,1:kbm1) = v(:,:,1:kbm1) - tps_3d(:,:,1:kbm1) + (vtb_3d+vtf_3d) ./ dt_ayb(:,:,1:kbm1);
+%             
+            vtb_3d = repmat(vtb, 1, 1, kb);
+            vtf_3d = repmat(vtf, 1, 1, kb);
+            tps_3d = repmat(tps, 1, 1, kb);
             dt_ayb = 2.0 * AYB(dt_3d1);
-            v(:,:,1:kbm1) = v(:,:,1:kbm1) - tps_3d + (vtb_3d+vtf_3d) ./ dt_ayb;
+            v = v - (tps_3d - (vtb_3d+vtf_3d) ./ dt_ayb) .* REV_MASK_KB;
+            
             
 
             %     vertvl calculates w from u, v, dt (h+et), etf and etb:
@@ -799,7 +820,8 @@ for iint=1:iend
 %                     end
 %                 end
 %             end
-            tps = sum((uf+ub-2.e0*u).*dz_3d, 3);
+            %tps1  = sum((uf+ub-2.e0*u).*dz_3d, 3);
+            tps = sum((uf+ub-2.e0*u).*dz_3d .* REV_MASK_KB, 3);
             %
 %             for k=1:kbm1
 %                 for j=1:jm
@@ -810,9 +832,14 @@ for iint=1:iend
 %                     end
 %                 end
 %             end
-            tps_3d = repmat(tps, 1, 1, kbm1);
-            u(:,:,1:kbm1)=u(:,:,1:kbm1)+ ...
-                .5e0*smoth*(uf(:,:,1:kbm1)+ub(:,:,1:kbm1)-2.e0*u(:,:,1:kbm1)-tps_3d);
+            tps_3d = repmat(tps, 1, 1, kb);
+            
+%             u1 = u;
+%             u(:,:,1:kbm1)=u(:,:,1:kbm1)+ ...
+%                 .5e0*smoth*(uf(:,:,1:kbm1)+ub(:,:,1:kbm1)-2.e0*u(:,:,1:kbm1)-tps_3d(:,:,1:kbm1));
+            
+            u = u + 0.5e0*smoth*(uf + ub - 2.e0*u - tps_3d) .* REV_MASK_KB;
+            
             %
 %           tps = zeros(im,jm);
 %             for k=1:kbm1
@@ -823,7 +850,7 @@ for iint=1:iend
 %                     end
 %                 end
 %             end
-            tps = sum((vf+vb-2.e0*v).*dz_3d, 3);
+            tps = sum((vf+vb-2.e0*v) .* dz_3d .* REV_MASK_KB, 3);
             
             %
 %             for k=1:kbm1
@@ -836,9 +863,11 @@ for iint=1:iend
 %                 end
 %             end
             %
-            tps_3d = repmat(tps,1,1,kbm1);
-            v(:,:,1:kbm1) = v(:,:,1:kbm1)+ ...
-                .5e0*smoth*(vf(:,:,1:kbm1)+vb(:,:,1:kbm1)-2.e0*v(:,:,1:kbm1)-tps_3d);
+            tps_3d = repmat(tps,1,1,kb);
+%             v(:,:,1:kbm1) = v(:,:,1:kbm1)+ ...
+%                 .5e0*smoth*(vf(:,:,1:kbm1)+vb(:,:,1:kbm1)-2.e0*v(:,:,1:kbm1)-tps_3d);
+            
+            v = v + 0.5e0*smoth*(vf + vb - 2.e0*v-tps_3d) .* REV_MASK_KB;
             
             ub=u;
             u=uf;
