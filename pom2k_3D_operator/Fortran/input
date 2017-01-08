@@ -1,0 +1,139 @@
+&setting
+
+iend             = 100,
+im               = 65,
+jm               = 49,
+kb               = 21,
+
+! External (2-D) time step (sec.) according to CFL
+dte              = 6,
+
+! <Internal (3-D) time step>/<External (2-D) time step> (dti/dte: dimensionless)
+isplit           = 30,    
+
+! Integers defining the number of logarithmic
+! layers at the surface and bottom(used by subroutine depth).
+! The number of logarithmic layers are kl1-2
+! at the surface and kb-kl2-1 at the bottom. For no log portions,
+! set kl1=2 and kl2=kb-2
+
+kl1              = 6,     
+kl2              = 19,    
+                          
+
+! iproblem       problem type          initialization
+! Case 1 :       seamount              seamount
+! Case 2 :       conservation box      box
+! Case 3 :       IC from file          file2ic
+
+iproblem         = 1,     
+
+! Mode           description
+! 2              2-D calculation (bottom stress calculated in advave)
+! 3              3-D calculation (bottom stress calculated in profu,v)
+! 4              3-D calculation with t and s held fixed
+mode             = 3,     
+                          
+
+! nadv           Advection scheme
+! 1 Centered scheme, as originally provide in POM
+! 2 Smolarkiewicz iterative upstream scheme, based
+!   on subroutines provided by Gianmaria Sannino
+!   and Vincenzo Artale
+nadv             = 1,     
+						  
+
+! Constants for Smolarkiewicz iterative upstream scheme.
+! Number of iterations, this should be in the range 1-4,
+! 1 is standard upstream differencing, 3 adds 50% CPU time to POM.
+nitera           = 2,     
+                          
+
+! Smoothing parameter, this should preferably be 1,
+! but 0<sw<1 gives smoother solutions with less overshoot when nitera>1.
+sw               = 0.50,  
+                          
+
+! Index to indicate whether run to start from restart file.
+! (nread=0: no restart input file; nread=1: restart input file)
+nread            = 0,     
+                          
+
+! Initial print interval(days)
+prtd1            = 0.0125,
+
+! Time to switch from prtd1 to prtd2(days)
+prtd2            = 1.0,         
+swtch            = 1000.0,
+
+! Printout skip interval in i
+iskp             = 4,
+
+! Printout skip interval in j
+jskp             = 3,           
+
+! Logical for inertial ramp (true if inertial ramp to
+! be applied to wind stress and baroclinic forcing, otherwise false.)
+lramp            = false,       
+
+
+! Inverse horizontal turbulent Prandtl number
+! (ah/am: dimensionless): Note that tprni=0.0 yields zero horizontal diffusivity!
+tprni            = 0.20,        
+
+
+! Maximum allowable value of:
+! <difference of depths>/<sum of depths> for two
+! adjacent cells (dimensionless), this is used in
+! subroutine slpmax. If >=1, then slpmax is not applied.
+slmax            = 2.0,         
+                                
+
+! Water type, used in subroutine proft.
+! ntp        Jerlov water type
+! 1          i	
+! 2          ia	
+! 3          ib	
+! 4          ii	
+! 5          iii
+ntp              = 2,           
+								
+
+! Surface temperature boundary condition, used in subroutine proft:
+! nbct               prescribed temperature
+! prescribed flux            short wave penetration
+! 1                  no                               yes                        no
+! 2                  no                               yes                        yes
+! 3                  yes                              no                         no
+! 4                  yes                              no                         yes
+nbct             = 1,           
+                                
+								
+! Surface salinity boundary condition, used in subroutine proft:
+! nbcs               prescribed salinity              prescribed flux
+! 1                  no                               yes
+! 3                  yes                              no
+nbcs             = 1,           
+								
+! Step interval during which external (2-D) mode
+! advective terms are not updated (dimensionless)
+ispadv           = 5,           
+
+! Weight used for surface slope term in external (2-D) dynamic equation
+! (a value of alpha = 0.0 is perfectly acceptable,
+! but the value alpha = 0.2250 permits a longer time step)
+alpha            = 0.2250,      
+
+! Temperature bias (deg. C)
+tbias            = 0.0,         
+
+! Salinity bias
+sbias            = 0.0,         
+
+! Temperature of atm
+tatm             = 0.0,         
+
+! Salinity of atm
+satm             = 0.0,         
+
+&end
