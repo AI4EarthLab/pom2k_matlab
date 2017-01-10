@@ -1,9 +1,10 @@
 function[dx,dy,cor,...
     east_c,north_c,east_e,north_e,east_u,north_u,east_v,north_v,...
-    h,art,aru,arv,fsm,dum,dvm,...
-    tb,sb,tclim,sclim,ub,uab,elb,etb,dt,...
-    aam2d,rho,rmean,rfe,rfw,rfn,rfs,...
-    uabw,uabe,ele,elw,tbe,tbw,sbe,sbw,tbn,tbs,sbn,sbs,rot,els,eln,vabs,vabn,ubw,ube,vbs,vbn] = file2ic(dx,dy,cor,...
+    h,art,aru,arv,fsm,dum,dvm,tb,sb,tclim,sclim,ub,uab,elb,etb,dt,...
+    aam2d,rho,rmean,rfe,rfw,rfn,rfs,uabw,uabe,ele,elw,tbe,tbw,sbe,...
+    sbw,tbn,tbs,sbn,sbs,rot,els,eln,vabs,vabn,ubw,ube,vbs,vbn,...
+    dx_3d,dy_3d,cor_3d,h_3d,art_3d,aru_3d,arv_3d,fsm_3d,dum_3d,dvm_3d, ...
+    dt_3d,z,zz,dz,dzz,z_3d,zz_3d,dz_3d,dzz_3d] = file2ic(dx,dy,cor,...
     east_c,north_c,east_e,north_e,east_u,north_u,east_v,north_v,...
     h,art,aru,arv,fsm,dum,dvm,...
     tb,sb,tclim,sclim,ub,uab,elb,etb,dt,...
@@ -20,126 +21,65 @@ function[dx,dy,cor,...
 % *                                                                    *
 % **********************************************************************
 %
+load('grid.mat');load('operator.mat');load('para.mat');
 field = '';
+name  = ' ';
 rad=0.01745329;
 re=6371.E3;
 fprintf('(/,'' Read grid and initial conditions '',/');
 %
+%---start read--------------
 %--- 1D ---
-fid = fopen('data.in','r');
-fscanf(fid,'%s',field);
-fprintf('%s',filed);
+fid = fopen('IC.dat','r');
+%--------------1 D
+name=fscanf(fid,'%s',[1]);
+z=fscanf(fid,'%f',[1,kb]);
+
+name=fscanf(fid,'%s',[1]);
+zz=fscanf(fid,'%f',[1,kb]);
+
+name=fscanf(fid,'%s',[1]);
+dz=fscanf(fid,'%f',[1,kb]);
+
+name=fscanf(fid,'%s',[1]);
+dzz=fscanf(fid,'%f',[1,kb]);
+
+%---------------2 D
+name=fscanf(fid,'%s',[1]);
+east_e=fscanf(fid,'%f',[im,jm]);
+
+name=fscanf(fid,'%s',[1]);
+north_e=fscanf(fid,'%f',[im,jm]);
+
+name=fscanf(fid,'%s',[1]);
+h=fscanf(fid,'%f',[im,jm]);
+
+%---------------3 D
+name=fscanf(fid,'%s',[1]);
 for k=1:kb
-    fscanf('%f',z(k));
+t(:,:,k)=fscanf(fid,'%f',[im,jm]);
 end
 
-fscanf(fid,'%s',field);
-fprintf('%s',filed);
+name=fscanf(fid,'%s',[1]);
 for k=1:kb
-    fscanf(fid,'%f',zz(k));
+s(:,:,k)=fscanf(fid,'%f',[im,jm]);
 end
 
-fscanf(fid,'%s',field);
-fprintf('%s',filed);
+name=fscanf(fid,'%s',[1]);
 for k=1:kb
-    fscanf(fid,'%f',dz(k));
+rmean(:,:,k)=fscanf(fid,'%f',[im,jm]);
 end
-
-fscanf(fid,'%s',field);
-fprintf('%s',filed);
-for k=1:kb
-    fscanf(fid,'%f',dzz(k));
-end
-
-
-%--- 2D ---
-fscanf(fid,'%s',field);
-fprintf('%s',filed);
-for i=1:im
-    for j=1:jm
-        fscanf(fid,'%f',east_e(i,j));
-    end
-end
-
-fscanf(fid,'%s',field);
-fprintf('%s',filed);
-for i=1:im
-    for j=1:jm
-        fscanf(fid,'%f',north_e(i,j));
-    end
-end
-
-
-fscanf(fid,'%s',field);
-fprintf('%s',filed);
-for i=1:im
-    for j=1:jm
-        fscanf(fid,'%f',h(i,j));
-    end
-end
-
-fscanf(fid,'%s',field);
-fprintf('%s',filed);
-for i=1:im
-    for j=1:jm
-        fscanf(fid,'%f',h(i,j));
-    end
-end
-
-%--- 3D ---
-
-fscanf(fid,'%s',field);
-fprintf('%s',filed);
-for i=1:im
-    for j=1:jm
-        for k=1:kb
-            fscanf(fid,'%f',t(i,j,k));
-        end
-    end
-end
-
-fscanf(fid,'%s',field);
-fprintf('%s',filed);
-for i=1:im
-    for j=1:jm
-        for k=1:kb
-            fscanf(fid,'%f',s(i,j,k));
-        end
-    end
-end
-
-fscanf(fid,'%s',field);
-fprintf('%s',filed);
-for i=1:im
-    for j=1:jm
-        for k=1:kb
-            fscanf(fid,'%f',rmean(i,j,k));
-        end
-    end
-end
-
-
 
 %--- Constant wind stress read here
 % (for time dep. read in loop 9000 & interpolate in time)
+%---------------2 D
+name=fscanf(fid,'%s',[1]);
+wusurf(:,:)=fscanf(fid,'%f',[65,49]);
 
-fscanf(fid,'%s',field);
-fprintf('%s',filed);
-for i=1:im
-    for j=1:jm
-        scanf(fid,'%f',wusurf(i,j));
-    end
-end
+name=fscanf(fid,'%s',[1]);
+wvsurf(:,:)=fscanf(fid,'%f',[65,49]);
 
-
-fscanf(fid,'%s',field);
-fprintf('%s',filed);
-for i=1:im
-    for j=1:jm
-        scanf(fid,'%f',wvsurf(i,j));
-    end
-end
-
+%-----------------read end-------------------
 %
 % --- calc. surface & lateral BC from climatology
 %
@@ -193,9 +133,9 @@ sb = s;
 ub = zeros(im,jm,kb);
 vb=zeros(im,jm,kb);
 %
-
-[sb,tb,rho]=dens(si,ti,rhoo,...
-    im,jm,kbm1,tbias,sbias,grav,rhoref,zz,h,fsm);
+h_3d=repmat(h,1,1,kb);
+fsm_3d=repmat(fsm,1,1,kb);
+[rho]=new_dens(sb,tb,h_3d,fsm_3d);
 %
 % --- calc. Curiolis Parameter
 %
@@ -229,8 +169,7 @@ end
 %
 %     Calculate areas and masks:
 %
-[art,aru,arv,fsm,dum,dvm]=areas_masks(art,aru,arv,fsm,dum,dvm,...
-    im,jm,dx,dy,h);
+[art,aru,arv,fsm,dum,dvm]=areas_masks(im,jm,dx,dy,h);
 %
 %
 % --- the following grids are needed only for netcdf plotting
@@ -315,6 +254,21 @@ rfe=0.e0;
 rfw=0.e0;
 rfn=0.e0;
 rfs=0.e0;
+
+dx_3d=repmat(dx,1,1,kb);    dy_3d=repmat(dy,1,1,kb);
+cor_3d=repmat(cor,1,1,kb);  art_3d=repmat(art,1,1,kb);
+aru_3d=repmat(aru,1,1,kb);  arv_3d=repmat(arv,1,1,kb);
+dum_3d=repmat(dum,1,1,kb);  dvm_3d=repmat(dvm,1,1,kb);
+dt_3d=repmat(dt,1,1,kb);    
+
+z_3d=zeros(im,jm,kb); zz_3d=zeros(im,jm,kb); dz_3d=zeros(im,jm,kb); dzz_3d=zeros(im,jm,kb); 
+for k=1:kb
+    z_3d(:,:,k)=repmat(z(k),im,jm);
+    zz_3d(:,:,k)=repmat(zz(k),im,jm);
+    dz_3d(:,:,k)=repmat(dz(k),im,jm);
+    dzz_3d(:,:,k)=repmat(dzz(k),im,jm);
+end
+
 %
 return
 end
