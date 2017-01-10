@@ -2,14 +2,16 @@
 PNETCDF=${ESM_SOFT}/pnetcdf/
 
 CFLAGS	         =  
-FFLAGS	         =-Wno-tabs -I ${PNETCDF}/include  -J ${DM}
+FFLAGS	         =-Wno-tabs -I ${PNETCDF}/include  -J ${DM} -g
 CPPFLAGS         =
 FPPFLAGS         =
 LOCDIR           = src/ksp/ksp/examples/tutorials/
 MANSEC           = KSP
 CLEANFILES       = pom2k *.o *.mod *.nc
 NP               = 1
-OBJ		 = constants.o new_depth.o input.o grid.o new_baropg.o new_dense.o
+OBJ		 = constants.o new_depth.o input.o grid.o new_baropg.o new_dense.o \
+		   new_vertvl.o
+
 OBJMAIN		 = ${OBJ} pom2k.o 
 
 include ${PETSC_DIR}/lib/petsc/conf/variables

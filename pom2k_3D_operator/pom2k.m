@@ -206,9 +206,9 @@ ramp=0.0;
 
 tatm = 0.0;
 satm = 0.0;
-io = zeros(100);
-jo = zeros(100);
-ko = zeros(100);
+%io = zeros(100);
+%jo = zeros(100);
+%ko = zeros(100);
 
 %     End of input of constants
 %***********************************************************************

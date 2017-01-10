@@ -3,7 +3,6 @@ subroutine new_depth(z, zz, dz, dzz, z_3d, zz_3d, dz_3d, dzz_3d, ierr)
   use dm_op
   use dm
   use dm_type
-  use constants
   use input
   implicit none
   
@@ -14,7 +13,9 @@ subroutine new_depth(z, zz, dz, dzz, z_3d, zz_3d, dz_3d, dzz_3d, ierr)
   real(kind=8), allocatable :: z1(:), zz1(:), dz1(:), dzz1(:)
 
   allocate(z1(kb), zz1(kb), dz1(kb), dzz1(kb))
-  
+
+
+
   kdz=(/1,1,2,4,8,16,32,64,128,256,512,1024/);
 
   z1 = 0; zz1 = 0; dz1 = 0; dzz1 = 0;
@@ -28,7 +29,7 @@ subroutine new_depth(z, zz, dz, dzz, z_3d, zz_3d, dz_3d, dzz_3d, ierr)
   do k=kl1+1,kl2
      z1(k)=z1(k-1)+delz;
   enddo
-
+  
   do k=kl2+1,kb
      dz1(k)=kdz(kb-k+1)*delz/kdz(kb-kl2);
      z1(k)=z1(k-1)+dz1(k);
@@ -61,12 +62,14 @@ subroutine new_depth(z, zz, dz, dzz, z_3d, zz_3d, dz_3d, dzz_3d, ierr)
   zz = dm_zeros(1, 1, kb)
   dz = dm_zeros(1, 1, kb)
   dzz= dm_zeros(1, 1, kb)
+
   
   call dm_setvalues(z, (/0/), (/0/), (/(i, i=0,kb-1)/), z1, ierr)
   call dm_setvalues(zz, (/0/), (/0/), (/(i, i=0,kb-1)/), zz1, ierr)
   call dm_setvalues(dz, (/0/), (/0/), (/(i, i=0,kb-1)/), dz1, ierr)
   call dm_setvalues(dzz, (/0/), (/0/), (/(i, i=0,kb-1)/), dzz1, ierr)
 
+  
   z_3d  = dm_rep(z,  im, jm, 1)
   zz_3d = dm_rep(zz, im, jm, 1)
   dz_3d = dm_rep(dz, im, jm, 1)

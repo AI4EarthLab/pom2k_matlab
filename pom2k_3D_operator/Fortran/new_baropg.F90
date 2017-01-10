@@ -2,7 +2,6 @@
 subroutine new_baropg()
   use dm
   use dm_op
-  use constants
   use grid
   
   implicit none
@@ -20,6 +19,8 @@ subroutine new_baropg()
   drhox=dm_zeros(im,jm,kb);
   drhoy=dm_zeros(im,jm,kb);
 
+
+
   dt_3d=dm_rep(dt,1,1,kb);
 
   ! !% Calculate x-component of baroclinic pressure gradient:
@@ -27,7 +28,7 @@ subroutine new_baropg()
   drhox = drhox + (NAG_MASK_Z1 .em. drhox) - &
        grav .em. (zz_3d .em. MASK_Z1) .em. &
        AXB(dt_3d .em. MASK_Z1) .em. DXB(rho .em. MASK_Z1)
-  
+
   ! drhox= SUM1(drhox-grav *DZB(zz_3d) .* AXB(dt_3d) .* DXB(AZB(rho))
   !        + grav * AZB(zz_3d) .* DXB(dt_3d) .* DZB(AXB(rho)));
   drhox = CSUM(drhox - grav .em. DZB(zz_3d) .em. AXB(dt_3d) .em. DXB(AZB(rho)) &
@@ -36,6 +37,7 @@ subroutine new_baropg()
   ! drhox = ramp*drhox .* AXB(dt_3d) .* dum_3d .* AXB(dy_3d);
   drhox = ramp * drhox .em. AXB(dt_3d) .em. dum_3d .em. AXB(dy_3d);
 
+  
   ! %Calculate y-component of baroclinic pressure gradient:
   ! drhoy(:,:,1)= -grav .* zz_3d(:,:,1) .* AYB(dt_3d(:,:,1)) .* DYB(rho(:,:,1));
   drhoy = drhoy + (drhoy .em. NAG_MASK_Z1) - &

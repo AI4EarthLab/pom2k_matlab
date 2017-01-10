@@ -1,6 +1,5 @@
 subroutine new_dense()
   use dm_op
-  use constants
   use grid
   use input
   
@@ -23,8 +22,13 @@ subroutine new_dense()
 
   rhor=rhor + (0.824493e0-4.0899e-3*tr+7.6438e-5*tr2-8.2467e-7*tr3 &
        +5.3875e-9*tr4) .em. sr+(-5.72466e-3+1.0227e-4*tr &
-       -1.6546e-6*tr2) .em. dm_pow(dm_abs(sr), 1.5_8) + 4.8314e-4 * sr .em. sr;
+       -1.6546e-6*tr2) .em. dm_pow(dm_abs(sr), 1.5)
 
+  ! rhor=rhor + (0.824493e0-4.0899e-3*tr+7.6438e-5*tr2-8.2467e-7*tr3 &
+  !      +5.3875e-9*tr4) .em. sr+(-5.72466e-3+1.0227e-4*tr &
+  !      -1.6546e-6*tr2) .em. dm_pow(dm_abs(sr), 1.5) + 4.8314e-4 * sr .em. sr;
+
+  
   cr=1449.1e0+.0821e0 * p+4.55e0 * tr-.045e0*tr2+1.34e0*(sr-35.e0);
 
   rhor=rhor +1.e5 * p .ed. (cr .em. cr) .em. (1.e0-2.e0 * p .ed. (cr .em. cr));

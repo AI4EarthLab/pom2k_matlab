@@ -2,7 +2,6 @@ module grid
   use dm_type
   use dm
   use dm_op
-  use constants
   use input
   implicit none
 
