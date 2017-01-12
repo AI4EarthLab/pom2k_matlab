@@ -10,7 +10,7 @@ module grid
   ! type(Matrix) :: arv, fsm, dum, dvm, tb, sb, tclim, sclim, ub, uab, elb, etb
   type(Matrix) :: dt,    tbe
 
-  real(kind=8)    rfe, rfn, rfs
+  real(kind=8)    rfe, rfw, rfn, rfs
   type(Matrix) :: dx_3d, dy_3d, cor_3d, h_3d, art_3d, aru_3d, arv_3d
   type(Matrix) :: fsm_3d, dum_3d, dvm_3d, dt_3d, d_3d
 
