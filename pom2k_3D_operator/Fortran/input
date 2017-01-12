@@ -1,9 +1,9 @@
 &setting
 
 iend             = 100,
-im               = 65,
-jm               = 49,
-kb               = 21,
+im               = 11,
+jm               = 9,
+kb               = 7,
 
 ! External (2-D) time step (sec.) according to CFL
 dte              = 6,
@@ -17,9 +17,8 @@ isplit           = 30,
 ! at the surface and kb-kl2-1 at the bottom. For no log portions,
 ! set kl1=2 and kl2=kb-2
 
-kl1              = 6,     
-kl2              = 19,    
-                          
+kl1              = 3,     
+kl2              = 5,    
 
 ! iproblem       problem type          initialization
 ! Case 1 :       seamount              seamount
@@ -87,38 +86,7 @@ tprni            = 0.20,
 ! adjacent cells (dimensionless), this is used in
 ! subroutine slpmax. If >=1, then slpmax is not applied.
 slmax            = 2.0,         
-                                
-
-! Water type, used in subroutine proft.
-! ntp        Jerlov water type
-! 1          i	
-! 2          ia	
-! 3          ib	
-! 4          ii	
-! 5          iii
-ntp              = 2,           
 								
-
-! Surface temperature boundary condition, used in subroutine proft:
-! nbct               prescribed temperature
-! prescribed flux            short wave penetration
-! 1                  no                               yes                        no
-! 2                  no                               yes                        yes
-! 3                  yes                              no                         no
-! 4                  yes                              no                         yes
-nbct             = 1,           
-                                
-								
-! Surface salinity boundary condition, used in subroutine proft:
-! nbcs               prescribed salinity              prescribed flux
-! 1                  no                               yes
-! 3                  yes                              no
-nbcs             = 1,           
-								
-! Step interval during which external (2-D) mode
-! advective terms are not updated (dimensionless)
-ispadv           = 5,           
-
 ! Weight used for surface slope term in external (2-D) dynamic equation
 ! (a value of alpha = 0.0 is perfectly acceptable,
 ! but the value alpha = 0.2250 permits a longer time step)
@@ -135,5 +103,100 @@ tatm             = 0.0,
 
 ! Salinity of atm
 satm             = 0.0,         
+
+days = 2,
+prtd1=0.0125,
+prtd2=1.0,
+swtch=1000.0,
+
+!% Printout skip interval in i
+iskp=4;             
+
+
+jskp=3;             
+
+! %     Logical for inertial ramp (true if inertial ramp to be applied
+! %     to wind stress and baroclinic forcing, otherwise false)
+lramp=false;
+
+small     = 1.d-9   
+pi        = 3.14159265358
+
+!%Reference density (recommended values: 1025 for seawater,
+!1000 for freswater; S.I. units):
+rhoref    = 1025.0  
+
+!% von Karman's constant
+kappa     = 0.40
+
+!% Bottom roughness (metres)
+z0b       = 0.01    
+
+!% Minimum bottom friction coeff.
+aam_init  = 500.0
+
+!% ramp is not assigned in fortran pom2k before used in barop
+ramp      = 0.0     
+
+!% Maximum bottom friction coeff.
+cbcmax=1.0        
+
+!% Smagorinsky diffusivity coeff.
+horcon=0.20
+
+! %  Background viscosity used in subroutines profq, proft, profu and profv (S.I. units):
+umol=2.e-5
+
+! %     Maximum depth used in radiation boundary condition in subroutine bcond (metres):
+hmax=4500.0
+
+! %     Maximum magnitude of vaf (used in check that essentially tests for CFL violation):
+vmaxl=100.0
+
+! %     Water type, used in subroutine proft.
+! %       ntp    Jerlov water type
+! %        1            i
+! %        2            ia
+! %        3            ib
+! %        4            ii
+! %        5            iii
+ntp=2
+
+! %     Surface temperature boundary condition, used in subroutine proft:
+! %       nbct   prescribed    prescribed   short wave
+! %              temperature      flux      penetration
+! %        1        no           yes           no
+! %        2        no           yes           yes
+! %        3        yes          no            no
+! %        4        yes          no            yes
+! %
+nbct=1
+
+! %     Surface salinity boundary condition, used in subroutine proft:
+! %       nbcs   prescribed    prescribed
+! %               salinity      flux
+! %        1        no           yes
+! %        3        yes          no
+! %     NOTE that only 1 and 3 are allowed for salinity.
+nbcs=1
+
+! %     Step interval during which external (2-D) mode advective terms are
+! %     not updated (dimensionless):
+ispadv=5
+
+! %     Constant in temporal filter used to prevent solution splitting
+! %     (dimensionless):
+smoth=0.100
+
+! %     Weight used for surface slope term in external (2-D) dynamic
+! %     equation (a value of alpha = 0.0 is perfectly acceptable, but the
+! %     value, alpha=.2250 permits a longer time step):
+alpha=0.2250
+
+! %     Initial value of aam:
+aam_init=500.0
+
+! % ramp is not assigned in fortran pom2k before used in barop
+ramp=0.0
 
 &end
