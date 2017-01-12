@@ -1,15 +1,18 @@
 &setting
 
-iend             = 100,
-im               = 11,
-jm               = 9,
-kb               = 7,
+iend             = 11,
 
-! External (2-D) time step (sec.) according to CFL
-dte              = 6,
+!!small 
+! im               = 5,
+! jm               = 3,
+! kb               = 3,
 
-! <Internal (3-D) time step>/<External (2-D) time step> (dti/dte: dimensionless)
-isplit           = 30,    
+!!tiny
+im               = 9,
+jm               = 7,
+kb               = 5,
+kl1              = 2,     
+kl2              = 2,    
 
 ! Integers defining the number of logarithmic
 ! layers at the surface and bottom(used by subroutine depth).
@@ -17,8 +20,13 @@ isplit           = 30,
 ! at the surface and kb-kl2-1 at the bottom. For no log portions,
 ! set kl1=2 and kl2=kb-2
 
-kl1              = 3,     
-kl2              = 5,    
+
+! External (2-D) time step (sec.) according to CFL
+dte              = 6,
+
+! <Internal (3-D) time step>/<External (2-D) time step> (dti/dte: dimensionless)
+isplit           = 30,    
+
 
 ! iproblem       problem type          initialization
 ! Case 1 :       seamount              seamount
@@ -112,6 +120,7 @@ swtch=1000.0,
 !% Printout skip interval in i
 iskp=4;             
 
+grav=9.8
 
 jskp=3;             
 

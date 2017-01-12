@@ -4,6 +4,8 @@ program pom2k
   use dm_type
   use input
   use grid
+  use functions
+  
   implicit none
   type(Matrix) :: tmp
   integer :: ierr
@@ -41,6 +43,7 @@ program pom2k
      print *, "im=",im,",jm=",jm,",kb=",kb
   endif
 
+
   !*************************************
   dti=dte * isplit;
 
@@ -60,9 +63,13 @@ program pom2k
      print*, "ispi=",ispi,"isp2i=",isp2i
   endif
 
-  
-  call new_depth(z, zz, dz, dzz, z_3d, zz_3d, dz_3d, dzz_3d, kl1, kl2, ierr)
 
+  !call new_depth(z, zz, dz, dzz, z_3d, zz_3d, dz_3d, dzz_3d, kl1, kl2, ierr)
+  call new_depth(ierr)
+  
+  !********************
+  !LOAD GRIDFILE2IC HERE
+  !*******************
   
   !Inertial period for temporal filter:
   !period=(2.0*pi)/abs(cor(floor(im/2),floor(jm/2)))/86400.0;
@@ -85,6 +92,7 @@ program pom2k
   etf= et;
   d = h + el;
   dt = h + et;
+
 
   !w(:,:,1)=vfluxf;
   w = w - w .em. MASK_Z1 + dm_rep(vfluxf, 1, 1, kb) .em. MASK_Z1
@@ -110,12 +118,11 @@ program pom2k
   u  = ub;
   v  = vb;
 
-  call new_dense()
-  
-  call new_baropg()
 
   
-  
+  call new_dense()
+
+  call new_baropg()  
   ! drx2d = sum(drhox .* dz_3d .* REV_MASK_KB, 3);
   ! dry2d = sum(drhoy .* dz_3d .* REV_MASK_KB, 3);
   drx2d = CSUM(drhox .em. dz_3d .em. REV_MASK_Z2, 4)
@@ -127,6 +134,7 @@ program pom2k
 
   cbc=dm_pow(kappa * dm_pow(dm_log((1.0+dm_getvalue(zz, 0, 0, kbm1-1)) * (1.0/z0b) * h), -1.0), 2.0);
   !!cbc=max(cbcmin,cbc);
+
 
   ! % If the following is invoked, then it is probable that the wrong
   ! % choice of z0b or vertical spacing has been made:
@@ -159,6 +167,7 @@ program pom2k
         ramp=1.0;
      endif
 
+     
      ! %       write(6,2) mode,iint,time
      ! %   2   format(' mode,iint,time =',2i5,f9.2)
      ! %-----------------------------------------------------------------------
@@ -183,9 +192,7 @@ program pom2k
      call dm_setvalues(wssurf, idxm1, idxn1, (/0/), array1, ierr)
 
      satm = 0.0
-
   
-
      ! %-----------------------------------------------------------------------
      ! %
      ! %     Set lateral viscosity:
@@ -202,16 +209,22 @@ program pom2k
      ! %                                     +.5*(du/dy+dv/dx)**2) )
      ! %
 
+      
      if(mode/=2) then
-        ! [advx,advy]=new_advct(u,v,dt_3d,aam,ub,vb);        
-        ! [rho,drhox,drhoy] = new_baropg(rho, rmean, dt, ramp);   
+        ![advx,advy]=new_advct(u,v,dt_3d,aam,ub,vb);
+        call new_advct()
+        
+        ! [rho,drhox,drhoy] = new_baropg(rho, rmean, dt, ramp);
+        call new_baropg()
+
+        
         ! aam=horcon .* dx_3d .* dy_3d .*sqrt((DXF(u)./dx_3d).^2 + (DYF(v)./dy_3d).^2 ...
         ! +0.5*( DYB(AYF(AXF(u)))./dy_3d + DXB(AXF(AYF(v)))./dx_3d).^2 );
-
         aam = horcon * dx_3d .em. dy_3d .em. dm_sqrt(dm_squ(DXF(u) .ed. dx_3d) + &
              dm_squ((DYF(v) .ed. dy_3d)) + 0.5 * dm_squ(DYB(AYF(AXF(u))) .ed. dy_3d + &
              DXB(AXF(AYF(v))) .ed. dx_3d))
 
+        
         ! aam(:,1,:)=aam_init;
         ! aam(:,jm,:)=aam_init;
         ! aam(1,:,:)=aam_init;
@@ -223,6 +236,7 @@ program pom2k
         aam = aam - (aam .em. MASK_X2 - aam_init * MASK_X2)
         aam = aam - (aam .em. MASK_Z2 - aam_init * MASK_Z2)
 
+        
         ! % Form vertical averages of 3-D fields for use in external (2-D)
         ! % mode:
         ! adx2d = sum(advx.*dz_3d, 3);
@@ -230,50 +244,45 @@ program pom2k
         ! drx2d = sum(drhox.*dz_3d, 3);
         ! dry2d = sum(drhoy.*dz_3d, 3);
         ! aam2d = sum(aam.*dz_3d, 3);
-
         adx2d = CSUM(advx .em. dz_3d, 4)
         ady2d = CSUM(advy .em. dz_3d, 4);
         drx2d = CSUM(drhox .em. dz_3d, 4);
         dry2d = CSUM(drhoy .em. dz_3d, 4);
         aam2d = CSUM(aam .em. dz_3d, 4);
 
+     
         ! [tps,wubot,wvbot,advua,advva]
         !      = new_advave(tps,wubot,wvbot,mode,aam2d,uab,vab,ua,va,cbc,d);
+        call new_advave(iint)
 
-        !call new_advave()
 
         adx2d = adx2d - advua;
         ady2d = ady2d - advva;
      endif
 
+     
      egf= ispi * el;
-
      
      ! utf=ua .* 2.0 .* AXB(d) .* isp2i;
      ! vtf=va .* 2.0 .* AYB(d) .* isp2i;
      utf = 2.0 * isp2i * ua .em. AXB(d)
      vtf = 2.0 * isp2i * va .em. AYB(d)
-
      
      !% Begin external (2-D) mode        
      do iext=1,isplit    
-
-        
         ! %     NOTE addition of surface freshwater flux, w(i,j,1)=vflux, compared
         ! %     with pom98.f. See also modifications to subroutine vertvl.
-
         !elf= elb+dte2.*(-(DXF( AXB(d).*AXB(dy).*ua)+DYF(AYB(d).*AYB(dx).*va))./ art-vfluxf);  
-        elf= elb+dte2 * (-(DXF(AXB(d) .em. AXB(dy) .em. ua) + &
-             DYF(AYB(d) .em. AYB(dx) .em. va)) .em. dm_pow(art-vfluxf,-1.0))
-     
+        elf= elb + dte2 * (-(DXF(AXB(d) .em. AXB(dy) .em. ua) + &
+             DYF(AYB(d) .em. AYB(dx) .em. va)) .em. dm_pow(art, -1) - vfluxf)
 
         ! [elf,uaf,vaf,uf,vf,w] = new_bcond(1,elf,uaf,vaf,uf,vf,w,...
         !     im,jm,kb,imm1,jmm1,kbm1,...
         !     fsm,grav,ramp,rfe,h,uabe,ele,el,uabw,rfw,elw,rfn,eln,vabs,rfs,els,...
         !     dum,dvm,hmax,u,v,t,s,tbn,sbn,dti,tbs,sbs,q2,q2l,small,vabn,dx,dy,dt,tbe,sbe,tbw,sbw,zz);
-
         if(mod(iext,ispadv)==0) then
-        ![tps,wubot,wvbot,advua,advva] = new_advave(tps,wubot,wvbot,mode,aam2d,uab,vab,ua,va,cbc,d); 
+           ![tps,wubot,wvbot,advua,advva] = new_advave(tps,wubot,wvbot,mode,aam2d,uab,vab,ua,va,cbc,d);
+           call new_advave(iint)
         endif
 
         ! uaf=   DIVISION( (2.0*AXB(h+elb) .* aru .* uab ...
@@ -281,8 +290,6 @@ program pom2k
         !        + grav .* AXB(dy) .* AXB(d)  ...
         !          .*( (1.0-2.0*alpha) .* DXB(el) + alpha* (DXB(elb)+ DXB(elf)) + DXB(e_atmos) ) ...
         !        + drx2d + aru .* (wusurf-wubot))) , (2.0*AXB(h+elf) .* aru));      
-
-        
         uaf = (2.0*AXB(h+elb) .em. aru .em. uab &
              -4.0 * dte .em. (adx2d + advua - aru .em. AXB(cor .em. d .em. AYF(va)) + &
              grav * AXB(dy) .em. AXB(d) .em. &
@@ -294,7 +301,6 @@ program pom2k
              grav * AYB(dx) .em. AYB(d) .em. &
              ((1.0-2.0*alpha) * DYB(el) + alpha * (DYB(elb)+ DYB(elf)) + DYB(e_atmos)) + &
              dry2d + arv .em. (wvsurf-wvbot))) .ed. (2.0*AYB(h+elf) .em. arv);  
-
 
         ! [elf,uaf,vaf,uf,vf,w] = new_bcond(2,elf,uaf,vaf,uf,vf,w,...
         !     im,jm,kb,imm1,jmm1,kbm1,...
@@ -316,16 +322,18 @@ program pom2k
            etf=(etf+0.5*elf) .em. fsm;
         endif
 
-        
+
+
+      
         ! % Stop if velocity condition violated (generally due to CFL
         ! % criterion not being satisfied):   
         ! [vamax, vapos]=max(abs(vaf(:)));
         ! [imax, jmax]=ind2sub(size(vaf), vapos);
         call dm_max(vaf, val1, pos1, ierr)
         call dm_min(vaf, val2, pos2, ierr)
-        
 
         vamax = max(abs(val1), abs(val2))
+
         
         ! if(vamax <= vmaxl)
         !     ! %
@@ -369,6 +377,10 @@ program pom2k
      enddo
 
 
+     
+      !      call dm_finalize(ierr)
+      ! stop
+
      ! %===========================================
      ! %End of external (2-D) mode
      ! %=============================================
@@ -377,7 +389,6 @@ program pom2k
         if((iint /= 1 .or. time0 /= 0.e0) .and. mode/=2) then
 
            !% Adjust u(z) and v(z) such that depth average of (u,v) = (ua,va):
-
            !tps=sum(u(:,:,1:kbm1).*dz_3d(:,:,1:kbm1), 3);
            tps=CSUM(u .em. dz_3d .em. MASK_Z2, 4)
 
@@ -385,7 +396,6 @@ program pom2k
            ! utf_3d = repmat(utf, 1, 1, kb);
            ! tps_3d = repmat(tps, 1, 1, kb);
            ! dt_3d1 = repmat(dt,  1, 1, kb);
-
            utb_3d = dm_rep(utb, 1, 1, kb);
            utf_3d = dm_rep(utf, 1, 1, kb);
            tps_3d = dm_rep(tps, 1, 1, kb);
@@ -413,11 +423,8 @@ program pom2k
            !v = v - (tps_3d - (vtb_3d+vtf_3d) ./ dt_ayb) .* REV_MASK_KB;           
            v = v - (tps_3d - (vtb_3d+vtf_3d) .ed. dt_ayb) .em. REV_MASK_Z2;
 
-           
            ![a0,c0,w0]=new_vertvl(a,c,w,dx,dy,dz,dt,u,v,vfluxb,vfluxf,etf,etb,dti2,im,jm,imm1,jmm1,kbm1);
-           !print*,"dti2=", dti2
            call new_vertvl(dti2)
-
            
            ! [elf,uaf,vaf,uf,vf,w] = new_bcond(5,elf,uaf,vaf,uf,vf,w,...
            !     im,jm,kb,imm1,jmm1,kbm1,...
@@ -427,18 +434,13 @@ program pom2k
            vf = ZEROS
            uf = ZEROS
 
-           ! % calculate q2f and q2lf using uf, vf, a and c as temporary variables:
-           ! % [q2b,q2,uf,a,c]=advq(q2b,q2,uf,a,c,...
-           ! %     dt,dx,dy,dz,u,v,w,aam,h,dum,dvm,art,etb,etf,im,jm,imm1,jmm1,kbm1,dti2);
-
            ! THIS FUNCTION SHOULD BE REPLACED
            !uf=new_advq(q2b,q2,dt,u,v,w,aam,h,etb,etf,dti2);    
-
-           ! % [q2lb,q2l,vf,a,c]=advq(q2lb,q2l,vf,a,c,...
-           ! %     dt,dx,dy,dz,u,v,w,aam,h,dum,dvm,art,etb,etf,im,jm,imm1,jmm1,kbm1,dti2);
+           uf = new_advq(q2b, q2, dti2)
 
            ! THIS FUNCTION SHOULD BE REPLACED            
            !vf=new_advq(q2lb,q2l,dt,u,v,w,aam,h,etb,etf,dti2);  
+           vf = new_advq(q2lb, q2l, dti2)
 
            ! THIS FUNCTION SHOULD BE REPLACED
            ! [a,c,tps,dtef,...
@@ -446,8 +448,10 @@ program pom2k
            !     uf,vf,q2b,q2lb,a,c]=new_profq(a,c,tps,dtef,....
            !     ee,gg,l,kq,km,kh,...
            !     uf,vf,q2,q2b,q2lb,a,c,...
-           !     h,etf,dti2,umol,dzz,grav,rho,kappa,u,v,dt,small,fsm,im,jm,kb,imm1,jmm1,kbm1,tbias,sbias,dz,...
+           !     h,etf,dti2,umol,dzz,grav,rho,kappa,
+           !     u,v,dt,small,fsm,im,jm,kb,imm1,jmm1,kbm1,tbias,sbias,dz,...
            !     wusurf,wubot,wvsurf,wvbot,t,s,rhoref,zz,z);
+           call new_profq(dti2)
 
            ! THIS FUNCTION SHOULD BE REPLACED           
            ! [elf,uaf,vaf,uf,vf,w] = new_bcond(6,elf,uaf,vaf,uf,vf,w,...
@@ -461,17 +465,17 @@ program pom2k
            q2 = uf;
            q2lb = q2l;
            q2l = vf;
-
            
            ! calculate tf and sf using uf, vf, a and c as temporary variables:
            if(mode /= 4) then
               if(nadv == 1)  then
                  ! THIS FUNCTION SHOULD BE REPLACED                             
                  !uf=new_advt1(tb,t,dt,u,v,aam,tprni,w,etb,etf,h);
+                 uf = new_advt1(tb, t, dti2)
                  ! THIS FUNCTION SHOULD BE REPLACED                             
                  !vf=new_advt1(sb,s,dt,u,v,aam,tprni,w,etb,etf,h);
+                 vf = new_advt1(sb, s, dti2)
               elseif(nadv==2)  then
-
                  ! THIS FUNCTION SHOULD BE REPLACED                                               
                  ! [tb,t,tclim,uf,a,c,nitera,sw,...
                  !  zflux] = advt2(tb,t,tclim,uf,a,c,nitera,sw,...
@@ -512,14 +516,15 @@ program pom2k
 
               call new_dense()
            endif
-
+    
+           
            !% calculate uf and vf:
            ! THIS FUNCTION SHOULD BE REPLACED
            !uf = new_advu(advx,cor,dt,e_atmos,drhox,h,ub,u,v,w,egf,egb,etf,etb);
-
+           call new_advu(dti2)
            ! THIS FUNCTION SHOULD BE REPLACED
            !vf = new_advv(advy,cor,dt,e_atmos,drhoy,h,vb,u,v,w,egf,egb,etf,etb);
-
+           call new_advv(dti2)
            !vf0 = vf;
 
            ! THIS FUNCTION SHOULD BE REPLACED                                            
@@ -570,7 +575,7 @@ program pom2k
      if(iint>=iswtch) then
         iprint=floor(prtd2*24.e0*3600.e0/dti + 0.5);
      endif
-
+     
      if(mod(iint,iprint)==0 .or. vamax >= vmaxl) then
 
         if(myrank == 0) then
@@ -579,20 +584,24 @@ program pom2k
                 "time = ", time, "iint = ", iint, &
                 "iexit=", iexit, "iprint = ", iprint 
         endif
-     
+
+
+        
         vtot=0.e0;
         atot=0.e0;
         taver=0.e0;
         saver=0.e0;
         eaver=0.e0;
 
+        
         !dt_3d1 = repmat(dt, 1, 1, kb);
         dt_3d1 = dm_rep(dt, 1, 1, kb)
 
+        
         !tmp_dvol = dx_3d(:,:,1:kbm1).*dy_3d(:,:,1:kbm1).*fsm_3d(:,:,1:kbm1).*
         !           dt_3d1(:,:,1:kbm1).*dz_3d(:,:,1:kbm1);
         tmp_dvol = (dx_3d .em. MASK_Z1) .em. dy_3d .em. fsm_3d .em. dt_3d1 .em. dz_3d;
-
+        
         ! vtot=sum(tmp_dvol(:));
         ! taver=sum(reshape(tb(:,:,1:kbm1).*tmp_dvol,[],1));
         ! saver=sum(reshape(sb(:,:,1:kbm1).*tmp_dvol,[],1));
@@ -616,9 +625,6 @@ program pom2k
         saver=saver/vtot;
         eaver=eaver/atot;
         tsalt=(saver+sbias)*vtot;
-
-        ! call dm_finalize(ierr)
-        ! stop
 
         ! fprintf('vtot = %.6f,atot = %.6f\n',vtot,atot);
         ! fprintf('eaver = %.6f,taver = %.6f,saver=%.6f,saver = %.6f,tsalt = %.6f\n', &
@@ -650,6 +656,8 @@ program pom2k
            stop
         end if
      end if
+
+    
      ! %-----------------------------------------------------------------------
      ! %
      ! %  End of internal (3-D) mode
