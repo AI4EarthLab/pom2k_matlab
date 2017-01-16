@@ -44,7 +44,7 @@ module grid
   type(Matrix) ele      , eln      , els   , elw       
   type(Matrix) sbe,  sbn     , sbs     , sbw      
   type(Matrix) tbn     , tbs     , tbw      
-  type(Matrix) uabe     , uabw     , ube     , ubw    
+  type(Matrix) uabe     , uabw     , ube     , ubw
   type(Matrix) vabn     , vabs     , vbn     , vbs    
 
   type(Matrix) z, zz, dz, dzz, z_3d, zz_3d, dz_3d, dzz_3d
@@ -245,7 +245,8 @@ contains
     call dm_destroy(sbs, ierr); call dm_destroy(sbw,ierr);      
     call dm_destroy(tbn, ierr); call dm_destroy(tbs, ierr);
     call dm_destroy(tbw, ierr);       
-    call dm_destroy(uabe, ierr);  call dm_destroy(uabw,ierr);
+    call dm_destroy(uabe, ierr); call dm_destroy(uabw,ierr);
+    
     call dm_destroy(ube, ierr);   call dm_destroy(ubw, ierr);    
     call dm_destroy(vabn, ierr);  call dm_destroy(vabs, ierr);
     call dm_destroy(vbn, ierr);   call dm_destroy(vbs, ierr);    

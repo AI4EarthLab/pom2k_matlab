@@ -30,7 +30,7 @@ program pom2k
 
   call InitGrid()
   call InitOperatorModule(im, jm, kb)
-
+  
   call dm_init2(im, jm , kb,ierr)
 
   allocate(idxm1(imm2), idxn1(jmm2))
@@ -38,11 +38,19 @@ program pom2k
   idxn1=(/(i, i=1,jmm2)/)
   array1=(/(0,i=1,imm2*jmm2)/)
 
+  call file2ic()
+
+  call dm_view(z, ierr)
+  call dm_view(zz, ierr)
+  call dm_view(dzz, ierr)
+  call dm_view(dz, ierr)  
+  call dm_finalize(ierr)
+  stop
+  
   if(myrank==0) then
      print *, "==============Input paramenters==========="
      print *, "im=",im,",jm=",jm,",kb=",kb
   endif
-
 
   !*************************************
   dti=dte * isplit;
@@ -63,14 +71,12 @@ program pom2k
      print*, "ispi=",ispi,"isp2i=",isp2i
   endif
 
-
   !call new_depth(z, zz, dz, dzz, z_3d, zz_3d, dz_3d, dzz_3d, kl1, kl2, ierr)
   call new_depth(ierr)
   
   !********************
   !LOAD GRIDFILE2IC HERE
   !*******************
-  
   !Inertial period for temporal filter:
   !period=(2.0*pi)/abs(cor(floor(im/2),floor(jm/2)))/86400.0;
   tmp_val = dm_getvalue(cor, im/2, jm/2, 0)
@@ -93,10 +99,8 @@ program pom2k
   d = h + el;
   dt = h + et;
 
-
   !w(:,:,1)=vfluxf;
   w = w - w .em. MASK_Z1 + dm_rep(vfluxf, 1, 1, kb) .em. MASK_Z1
-
 
   ! d_3d=repmat(d,1,1,kb);
   ! dt_3d=repmat(dt,1,1,kb);
@@ -117,8 +121,6 @@ program pom2k
   s  = sb;
   u  = ub;
   v  = vb;
-
-
   
   call new_dense()
 
@@ -134,7 +136,6 @@ program pom2k
 
   cbc=dm_pow(kappa * dm_pow(dm_log((1.0+dm_getvalue(zz, 0, 0, kbm1-1)) * (1.0/z0b) * h), -1.0), 2.0);
   !!cbc=max(cbcmin,cbc);
-
 
   ! % If the following is invoked, then it is probable that the wrong
   ! % choice of z0b or vertical spacing has been made:
@@ -183,7 +184,6 @@ program pom2k
      ! %     To make a healthy surface Ekman layer, it would be well to set
      ! %     kl1=9.
      ! %
-
      call dm_setvalues(e_atmos, idxm1, idxn1, (/0/), array1, ierr)
      call dm_setvalues(vfluxf, idxm1, idxn1, (/0/), array1, ierr)
      call dm_setvalues(w, idxm1, idxn1, (/0/), array1, ierr)
@@ -208,7 +208,6 @@ program pom2k
      ! %       ( hor visc = horcon*dx*dy*sqrt((du/dx)**2+(dv/dy)**2
      ! %                                     +.5*(du/dy+dv/dx)**2) )
      ! %
-
       
      if(mode/=2) then
         ![advx,advy]=new_advct(u,v,dt_3d,aam,ub,vb);
@@ -216,7 +215,6 @@ program pom2k
         
         ! [rho,drhox,drhoy] = new_baropg(rho, rmean, dt, ramp);
         call new_baropg()
-
         
         ! aam=horcon .* dx_3d .* dy_3d .*sqrt((DXF(u)./dx_3d).^2 + (DYF(v)./dy_3d).^2 ...
         ! +0.5*( DYB(AYF(AXF(u)))./dy_3d + DXB(AXF(AYF(v)))./dx_3d).^2 );
@@ -376,8 +374,6 @@ program pom2k
         endif
      enddo
 
-
-     
       !      call dm_finalize(ierr)
       ! stop
 
@@ -453,6 +449,8 @@ program pom2k
            !     wusurf,wubot,wvsurf,wvbot,t,s,rhoref,zz,z);
            call new_profq(dti2)
 
+           ! call dm_finalize(ierr)
+           ! stop
            ! THIS FUNCTION SHOULD BE REPLACED           
            ! [elf,uaf,vaf,uf,vf,w] = new_bcond(6,elf,uaf,vaf,uf,vf,w,...
            !     im,jm,kb,imm1,jmm1,kbm1,...
@@ -516,7 +514,6 @@ program pom2k
 
               call new_dense()
            endif
-    
            
            !% calculate uf and vf:
            ! THIS FUNCTION SHOULD BE REPLACED
@@ -584,19 +581,15 @@ program pom2k
                 "time = ", time, "iint = ", iint, &
                 "iexit=", iexit, "iprint = ", iprint 
         endif
-
-
         
         vtot=0.e0;
         atot=0.e0;
         taver=0.e0;
         saver=0.e0;
         eaver=0.e0;
-
         
         !dt_3d1 = repmat(dt, 1, 1, kb);
         dt_3d1 = dm_rep(dt, 1, 1, kb)
-
         
         !tmp_dvol = dx_3d(:,:,1:kbm1).*dy_3d(:,:,1:kbm1).*fsm_3d(:,:,1:kbm1).*
         !           dt_3d1(:,:,1:kbm1).*dz_3d(:,:,1:kbm1);

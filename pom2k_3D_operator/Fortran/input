@@ -8,11 +8,11 @@ iend             = 11,
 ! kb               = 3,
 
 !!tiny
-im               = 9,
-jm               = 7,
-kb               = 5,
+im               = 21,
+jm               = 15,
+kb               = 9,
 kl1              = 2,     
-kl2              = 2,    
+kl2              = 7,    
 
 ! Integers defining the number of logarithmic
 ! layers at the surface and bottom(used by subroutine depth).

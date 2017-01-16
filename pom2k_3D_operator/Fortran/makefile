@@ -9,7 +9,7 @@ LOCDIR           = src/ksp/ksp/examples/tutorials/
 MANSEC           = KSP
 CLEANFILES       = pom2k *.o *.mod *.nc
 NP               = 1
-OBJ		 = input.o grid.o  functions.o
+OBJ		 = input.o grid.o  functions.o file2ic.o
 OBJMAIN		 = ${OBJ} pom2k.o 
 
 include ${PETSC_DIR}/lib/petsc/conf/variables
