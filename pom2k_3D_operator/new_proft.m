@@ -13,28 +13,40 @@ rad=zeros(im,jm,kb);
 a = zeros(im,jm,kb);c = zeros(im,jm,kb); d=zeros(im,jm,kb);
 dh = h+etf;
 dh_3d=repmat(dh,1,1,kb);swrad_3d=repmat(swrad,1,1,kb);
-la=zeros(kbm1); f1=zeros(im,jm,kb);
+la=zeros(kb); f1=zeros(im,jm,kb);
 
-    d(:,:,1:kbm2)=-dti2*(kh(:,:,2:kbm1)+umol);
-    a=DIVISION(d,dz_3d.*dzz_3d.*dh_3d.*dh_3d);
-    a(:,:,kbm1)= 0.e0;
+if(nbc==2||nbc==4)
+   rad=swrad_3d.*(r(ntp)*exp(z_3d.*dh_3d/ad1(ntp))+(1.e0-r(ntp))*exp(z_3d.*dh_3d/ad2(ntp)));
+   rad(:,:,kb)=0.0;
+end
 
-    d(:,:,2:kbm1)=dzz_3d(:,:,1:kbm2);
-    c=DIVISION(-dti2*(kh+umol),dz_3d.*d.*dh_3d.*dh_3d);
-    c(:,:,1)  =0.e0;
+    a(:,:,1:kbm2)=-dti2*(kh(:,:,2:kbm1)+umol); 
+    a=DIVISION(a,dz_3d.*dzz_3d.*dh_3d.*dh_3d);
 
-    d=-f - dti2 .* DZF(rad) ./(dh_3d .* dz_3d);
+    c(:,:,2:kbm1)=dzz_3d(:,:,1:kbm2);
+    c=DIVISION(-dti2*(kh+umol),dz_3d.*c.*dh_3d.*dh_3d);
+
+    d=-f - DIVISION(dti2 .* DZF(rad),(dh_3d .* dz_3d));
     d(:,:,1)= -f(:,:,1) + dti2 .* wfsurf(:,:) ./ (dh(:,:) .* dz(1));
-    d(:,:,kb-1)=-f(:,:,kb-1); 
+    d(:,:,kb)=-f(:,:,kb);
+
+if(nbc==2)
+    d(:,:,1)=-f(:,:,1) + dti2*(wfsurf+rad(:,:,1)-rad(:,:,2))./(dz(1)*dh);
+elseif(nbc==3 || nbc==4)
+    a(:,:,1)=0.e0;
+    d(:,:,1)=-fsurf;
+end
+    
 %     calculate penetrative radiation. At the bottom any unattenuated
 %     radiation is deposited in the bottom layer:
+    temp1=a(:,:,1:kbm1);    temp2=c(:,:,2:kb);  
+
   for j=2:jm
       for i=2:im
-   la=diag(reshape(a(i,j,1:kbm1)+c(i,j,1:kbm1)-1,kbm1,1),0) ...
-      - diag(reshape(a(i,j,1:kbm2),kbm2,1),1) ...
-      - diag(reshape(c(i,j,2:kbm1),kbm2,1),-1);
-   f1(i,j,1:kbm1)=la\reshape(d(i,j,1:kbm1),kbm1,1); 
+   la=diag(reshape(a(i,j,:)+c(i,j,:)-1,kb,1),0) ...
+      - diag(reshape(temp1(i,j,:),kbm1,1),1) ...
+      - diag(reshape(temp2(i,j,:),kbm1,1),-1);
+   f1(i,j,:)=la\reshape(d(i,j,:),kb,1); 
       end
   end
-  
 return
