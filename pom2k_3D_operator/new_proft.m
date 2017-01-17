@@ -15,6 +15,11 @@ dh = h+etf;
 dh_3d=repmat(dh,1,1,kb);swrad_3d=repmat(swrad,1,1,kb);
 la=zeros(kb); f1=zeros(im,jm,kb);
 
+if(nbc==2||nbc==4)
+   rad=swrad_3d.*(r(ntp)*exp(z_3d.*dh_3d/ad1(ntp))+(1.e0-r(ntp))*exp(z_3d.*dh_3d/ad2(ntp)));
+   rad(:,:,kb)=0.0;
+end
+
     a(:,:,1:kbm2)=-dti2*(kh(:,:,2:kbm1)+umol); 
     a=DIVISION(a,dz_3d.*dzz_3d.*dh_3d.*dh_3d);
 
@@ -23,7 +28,14 @@ la=zeros(kb); f1=zeros(im,jm,kb);
 
     d=-f - DIVISION(dti2 .* DZF(rad),(dh_3d .* dz_3d));
     d(:,:,1)= -f(:,:,1) + dti2 .* wfsurf(:,:) ./ (dh(:,:) .* dz(1));
-    d(:,:,kb-1:kb)=-f(:,:,kb-1:kb);
+    d(:,:,kb)=-f(:,:,kb);
+
+if(nbc==2)
+    d(:,:,1)=-f(:,:,1) + dti2*(wfsurf+rad(:,:,1)-rad(:,:,2))./(dz(1)*dh);
+elseif(nbc==3 || nbc==4)
+    a(:,:,1)=0.e0;
+    d(:,:,1)=-fsurf;
+end
     
 %     calculate penetrative radiation. At the bottom any unattenuated
 %     radiation is deposited in the bottom layer:
