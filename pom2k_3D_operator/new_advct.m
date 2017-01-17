@@ -25,6 +25,6 @@ advx=DXB( xflux ) + DYF( yflux ) - aru_3d .* AXB(  curv .* dt_3d .* AYF(v) );
 xflux = AYB(AXB(dy_3d)) .* ( ( AYB( AXB(dt_3d) .* u ) .* AXB(v) ) -AYB(AXB(dt_3d)) .* AYB(AXB(aam)) ...
                  .* ( DIVISION( DYB(ub), AYB(AXB(dy_3d)) ) + DIVISION( DXB(vb), AYB(AXB(dx_3d)) ) ) ) ;
 yflux = dx_3d .* (AYF( AYB(dt_3d) .* v ) .* AYF(v) - dt_3d.*aam*2.0.*DYF(vb)./dy_3d );                   
-advy=DXF( xflux ) + DYB( yflux ) - aru_3d .* AYB(  curv .* dt_3d .* AXF(u) ); 
+advy=DXF( xflux ) + DYB( yflux ) + arv_3d .* AYB(  curv .* dt_3d .* AXF(u) ); 
 
 end
