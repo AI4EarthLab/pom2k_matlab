@@ -50,7 +50,7 @@ subroutine file2ic()
   allocate(t1(im,jm,kb),s1(im,jm,kb),rmean1(im,jm,kb),tclim1(im,jm,kb),sclim1(im,jm,kb), &
        tb1(im,jm,kb),sb1(im,jm,kb),ub1(im,jm,kb),vb1(im,jm,kb) )
   
-  write(6,'(/,'' Read grid and initial conditions '',/)')
+  write(6,'(/,'' Reading grid and initial conditions '',/)')
 
   ! C--- 1D ---
   read(40,'(a5)') field

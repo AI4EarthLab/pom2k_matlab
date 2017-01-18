@@ -9,15 +9,17 @@ LOCDIR           = src/ksp/ksp/examples/tutorials/
 MANSEC           = KSP
 CLEANFILES       = pom2k *.o *.mod *.nc
 NP               = 1
-OBJ		 = input.o grid.o  functions.o file2ic.o
+OBJ		 = input.o grid.o  file2ic.o proft.o profu.o  \
+		   vertvl.o advave.o baropg.o advct.o advt1.o \
+                   advu.o advv.o dense.o depth.o advq.o profq.o profv.o bcond.o
+
 OBJMAIN		 = ${OBJ} pom2k.o 
 
 include ${PETSC_DIR}/lib/petsc/conf/variables
 include ${PETSC_DIR}/lib/petsc/conf/rules
 
-main: ${OBJMAIN}  
-	-${FLINKER} -o pom2k ${OBJMAIN} ${PETSC_KSP_LIB} \
-	${PNETCDF}/lib/libpnetcdf.a -J ${DM} ${DM}/libdm.a
+main: ${OBJMAIN}  -${FLINKER} -o pom2k ${OBJMAIN} ${PETSC_KSP_LIB} \
+      ${PNETCDF}/lib/libpnetcdf.a -J ${DM} ${DM}/libdm.a
 
 run : main
 	-@./pom2k

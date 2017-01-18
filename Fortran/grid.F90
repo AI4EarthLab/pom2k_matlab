@@ -57,116 +57,116 @@ contains
 
     call LoadInput()
 
-    xflux = dm_ones(im,jm,kb);
-    yflux = dm_ones(im,jm,kb);
-    curv = dm_ones(im,jm,kb);
-    curv2d = dm_ones(im, jm, 1)
+    xflux = dm_zeros(im,jm,kb);
+    yflux = dm_zeros(im,jm,kb);
+    curv = dm_zeros(im,jm,kb);
+    curv2d = dm_zeros(im, jm, 1)
     
-    dx=dm_ones(im,jm,1)      ;dy=dm_ones(im,jm,1)      ;
-    cor=dm_ones(im,jm,1)     ;
-    east_c=dm_ones(im,jm,1)  ;east_e=dm_ones(im,jm,1)  ;
-    east_u=dm_ones(im,jm,1)  ;east_v=dm_ones(im,jm,1)  ;
-    north_c=dm_ones(im,jm,1) ;north_e=dm_ones(im,jm,1) ;
-    north_u=dm_ones(im,jm,1) ;north_v=dm_ones(im,jm,1) ;
-    h=dm_ones(im,jm,1)       ;art=dm_ones(im,jm,1)     ;
-    aru=dm_ones(im,jm,1)     ;arv=dm_ones(im,jm,1)     ;
-    fsm=dm_ones(im,jm,1)     ;dum=dm_ones(im,jm,1)     ;
-    dvm=dm_ones(im,jm,1)     ;
-    tb=dm_ones(im,jm,kb)     ;sb=dm_ones(im,jm,kb)   ;
-    tclim=dm_ones(im,jm,kb)  ;sclim=dm_ones(im,jm,kb);
-    ub=dm_ones(im,jm,kb)     ;uab=dm_ones(im,jm,1)     ;
-    elb=dm_ones(im,jm,1)     ;etb=dm_ones(im,jm,1)     ;
-    dt=dm_ones(im,jm,1)      ;aam2d=dm_ones(im,jm,1)   ;
-    rho=dm_ones(im,jm,kb)    ;rmean=dm_ones(im,jm,kb);
-    uabw=dm_ones(1,jm,1)     ;uabe=dm_ones(1,jm,1)     ;
-    ele=dm_ones(1,jm,1)      ;elw=dm_ones(1,jm,1)      ;
-    tbe=dm_ones(jm,kb,1)     ;tbw=dm_ones(jm,kb,1)     ;
-    sbe=dm_ones(jm,kb,1)     ;sbw=dm_ones(jm,kb,1)     ;
-    tbn=dm_ones(im,kb,1)     ;tbs=dm_ones(im,kb,1)     ;
-    sbn=dm_ones(im,kb,1)     ;sbs=dm_ones(im,kb,1)     ;
+    dx=dm_zeros(im,jm,1)      ;dy=dm_zeros(im,jm,1)      ;
+    cor=dm_zeros(im,jm,1)     ;
+    east_c=dm_zeros(im,jm,1)  ;east_e=dm_zeros(im,jm,1)  ;
+    east_u=dm_zeros(im,jm,1)  ;east_v=dm_zeros(im,jm,1)  ;
+    north_c=dm_zeros(im,jm,1) ;north_e=dm_zeros(im,jm,1) ;
+    north_u=dm_zeros(im,jm,1) ;north_v=dm_zeros(im,jm,1) ;
+    h=dm_zeros(im,jm,1)       ;art=dm_zeros(im,jm,1)     ;
+    aru=dm_zeros(im,jm,1)     ;arv=dm_zeros(im,jm,1)     ;
+    fsm=dm_zeros(im,jm,1)     ;dum=dm_zeros(im,jm,1)     ;
+    dvm=dm_zeros(im,jm,1)     ;
+    tb=dm_zeros(im,jm,kb)     ;sb=dm_zeros(im,jm,kb)   ;
+    tclim=dm_zeros(im,jm,kb)  ;sclim=dm_zeros(im,jm,kb);
+    ub=dm_zeros(im,jm,kb)     ;uab=dm_zeros(im,jm,1)     ;
+    elb=dm_zeros(im,jm,1)     ;etb=dm_zeros(im,jm,1)     ;
+    dt=dm_zeros(im,jm,1)      ;aam2d=dm_zeros(im,jm,1)   ;
+    rho=dm_zeros(im,jm,kb)    ;rmean=dm_zeros(im,jm,kb);
+    uabw=dm_zeros(1,jm,1)     ;uabe=dm_zeros(1,jm,1)     ;
+    ele=dm_zeros(1,jm,1)      ;elw=dm_zeros(1,jm,1)      ;
+    tbe=dm_zeros(jm,kb,1)     ;tbw=dm_zeros(jm,kb,1)     ;
+    sbe=dm_zeros(jm,kb,1)     ;sbw=dm_zeros(jm,kb,1)     ;
+    tbn=dm_zeros(im,kb,1)     ;tbs=dm_zeros(im,kb,1)     ;
+    sbn=dm_zeros(im,kb,1)     ;sbs=dm_zeros(im,kb,1)     ;
     rfe            =0.0       ;rfn            =0.0  ;
     rfs            =0.0;                         
 
-    dx_3d=dm_ones(im,jm,kb)  ;dy_3d=dm_ones(im,jm,kb) ;
-    cor_3d=dm_ones(im,jm,kb) ;
-    h_3d=dm_ones(im,jm,kb)   ;art_3d=dm_ones(im,jm,kb);
-    aru_3d=dm_ones(im,jm,kb) ;arv_3d=dm_ones(im,jm,kb) ;
-    fsm_3d=dm_ones(im,jm,kb) ;dum_3d=dm_ones(im,jm,kb);
-    dvm_3d=dm_ones(im,jm,kb) ;dt_3d=dm_ones(im,jm,kb);
+    dx_3d=dm_zeros(im,jm,kb)  ;dy_3d=dm_zeros(im,jm,kb) ;
+    cor_3d=dm_zeros(im,jm,kb) ;
+    h_3d=dm_zeros(im,jm,kb)   ;art_3d=dm_zeros(im,jm,kb);
+    aru_3d=dm_zeros(im,jm,kb) ;arv_3d=dm_zeros(im,jm,kb) ;
+    fsm_3d=dm_zeros(im,jm,kb) ;dum_3d=dm_zeros(im,jm,kb);
+    dvm_3d=dm_zeros(im,jm,kb) ;dt_3d=dm_zeros(im,jm,kb);
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     ! 2D matrices
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    aam2d=dm_ones(im,jm,1)   ; advua=dm_ones(im,jm,1)   ; 
-    ady2d=dm_ones(im,jm,1)   ; art=dm_ones(im,jm,1)     ; 
-    cbc=dm_ones(im,jm,1)     ; cor=dm_ones(im,jm,1)     ; 
-    dry2d=dm_ones(im,jm,1)   ; dt=dm_ones(im,jm,1)      ; 
-    dx=dm_ones(im,jm,1)      ; dy=dm_ones(im,jm,1)      ; 
-    east_u=dm_ones(im,jm,1)  ; east_v=dm_ones(im,jm,1)  ; 
-    egf=dm_ones(im,jm,1)     ; el=dm_ones(im,jm,1)      ; 
-    et=dm_ones(im,jm,1)      ; etb=dm_ones(im,jm,1)     ; 
-    fluxva=dm_ones(im,jm,1)  ; fsm=dm_ones(im,jm,1)     ; 
-    north_e=dm_ones(im,jm,1) ; north_u=dm_ones(im,jm,1) ; 
-    rot=dm_ones(im,jm,1)     ; ssurf=dm_ones(im,jm,1)   ; 
-    tps=dm_ones(im,jm,1)     ; tsurf=dm_ones(im,jm,1)   ; 
-    uab=dm_ones(im,jm,1)     ; uaf=dm_ones(im,jm,1)     ; 
-    va=dm_ones(im,jm,1)      ; vab=dm_ones(im,jm,1)     ; 
-    vtb=dm_ones(im,jm,1)     ; vtf=dm_ones(im,jm,1)     ; 
-    wubot=dm_ones(im,jm,1)   ; wusurf=dm_ones(im,jm,1)  ; 
-    wubot1=dm_ones(im,jm,1)  ; wvbot1=dm_ones(im,jm,1)  ; 
+    aam2d=dm_zeros(im,jm,1)   ; advua=dm_zeros(im,jm,1)   ; 
+    ady2d=dm_zeros(im,jm,1)   ; art=dm_zeros(im,jm,1)     ; 
+    cbc=dm_zeros(im,jm,1)     ; cor=dm_zeros(im,jm,1)     ; 
+    dry2d=dm_zeros(im,jm,1)   ; dt=dm_zeros(im,jm,1)      ; 
+    dx=dm_zeros(im,jm,1)      ; dy=dm_zeros(im,jm,1)      ; 
+    east_u=dm_zeros(im,jm,1)  ; east_v=dm_zeros(im,jm,1)  ; 
+    egf=dm_zeros(im,jm,1)     ; el=dm_zeros(im,jm,1)      ; 
+    et=dm_zeros(im,jm,1)      ; etb=dm_zeros(im,jm,1)     ; 
+    fluxva=dm_zeros(im,jm,1)  ; fsm=dm_zeros(im,jm,1)     ; 
+    north_e=dm_zeros(im,jm,1) ; north_u=dm_zeros(im,jm,1) ; 
+    rot=dm_zeros(im,jm,1)     ; ssurf=dm_zeros(im,jm,1)   ; 
+    tps=dm_zeros(im,jm,1)     ; tsurf=dm_zeros(im,jm,1)   ; 
+    uab=dm_zeros(im,jm,1)     ; uaf=dm_zeros(im,jm,1)     ; 
+    va=dm_zeros(im,jm,1)      ; vab=dm_zeros(im,jm,1)     ; 
+    vtb=dm_zeros(im,jm,1)     ; vtf=dm_zeros(im,jm,1)     ; 
+    wubot=dm_zeros(im,jm,1)   ; wusurf=dm_zeros(im,jm,1)  ; 
+    wubot1=dm_zeros(im,jm,1)  ; wvbot1=dm_zeros(im,jm,1)  ; 
 
-    advva=dm_ones(im,jm,1)   ; adx2d=dm_ones(im,jm,1)   ; 
-    aru=dm_ones(im,jm,1)     ; arv=dm_ones(im,jm,1)     ; 
-    d=dm_ones(im,jm,1)       ; drx2d=dm_ones(im,jm,1)   ; 
-    dum=dm_ones(im,jm,1)     ; dvm=dm_ones(im,jm,1)     ; 
-    east_c=dm_ones(im,jm,1)  ; east_e=dm_ones(im,jm,1)  ; 
-    e_atmos=dm_ones(im,jm,1) ; egb=dm_ones(im,jm,1)     ; 
-    elb=dm_ones(im,jm,1)     ; elf=dm_ones(im,jm,1)     ; 
-    etf=dm_ones(im,jm,1)     ; fluxua=dm_ones(im,jm,1)  ; 
-    h=dm_ones(im,jm,1)       ; north_c=dm_ones(im,jm,1) ; 
-    north_v=dm_ones(im,jm,1) ; psi=dm_ones(im,jm,1)     ; 
-    swrad=dm_ones(im,jm,1)   ; vfluxb=dm_ones(im,jm,1)  ; 
-    ua=dm_ones(im,jm,1)      ; vfluxf=dm_ones(im,jm,1)  ; 
-    utb=dm_ones(im,jm,1)     ; utf=dm_ones(im,jm,1)     ; 
-    vaf=dm_ones(im,jm,1)     ;                             
-    wssurf=dm_ones(im,jm,1)  ; wtsurf=dm_ones(im,jm,1)  ; 
-    wvbot=dm_ones(im,jm,1)   ; wvsurf=dm_ones(im,jm,1)  ;   
+    advva=dm_zeros(im,jm,1)   ; adx2d=dm_zeros(im,jm,1)   ; 
+    aru=dm_zeros(im,jm,1)     ; arv=dm_zeros(im,jm,1)     ; 
+    d=dm_zeros(im,jm,1)       ; drx2d=dm_zeros(im,jm,1)   ; 
+    dum=dm_zeros(im,jm,1)     ; dvm=dm_zeros(im,jm,1)     ; 
+    east_c=dm_zeros(im,jm,1)  ; east_e=dm_zeros(im,jm,1)  ; 
+    e_atmos=dm_zeros(im,jm,1) ; egb=dm_zeros(im,jm,1)     ; 
+    elb=dm_zeros(im,jm,1)     ; elf=dm_zeros(im,jm,1)     ; 
+    etf=dm_zeros(im,jm,1)     ; fluxua=dm_zeros(im,jm,1)  ; 
+    h=dm_zeros(im,jm,1)       ; north_c=dm_zeros(im,jm,1) ; 
+    north_v=dm_zeros(im,jm,1) ; psi=dm_zeros(im,jm,1)     ; 
+    swrad=dm_zeros(im,jm,1)   ; vfluxb=dm_zeros(im,jm,1)  ; 
+    ua=dm_zeros(im,jm,1)      ; vfluxf=dm_zeros(im,jm,1)  ; 
+    utb=dm_zeros(im,jm,1)     ; utf=dm_zeros(im,jm,1)     ; 
+    vaf=dm_zeros(im,jm,1)     ;                             
+    wssurf=dm_zeros(im,jm,1)  ; wtsurf=dm_zeros(im,jm,1)  ; 
+    wvbot=dm_zeros(im,jm,1)   ; wvsurf=dm_zeros(im,jm,1)  ;   
 
 
     !*************************
     !3D matrices
     !*************************
-    aam=dm_ones(im,jm,kb)  ; advx=dm_ones(im,jm,kb) ;
-    advy=dm_ones(im,jm,kb) ; a=dm_ones(im,jm,kb)    ; 
-    c=dm_ones(im,jm,kb)    ; drhox=dm_ones(im,jm,kb);
-    drhoy=dm_ones(im,jm,kb); dtef=dm_ones(im,jm,kb) ; 
-    ee=dm_ones(im,jm,kb)   ; gg=dm_ones(im,jm,kb)   ;
-    kh=dm_ones(im,jm,kb)   ; km=dm_ones(im,jm,kb)   ; 
-    kq=dm_ones(im,jm,kb)   ; l=dm_ones(im,jm,kb)    ;
-    q2b=dm_ones(im,jm,kb)  ; q2=dm_ones(im,jm,kb)   ; 
-    q2lb=dm_ones(im,jm,kb) ; q2l=dm_ones(im,jm,kb)  ;
-    rho=dm_ones(im,jm,kb)  ; rmean=dm_ones(im,jm,kb);
-    sb=dm_ones(im,jm,kb)   ; sclim=dm_ones(im,jm,kb);
-    s=dm_ones(im,jm,kb)    ; tb=dm_ones(im,jm,kb)   ; 
-    tclim=dm_ones(im,jm,kb); t=dm_ones(im,jm,kb)    ;
-    ub=dm_ones(im,jm,kb)   ; uf=dm_ones(im,jm,kb)   ; 
-    u=dm_ones(im,jm,kb)    ; vb=dm_ones(im,jm,kb)   ;
-    vf=dm_ones(im,jm,kb)   ; v=dm_ones(im,jm,kb)    ; 
-    w=dm_ones(im,jm,kb)    ; zflux=dm_ones(im,jm,kb);
+    aam=dm_zeros(im,jm,kb)  ; advx=dm_zeros(im,jm,kb) ;
+    advy=dm_zeros(im,jm,kb) ; a=dm_zeros(im,jm,kb)    ; 
+    c=dm_zeros(im,jm,kb)    ; drhox=dm_zeros(im,jm,kb);
+    drhoy=dm_zeros(im,jm,kb); dtef=dm_zeros(im,jm,kb) ; 
+    ee=dm_zeros(im,jm,kb)   ; gg=dm_zeros(im,jm,kb)   ;
+    kh=dm_zeros(im,jm,kb)   ; km=dm_zeros(im,jm,kb)   ; 
+    kq=dm_zeros(im,jm,kb)   ; l=dm_zeros(im,jm,kb)    ;
+    q2b=dm_zeros(im,jm,kb)  ; q2=dm_zeros(im,jm,kb)   ; 
+    q2lb=dm_zeros(im,jm,kb) ; q2l=dm_zeros(im,jm,kb)  ;
+    rho=dm_zeros(im,jm,kb)  ; rmean=dm_zeros(im,jm,kb);
+    sb=dm_zeros(im,jm,kb)   ; sclim=dm_zeros(im,jm,kb);
+    s=dm_zeros(im,jm,kb)    ; tb=dm_zeros(im,jm,kb)   ; 
+    tclim=dm_zeros(im,jm,kb); t=dm_zeros(im,jm,kb)    ;
+    ub=dm_zeros(im,jm,kb)   ; uf=dm_zeros(im,jm,kb)   ; 
+    u=dm_zeros(im,jm,kb)    ; vb=dm_zeros(im,jm,kb)   ;
+    vf=dm_zeros(im,jm,kb)   ; v=dm_zeros(im,jm,kb)    ; 
+    w=dm_zeros(im,jm,kb)    ; zflux=dm_zeros(im,jm,kb);
 
 
-    ele=dm_ones(1,jm,1)      ; eln=dm_ones(1,im,1)      ;
-    els=dm_ones(1,im,1)      ; elw=dm_ones(1,jm,1)      ;
-    sbe=dm_ones(jm,kb,1)     ; sbn=dm_ones(im,kb,1)     ;
-    sbs=dm_ones(im,kb,1)     ; sbw=dm_ones(jm,kb,1)     ; 
-    tbe=dm_ones(jm,kb,1)     ; tbn=dm_ones(im,kb,1)     ;
-    tbs=dm_ones(im,kb,1)     ; tbw=dm_ones(jm,kb,1)     ; 
-    uabe=dm_ones(1,jm,1)     ; uabw=dm_ones(1,jm,1)     ;
-    ube=dm_ones(jm,kb,1)     ; ubw=dm_ones(jm,kb,1)     ; 
-    vabn=dm_ones(1,im,1)     ; vabs=dm_ones(1,im,1)     ;
-    vbn=dm_ones(im,kb,1)     ; vbs=dm_ones(im,kb,1)     ; 
+    ele=dm_zeros(1,jm,1)      ; eln=dm_zeros(1,im,1)      ;
+    els=dm_zeros(1,im,1)      ; elw=dm_zeros(1,jm,1)      ;
+    sbe=dm_zeros(jm,kb,1)     ; sbn=dm_zeros(im,kb,1)     ;
+    sbs=dm_zeros(im,kb,1)     ; sbw=dm_zeros(jm,kb,1)     ; 
+    tbe=dm_zeros(jm,kb,1)     ; tbn=dm_zeros(im,kb,1)     ;
+    tbs=dm_zeros(im,kb,1)     ; tbw=dm_zeros(jm,kb,1)     ; 
+    uabe=dm_zeros(1,jm,1)     ; uabw=dm_zeros(1,jm,1)     ;
+    ube=dm_zeros(jm,kb,1)     ; ubw=dm_zeros(jm,kb,1)     ; 
+    vabn=dm_zeros(1,im,1)     ; vabs=dm_zeros(1,im,1)     ;
+    vbn=dm_zeros(im,kb,1)     ; vbs=dm_zeros(im,kb,1)     ; 
 
-    d_3d=dm_ones(im,jm,kb)   ; 
+    d_3d=dm_zeros(im,jm,kb)   ; 
 
   end subroutine InitGrid
 
