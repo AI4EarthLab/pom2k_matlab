@@ -15,18 +15,18 @@ subroutine profq(dti2)
   real(kind=8), intent(in) :: dti2
   real(kind=8) ::  a1=0.92, b1=16.6, a2=0.74, b2=10.1, c1=0.08, const1
   real(kind=8) ::  e1=1.8, e2=1.33, sef=1.0, cbcnst=100., surfl=2.e5, shiw=0.0
-  type(Matrix) ::  l0, kn, boygr, gh,la, dh_3d2, dh, dh_3d,cc,p,utau2
+  type(Matrix) ::  l0, kn, boygr, gh, dh_3d2, dh, dh_3d,cc,p,utau2
   type(Matrix) :: filter, l0_kappa, tmp
   real(kind=8) :: ghc, coef1, coef2, coef3, coef4, coef5
   type(Matrix) :: LAA, LBB, sh, sm, temp, temp1, temp2
   integer :: ierr
 
-  l0    = dm_zeros(im,jm,1);
-  kn    = dm_zeros(im,jm,kb);
-  boygr = dm_zeros(im,jm,kb);
-  gh    = dm_zeros(im,jm,kb);
+  !l0    = dm_zeros(im,jm,1);
+  !kn    = dm_zeros(im,jm,kb);
+  !boygr = dm_zeros(im,jm,kb);
+  !gh    = dm_zeros(im,jm,kb);
   !stf   = dm_zeros(im,jm,kb);
-  la    = dm_zeros(1, 1, kb);
+
 
   dh = h + etf;
   dh_3d=dm_rep(dh,1,1,kb);
@@ -128,6 +128,9 @@ subroutine profq(dti2)
   l = (z_3d > -0.5) .em. (filter .em. l + (1 - filter) .em. l0_kappa) + &
        (z_3d <= -0.5) .em. l
 
+  ! print *, "in file: ", __FILE__, "line:", __LINE__
+  ! call dm_finalize(ierr)
+  ! stop
 
   ! gh=l.^2 .* boygr ./q2b;
   ! gh=min(gh, 0.028);
@@ -143,7 +146,7 @@ subroutine profq(dti2)
   ! %    Calculate production of turbulent kinetic energy:
   ! kn= DIVISION(km.*sef.*(AXF(DZB(u)).^2 + AYF(DZB(v)).^2) , ...
   !             (tmp.*dh_3d).^2) -shiw.*km.*boygr + kh.*boygr;
-  km = (sef * km .em. (dm_squ(AXF(DZB(u))) + dm_squ(AYF(DZB(v))))) .ed. &
+  kn = (sef * km .em. (dm_squ(AXF(DZB(u))) + dm_squ(AYF(DZB(v))))) .ed. &
        (dm_squ(tmp .em. dh_3d) - shiw * km .em. boygr + kh .em. boygr)
 
 
@@ -152,6 +155,8 @@ subroutine profq(dti2)
   ghc=-6.0e0;
   !stf=dm_ones(im,jm,kb);
 
+  print *, "in file: ", __FILE__, "line:", __LINE__
+  
   ! % It is unclear yet if diss. corr. is needed when surf. waves are included.
   ! %           if(gh(i,j,k).lt.0.e0)
   ! %    ...        stf(i,j,k)=1.0e0-0.9e0*(gh(i,j,k)/ghc)**1.5e0
@@ -171,6 +176,9 @@ subroutine profq(dti2)
   d = (REV_MASK_Z1 .em. d) - (uf .em. MASK_Z1)
   temp1 = a .em. REV_MASK_Z2
   temp2 = c .em. REV_MASK_Z1
+
+  print *, "in file: ", __FILE__, "line:", __LINE__
+
   ! call dm_finalize(ierr)
   ! stop
 
@@ -196,6 +204,8 @@ subroutine profq(dti2)
   ! vf(:,:,kb)=0.e0;
   vf = vf .em. MASK_Z2
 
+  print *, "in file: ", __FILE__, "line:", __LINE__
+  
   ! for k=2:kbm1
   !     dtef(:,:,k)=dtef(:,:,k).*(1.e0+e2.*((1.e0/abs(z(k)-z(1))+1.e0./abs(z(k)-z(kb)))     ...
   !                         .*l(:,:,k)./(dh(:,:)*kappa)).^2);
@@ -204,13 +214,23 @@ subroutine profq(dti2)
   !     d(:,:,1)=-(15.8*cbcnst)^(2./3.).*utau2;
   !     d(:,jm,1)=0.e0; d(im,:,1)=0.e0; d(:,:,kb)=0.e0;
   !     temp=vf(:,:,1);
-  d = -dti2 * kn .em. l .em. e1 - vf
-  d = -(15.8*cbcnst)**(2./3.) * utau2
+
+  ! call dm_print_info(kn, ierr)
+  ! call dm_print_info(l, ierr)
+  ! call dm_print_info(vf, ierr)
+  ! call dm_print_info(d, ierr)
+  ! call dm_print_info(REV_MASK_X1, ierr)
+  
+  d = -dti2 * e1 * kn .em. l - vf
+  d = dm_rep(-(15.8*cbcnst)**(2./3.) * utau2, 1, 1, kb) .em. MASK_Z1 +&
+       (REV_MASK_Z1 .em. d)
   d = d .em. REV_MASK_X1
   d = d .em. REV_MASK_Y1
   d = d .em. REV_MASK_Z1
-  temp = vf .em. MASK_Z1
-
+  ! temp = vf .em. MASK_Z1
+  
+  print *, "in file: ", __FILE__, "line:", __LINE__
+  
   !   for j=2:jm
   !       for i=2:im
   !    la=diag(reshape(a(i,j,:)+c(i,j,:)-1-dti2.*dtef(i,j,:),kb,1),0) ...
@@ -229,6 +249,8 @@ subroutine profq(dti2)
   ! dt_3d=repmat(dt,1,1,kb);
   dt_3d = dm_rep(dt, 1, 1, kb)
 
+  print *, "in file: ", __FILE__, "line:", __LINE__
+  
   ! filter = (uf<=small | vf<=small);
   ! filter(:,:,1) = false;
   ! filter(:,:,kb) = false;
@@ -291,7 +313,7 @@ subroutine profq(dti2)
   call dm_destroy(kn, ierr)
   call dm_destroy(boygr, ierr)
   call dm_destroy(gh, ierr)
-  call dm_destroy(la, ierr)
+
   call dm_destroy(dh_3d2, ierr)
   call dm_destroy(dh, ierr)
   call dm_destroy(dh_3d, ierr)

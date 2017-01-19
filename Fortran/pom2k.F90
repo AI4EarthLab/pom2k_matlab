@@ -152,7 +152,8 @@ program pom2k
   d_3d=dm_rep(d,1,1,kb);
   dt_3d=dm_rep(dt,1,1,kb);
 
-  
+  ! call dm_finalize(ierr)
+  ! stop
   ! %==========================================
   ! %           begin internal (3-D) mode
   ! %==========================================
@@ -252,6 +253,8 @@ program pom2k
         ady2d = ady2d - advva;
      endif
 
+     ! call dm_finalize(ierr)
+     ! stop
      
      egf= ispi * el;
      
@@ -272,7 +275,7 @@ program pom2k
         !     im,jm,kb,imm1,jmm1,kbm1,...
         !     fsm,grav,ramp,rfe,h,uabe,ele,el,uabw,rfw,elw,rfn,eln,vabs,rfs,els,...
         !     dum,dvm,hmax,u,v,t,s,tbn,sbn,dti,tbs,sbs,q2,q2l,small,vabn,dx,dy,dt,tbe,sbe,tbw,sbw,zz);
-        call bcond(1, dti)
+        !call bcond(1, dti)
         if(mod(iext,ispadv)==0) then
            ![tps,wubot,wvbot,advua,advva] = new_advave(tps,wubot,wvbot,mode,aam2d,uab,vab,ua,va,cbc,d);
            call advave(iint)
@@ -299,7 +302,7 @@ program pom2k
         !     im,jm,kb,imm1,jmm1,kbm1,...
         !     fsm,grav,ramp,rfe,h,uabe,ele,el,uabw,rfw,elw,rfn,eln,vabs,rfs,els,...
         !     dum,dvm,hmax,u,v,t,s,tbn,sbn,dti,tbs,sbs,q2,q2l,small,vabn,dx,dy,dt,tbe,sbe,tbw,sbw,zz);
-        call bcond(2, dti)
+        !call bcond(2, dti)
         ! if(iext==(isplit-2))
         !     etf=0.25*smoth*elf;
         ! elseif(iext==(isplit-1))
@@ -366,7 +369,9 @@ program pom2k
         endif
      enddo
 
-
+     ! print *, "rank=", myrank, "in file", __FILE__, "line:", __LINE__
+     ! call dm_finalize(ierr)
+     ! stop
      ! %===========================================
      ! %End of external (2-D) mode
      ! %=============================================
@@ -418,10 +423,11 @@ program pom2k
            !  fsm,grav,ramp,rfe,h,uabe,ele,el,uabw,rfw,elw,rfn,eln,vabs,rfs,els,...
            !  dum,dvm,hmax,u,v,t,s,tbn,sbn,dti,tbs, ...
            !  sbs,q2,q2l,small,vabn,dx,dy,dt,tbe,sbe,tbw,sbw,zz);
-           call bcond(5, dti)
+           !call bcond(5, dti)
            
            vf = ZEROS
            uf = ZEROS
+
 
            ! THIS FUNCTION SHOULD BE REPLACED
            !uf=new_advq(q2b,q2,dt,u,v,w,aam,h,etb,etf,dti2);    
@@ -430,6 +436,10 @@ program pom2k
            ! THIS FUNCTION SHOULD BE REPLACED            
            !vf=new_advq(q2lb,q2l,dt,u,v,w,aam,h,etb,etf,dti2);  
            call advq(vf, q2lb, q2l, dti2)
+
+           ! print *, "rank=", myrank, "in file", __FILE__, "line:", __LINE__
+           ! call dm_finalize(ierr)
+           ! stop
            
            ! THIS FUNCTION SHOULD BE REPLACED
            ! [a,c,tps,dtef,...
@@ -442,6 +452,10 @@ program pom2k
            !     wusurf,wubot,wvsurf,wvbot,t,s,rhoref,zz,z);
            call profq(dti2)
 
+           ! print *, "rank=", myrank, "in file", __FILE__, "line:", __LINE__
+           ! call dm_finalize(ierr)
+           ! stop
+           
            ! call dm_finalize(ierr)
            ! stop
            ! THIS FUNCTION SHOULD BE REPLACED           
@@ -450,7 +464,7 @@ program pom2k
            !   fsm,grav,ramp,rfe,h,uabe,ele,el,uabw,rfw,elw,rfn,eln,vabs,rfs,els,...
            !   dum,dvm,hmax,u,v,t,s,tbn,sbn,dti,tbs, ...
            !   sbs,q2,q2l,small,vabn,dx,dy,dt,tbe,sbe,tbw,sbw,zz);
-           call bcond(6, dti)
+           !call bcond(6, dti)
            
            q2 = q2  + .5e0 * smoth * (uf + q2b - 2.e0 * q2);
            q2l= q2l + .5e0 * smoth * (vf + q2lb - 2.e0 * q2l);
@@ -458,6 +472,10 @@ program pom2k
            q2  = uf;
            q2lb = q2l;
            q2l  = vf;
+
+           print *, "rank=", myrank, "in file", __FILE__, "line:", __LINE__
+           call dm_finalize(ierr)
+           stop
            
            ! calculate tf and sf using uf, vf, a and c as temporary variables:
            if(mode /= 4) then
@@ -502,7 +520,7 @@ program pom2k
               !  fsm,grav,ramp,rfe,h,uabe,ele,el,uabw,rfw,elw,rfn,eln,vabs,rfs,els,...
               !  dum,dvm,hmax,u,v,t,s,tbn,sbn,dti,tbs,
               !  sbs,q2,q2l,small,vabn,dx,dy,dt,tbe,sbe,tbw,sbw,zz);
-              call bcond(4, dti)
+              !call bcond(4, dti)
               
               t = t+.5e0*smoth*(uf+tb-2.e0*t);
               s = s+.5e0*smoth*(vf+sb-2.e0*s);
@@ -535,7 +553,7 @@ program pom2k
            !    fsm,grav,ramp,rfe,h,uabe,ele,el,uabw,rfw,elw,rfn,eln,vabs,rfs,els,...
            !    dum,dvm,hmax,u,v,t,s,tbn,sbn,dti,tbs,sbs,q2,q2l,
            !    small,vabn,dx,dy,dt,tbe,sbe,tbw,sbw,zz);
-           call bcond(3, dti)
+           !call bcond(3, dti)
            
            !tps = sum((uf+ub-2.e0*u).*dz_3d .* REV_MASK_KB, 3);
            tps = CSUM((uf+ub-2.e0*u) .em. dz_3d .em. REV_MASK_Z2, 4);
