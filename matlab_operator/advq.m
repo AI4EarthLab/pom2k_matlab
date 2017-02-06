@@ -1,4 +1,4 @@
-function [qf]=new_advq(qb,q,dt,u,v,w,aam,h,etb,etf,dti2)
+function [qf]=advq(qb,q,dt,u,v,w,aam,h,etb,etf,dti2)
 % **********************************************************************
 % *                                                                    *
 % * FUNCTION    :  calculates horizontal advection and diffusion, and  *

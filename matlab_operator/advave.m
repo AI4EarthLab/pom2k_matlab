@@ -1,4 +1,4 @@
-function  [curv2d,wubot,wvbot,advua,advva] = new_advave(curv2d,wubot,wvbot,mode,aam2d,uab,vab,ua,va,cbc,d)
+function  [curv2d,wubot,wvbot,advua,advva] = advave(curv2d,wubot,wvbot,mode,aam2d,uab,vab,ua,va,cbc,d)
 % **********************************************************************
 % *                                                                    *
 % * FUNCTION    :  Calculates horizontal advection and diffusion.      *

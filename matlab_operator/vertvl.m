@@ -1,11 +1,11 @@
-function [xflux,yflux,w]=new_vertvl (xflux,yflux,w,dx,dy,dz,dt,u,v,vfluxb,vfluxf,etf,etb,dti2,im,jm,imm1,jmm1,kbm1)
+function [xflux,yflux,w]=vertvl (xflux,yflux,w,dx,dy,dz,dt,u,v,vfluxb,vfluxf,etf,etb,dti2,im,jm,imm1,jmm1,kbm1)
 % **********************************************************************
 % *                                                                    *
 % * FUNCTION    :  calculates vertical velocity.                       *
 % *                                                                    *
 % **********************************************************************
 %load('grid.mat'); load('operator.mat');
-global  kb;
+global  kb dx_3d dy_3d dz_3d;
 dt_3d=repmat(dt,1,1,kb);
 %     Reestablish boundary conditions:
 xflux = AXB(dy_3d) .* AXB(dt_3d).* u;

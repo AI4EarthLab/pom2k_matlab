@@ -1,4 +1,4 @@
-function [vf] = new_advv(advy,cor,dt,e_atmos,drhoy,h,vb,u,v,w,egf,egb,etf,etb)
+function [vf] = advv(advy,cor,dt,e_atmos,drhoy,h,vb,u,v,w,egf,egb,etf,etb)
 %load('grid.mat');load('para.mat');load('operator.mat');
 
 global im jm kb arv_3d dti2 grav dx_3d dz_3d

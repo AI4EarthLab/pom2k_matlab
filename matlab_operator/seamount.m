@@ -6,7 +6,7 @@ function[dx,dy,cor,...
     uabw,uabe,ele,elw,tbe,tbw,sbe,sbw,tbn,tbs,sbn,sbs, ...
     dx_3d,dy_3d,cor_3d, ...
     h_3d,art_3d,aru_3d,arv_3d, ...
-    fsm_3d,dum_3d,dvm_3d,dt_3d] = new_seamount(e_atmos,aam)
+    fsm_3d,dum_3d,dvm_3d,dt_3d] = seamount(e_atmos,aam)
     
 global im jm kb pi slmax kbm1 zz tbias sbias jmm1 imm1 grav;
 
@@ -297,7 +297,7 @@ h(:,jm)=1.0;
 
 %     Calculate areas and masks:
 %[art,aru,arv,fsm,dum,dvm]=areas_masks(im,jm,dx,dy,h);
-[art,aru,arv,fsm,dum,dvm]=new_areas_masks(dx,dy,h);
+[art,aru,arv,fsm,dum,dvm]=areas_masks(dx,dy,h);
 
 dx_3d=repmat(dx,1,1,kb);
 dy_3d=repmat(dy,1,1,kb);
@@ -346,7 +346,7 @@ aam2d=aam(:,:,1);
 
 dt_3d=repmat(dt,1,1,kb);
 
-[rho]=new_dens(sb,tb,h_3d,fsm_3d);
+[rho]=dens(sb,tb,h_3d,fsm_3d);
 
 %     Generated horizontally averaged density field (in this
 %     application, the initial condition for density is a function

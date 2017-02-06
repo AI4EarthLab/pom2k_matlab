@@ -135,7 +135,7 @@ vb=zeros(im,jm,kb);
 %
 h_3d=repmat(h,1,1,kb);
 fsm_3d=repmat(fsm,1,1,kb);
-[rho]=new_dens(sb,tb,h_3d,fsm_3d);
+[rho]=dens(sb,tb,h_3d,fsm_3d);
 %
 % --- calc. Curiolis Parameter
 %
@@ -169,7 +169,7 @@ end
 %
 %     Calculate areas and masks:
 %
-[art,aru,arv,fsm,dum,dvm]=areas_masks(im,jm,dx,dy,h);
+[art,aru,arv,fsm,dum,dvm]=areas_masks(dx,dy,h);
 %
 %
 % --- the following grids are needed only for netcdf plotting

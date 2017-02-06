@@ -1,4 +1,4 @@
-function [ff]=new_advt1(fb,f,dt,u,v,aam,tprni,w,etb,etf,h)
+function [ff]=advt1(fb,f,dt,u,v,aam,tprni,w,etb,etf,h)
 % **********************************************************************
 % *                                                                    *
 % * FUNCTION    :  Integrates conservative scalar equations.           *

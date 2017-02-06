@@ -1,4 +1,4 @@
-function [rhoo]=new_dens(si,ti,h_3d,fsm_3d)
+function [rhoo]=dens(si,ti,h_3d,fsm_3d)
 % **********************************************************************
 % *                                                                    *
 % * FUNCTION    :  Calculates (density-1000.)/rhoref.                  *
