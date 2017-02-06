@@ -37,7 +37,7 @@
 % *                                                                    *
 % **********************************************************************
 %load('grid.mat');load('operator.mat');load('para.mat');
-global dzz_3d kbm2 dz_3d zz_3d;
+global dzz_3d kbm2 dz_3d zz_3d z_3d;
 
 a1=0.92; b1=16.6 ; a2=0.74 ; b2=10.1    ; c1=0.08;
 e1=1.8 ; e2=1.33 ; sef=1.0 ; cbcnst=100.; surfl=2.e5 ; shiw=0.0;
