@@ -1,0 +1,173 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.8	//
+1	pom2k.f	/^    1 format(1x,a40\/)$/;"	l	subroutine:prxy	file:
+1	pom2k.f	/^    1 format(1x,a40\/)$/;"	l	subroutine:prxyz	file:
+1	pom2k.f	/^    1 format(1x,a40\/)$/;"	l	subroutine:prxz	file:
+1	pom2k.f	/^    1 format(1x,a40\/)$/;"	l	subroutine:pryz	file:
+1	pom2k.f	/^    1 format(\/' tbias and sbias changed in subroutine box to:'\/$/;"	l	subroutine:box	file:
+1	pom2k.f	/^    1 format(\/2x,'k',7x,'z',9x,'zz',9x,'dz',9x,'dzz',\/)$/;"	l	subroutine:depth	file:
+2	pom2k.f	/^    2   format((' ',i5,4f10.3))$/;"	l	subroutine:depth	file:
+2	pom2k.f	/^    2 format(' Time = ',f9.4,' days    multiply all values by ',1pe8.2)$/;"	l	subroutine:prxy	file:
+2	pom2k.f	/^    2 format(' Time = ',f9.4,' days    multiply all values by ',1pe8.2)$/;"	l	subroutine:prxyz	file:
+2	pom2k.f	/^    2 format(' Time = ',f9.4,' days    multiply all values by ',1pe8.2)$/;"	l	subroutine:prxz	file:
+2	pom2k.f	/^    2 format(' Time = ',f9.4,' days    multiply all values by ',1pe8.2)$/;"	l	subroutine:pryz	file:
+2	pom2k.f	/^    2 format(\/2x,'k',7x,'z',9x,'zz',9x,'dz',9x,'dzz',\/)$/;"	l	subroutine:file2ic	file:
+3	pom2k.f	/^    3     format(\/,2x,24i5,\/)$/;"	l	subroutine:prxy	file:
+3	pom2k.f	/^    3   format((' ',i5,4f10.3))$/;"	l	subroutine:file2ic	file:
+3	pom2k.f	/^    3   format(3x,\/' Layer k = ',i2)$/;"	l	subroutine:prxyz	file:
+3	pom2k.f	/^    3   format(3x,\/' Section i =',i3)$/;"	l	subroutine:pryz	file:
+3	pom2k.f	/^    3   format(3x,\/' Section j =',i3)$/;"	l	subroutine:prxz	file:
+3	pom2k.f	/^    3 format(\/\/)$/;"	l	subroutine:depth	file:
+4	pom2k.f	/^    4       format(\/,'    i =  ',24i5,\/)$/;"	l	subroutine:prxz	file:
+4	pom2k.f	/^    4       format(\/,'    j =  ',24i5,\/)$/;"	l	subroutine:pryz	file:
+4	pom2k.f	/^    4       format(\/,2x,24i5,\/)$/;"	l	subroutine:prxyz	file:
+4	pom2k.f	/^    4     format(\/$/;"	l	program:pom2k	file:
+4	pom2k.f	/^    4     format(\/,12i10,\/)$/;"	l	subroutine:prxy	file:
+5	pom2k.f	/^    5       format(1x,i3,24i5)$/;"	l	subroutine:prxy	file:
+5	pom2k.f	/^    5       format(\/,'    i =  ',12i10,\/)$/;"	l	subroutine:prxz	file:
+5	pom2k.f	/^    5       format(\/,'    j =  ',12i10,\/)$/;"	l	subroutine:pryz	file:
+5	pom2k.f	/^    5       format(\/,12i10,\/)$/;"	l	subroutine:prxyz	file:
+5	pom2k.f	/^    5     format('vtot = ',e16.7,'   atot = ',e16.7,$/;"	l	program:pom2k	file:
+6	pom2k.f	/^    6         format(1x,i3,24i5)$/;"	l	subroutine:prxyz	file:
+6	pom2k.f	/^    6       format(1x,i2,12(e10.2))$/;"	l	subroutine:prxy	file:
+6	pom2k.f	/^    6       format(\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/$/;"	l	program:pom2k	file:
+6	pom2k.f	/^    6     format(8x,'d =',24i5.0,\/,'     z or zz')$/;"	l	subroutine:prxz	file:
+6	pom2k.f	/^    6     format(8x,'d =',24i5.0,\/,'     z or zz')$/;"	l	subroutine:pryz	file:
+7	pom2k.f	/^    7         format(1x,i2,12(e10.2))$/;"	l	subroutine:prxyz	file:
+7	pom2k.f	/^    7         format(1x,i2,2x,f6.3,24i5)$/;"	l	subroutine:prxz	file:
+7	pom2k.f	/^    7         format(1x,i2,2x,f6.3,24i5)$/;"	l	subroutine:pryz	file:
+7	pom2k.f	/^    7   format(\/\/)$/;"	l	subroutine:prxy	file:
+8	pom2k.f	/^    8         format(1x,i2,2x,f6.3,12(e10.2))$/;"	l	subroutine:prxz	file:
+8	pom2k.f	/^    8         format(1x,i2,2x,f6.3,12(e10.2))$/;"	l	subroutine:pryz	file:
+8	pom2k.f	/^    8     format(\/\/)$/;"	l	subroutine:prxyz	file:
+8	pom2k.f	/^    8   format(\/' Invalid value of iproblem ..... program terminated'\/)$/;"	l	program:pom2k	file:
+8000	pom2k.f	/^ 8000 continue        ! End of external (2-D) mode$/;"	l	program:pom2k	file:
+9	pom2k.f	/^    9           format(\/'Invalid value for nadv ..... ',$/;"	l	program:pom2k	file:
+9	pom2k.f	/^    9     format(\/\/)$/;"	l	subroutine:prxz	file:
+9	pom2k.f	/^    9     format(\/\/)$/;"	l	subroutine:pryz	file:
+9000	pom2k.f	/^ 9000 continue       !  End of internal (3-D) mode$/;"	l	program:pom2k	file:
+aam_init	pom2k.f	/^      real aam_init,/;"	v	program:pom2k
+advave	pom2k.f	/^      subroutine advave(/;"	s
+advct	pom2k.f	/^      subroutine advct(/;"	s
+advq	pom2k.f	/^      subroutine advq(/;"	s
+advt1	pom2k.f	/^      subroutine advt1(/;"	s
+advt2	pom2k.f	/^      subroutine advt2(/;"	s
+advu	pom2k.f	/^      subroutine advu$/;"	s
+advv	pom2k.f	/^      subroutine advv$/;"	s
+alpha	pom2k.c	/^     $  alpha          ,dte            ,dti            ,dti2           ,$/;"	v
+areas_masks	pom2k.f	/^      subroutine areas_masks$/;"	s
+atot	pom2k.f	/^      real aam_init,atot$/;"	v	program:pom2k
+baropg	pom2k.f	/^      subroutine baropg$/;"	s
+bcond	pom2k.f	/^      subroutine bcond(/;"	s
+bcondorl	pom2k.f	/^      subroutine bcondorl(/;"	s
+box	pom2k.f	/^      subroutine box$/;"	s
+cbcmax	pom2k.f	/^      real cbcmax,/;"	v	program:pom2k
+cbcmin	pom2k.f	/^      real cbcmax,cbcmin,/;"	v	program:pom2k
+darea	pom2k.f	/^      real cbcmax,cbcmin,darea$/;"	v	program:pom2k
+days	pom2k.f	/^      real days,/;"	v	program:pom2k
+dens	pom2k.f	/^      subroutine dens(/;"	s
+depth	pom2k.f	/^      subroutine depth$/;"	s
+dte	pom2k.c	/^     $  alpha          ,dte            ,dti            ,dti2           ,  $/;"	v
+dte	pom2k.c	/^     $  alpha          ,dte            ,dti            ,dti2           ,$/;"	v
+dte2	pom2k.f	/^      real days,dte2,/;"	v	program:pom2k
+dti	pom2k.c	/^     $  alpha          ,dte            ,dti            ,dti2           ,  $/;"	v
+dti	pom2k.c	/^     $  alpha          ,dte            ,dti            ,dti2           ,$/;"	v
+dti2	pom2k.c	/^     $  alpha          ,dte            ,dti            ,dti2           ,  $/;"	v
+dti2	pom2k.c	/^     $  alpha          ,dte            ,dti            ,dti2           ,$/;"	v
+dvol	pom2k.f	/^      real days,dte2,dvol$/;"	v	program:pom2k
+dzz	pom2k.c	/^     $  dz             ,dzz            ,z              ,zz$/;"	v
+eaver	pom2k.f	/^      real eaver$/;"	v	program:pom2k
+file2ic	pom2k.f	/^      subroutine file2ic$/;"	s
+findpsi	pom2k.f	/^      subroutine findpsi$/;"	s
+grav	pom2k.c	/^     $  grav           ,hmax           ,kappa          ,pi             ,$/;"	v
+hmax	pom2k.c	/^     $  grav           ,hmax           ,kappa          ,pi             ,$/;"	v
+horcon	pom2k.f	/^      real horcon$/;"	v	program:pom2k
+i	pom2k.f	/^      in/;"	v	program:pom2k
+iend	pom2k.f	/^      integer i,iend,/;"	v	program:pom2k
+iext	pom2k.f	/^      integer i,iend,iext,/;"	v	program:pom2k
+iint	pom2k.c	/^     $  iint           ,iprint         ,iskp           ,jskp           ,$/;"	v
+im	pom2k.c	/^     $  im             ,imm1           ,imm2           ,jm             ,$/;"	v
+imax	pom2k.f	/^      integer i,iend,iext,imax,/;"	v	program:pom2k
+imm1	pom2k.c	/^     $  im             ,imm1           ,imm2           ,jm             ,$/;"	v
+imm2	pom2k.c	/^     $  im             ,imm1           ,imm2           ,jm             ,$/;"	v
+io	pom2k.f	/^      integer io(/;"	v	program:pom2k
+iprint	pom2k.c	/^     $  iint           ,iprint         ,iskp           ,jskp           ,$/;"	v
+iproblem	pom2k.f	/^      integer iproblem$/;"	v	program:pom2k
+iskp	pom2k.c	/^     $  iint           ,iprint         ,iskp           ,jskp           ,$/;"	v
+isp2i	pom2k.f	/^      real ispi,isp2i$/;"	v	program:pom2k
+ispadv	pom2k.f	/^      integer i,iend,iext,imax,ispadv,/;"	v	program:pom2k
+ispi	pom2k.f	/^      real ispi,/;"	v	program:pom2k
+isplit	pom2k.f	/^      integer i,iend,iext,imax,ispadv,isplit,/;"	v	program:pom2k
+iswtch	pom2k.f	/^      integer i,iend,iext,imax,ispadv,isplit,iswtch$/;"	v	program:pom2k
+j	pom2k.f	/^      integer j,/;"	v	program:pom2k
+jm	pom2k.c	/^     $  im             ,imm1           ,imm2           ,jm             ,$/;"	v
+jmax	pom2k.f	/^      integer j,jmax$/;"	v	program:pom2k
+jmm1	pom2k.c	/^     $  jmm1           ,jmm2           ,kb             ,kbm1           ,$/;"	v
+jmm2	pom2k.c	/^     $  jmm1           ,jmm2           ,kb             ,kbm1           ,$/;"	v
+jo	pom2k.f	/^      integer io(100),jo(/;"	v	program:pom2k
+jskp	pom2k.c	/^     $  iint           ,iprint         ,iskp           ,jskp           ,$/;"	v
+k	pom2k.f	/^      integer k$/;"	v	program:pom2k
+kappa	pom2k.c	/^     $  grav           ,hmax           ,kappa          ,pi             ,$/;"	v
+kb	pom2k.c	/^     $  jmm1           ,jmm2           ,kb             ,kbm1           ,$/;"	v
+kbm1	pom2k.c	/^     $  jmm1           ,jmm2           ,kb             ,kbm1           ,$/;"	v
+kl1	pom2k.c	/^     $  kl1            ,kl2            ,mode           ,ntp$/;"	v
+kl2	pom2k.c	/^     $  kl1            ,kl2            ,mode           ,ntp$/;"	v
+ko	pom2k.f	/^      integer io(100),jo(100),ko(/;"	v	program:pom2k
+lramp	pom2k.f	/^      logical lramp$/;"	v	program:pom2k
+mode	pom2k.c	/^     $  kl1            ,kl2            ,mode           ,ntp$/;"	v
+nadv	pom2k.f	/^      integer nadv,/;"	v	program:pom2k
+nbcs	pom2k.f	/^      integer nadv,nbct,nbcs,/;"	v	program:pom2k
+nbct	pom2k.f	/^      integer nadv,nbct,/;"	v	program:pom2k
+netcdf_file	pom2k.f	/^      character*120 netcdf_file$/;"	v	program:pom2k
+nitera	pom2k.f	/^      integer nadv,nbct,nbcs,nitera,/;"	v	program:pom2k
+nread	pom2k.f	/^      integer nadv,nbct,nbcs,nitera,nread$/;"	v	program:pom2k
+period	pom2k.f	/^      real period,/;"	v	program:pom2k
+pi	pom2k.c	/^     $  grav           ,hmax           ,kappa          ,pi             ,$/;"	v
+pom2k	pom2k.f	/^      program pom2k$/;"	p
+printall	pom2k.f	/^      subroutine printall$/;"	s
+profq	pom2k.f	/^      subroutine profq(/;"	s
+proft	pom2k.f	/^      subroutine proft(/;"	s
+profu	pom2k.f	/^      subroutine profu$/;"	s
+profv	pom2k.f	/^      subroutine profv$/;"	s
+prtd1	pom2k.f	/^      real period,prtd1,/;"	v	program:pom2k
+prtd2	pom2k.f	/^      real period,prtd1,prtd2$/;"	v	program:pom2k
+prxy	pom2k.f	/^      subroutine prxy(/;"	s
+prxyz	pom2k.f	/^      subroutine prxyz(/;"	s
+prxz	pom2k.f	/^      subroutine prxz(/;"	s
+pryz	pom2k.f	/^      subroutine pryz(/;"	s
+ramp	pom2k.c	/^     $  ramp           ,rfe            ,rfn            ,rfs            ,$/;"	v
+rfe	pom2k.c	/^     $  ramp           ,rfe            ,rfn            ,rfs            ,$/;"	v
+rfn	pom2k.c	/^     $  ramp           ,rfe            ,rfn            ,rfs            ,$/;"	v
+rfs	pom2k.c	/^     $  ramp           ,rfe            ,rfn            ,rfs            ,$/;"	v
+rfw	pom2k.c	/^     $  rfw            ,rhoref         ,sbias          ,slmax          ,$/;"	v
+rhoref	pom2k.c	/^     $  rfw            ,rhoref         ,sbias          ,slmax          ,$/;"	v
+satm	pom2k.f	/^      real tatm,satm$/;"	v	program:pom2k
+saver	pom2k.f	/^      real saver,/;"	v	program:pom2k
+sbias	pom2k.c	/^     $  rfw            ,rhoref         ,sbias          ,slmax          ,$/;"	v
+seamount	pom2k.f	/^      subroutine seamount$/;"	s
+slmax	pom2k.c	/^     $  rfw            ,rhoref         ,sbias          ,slmax          ,$/;"	v
+slpmax	pom2k.f	/^      subroutine slpmax$/;"	s
+small	pom2k.c	/^     $  small          ,tbias          ,time           ,tprni          ,$/;"	v
+smol_adif	pom2k.f	/^      subroutine smol_adif(/;"	s
+smoth	pom2k.f	/^      real saver,smoth,/;"	v	program:pom2k
+sw	pom2k.f	/^      real saver,smoth,sw,/;"	v	program:pom2k
+swtch	pom2k.f	/^      real saver,smoth,sw,swtch$/;"	v	program:pom2k
+tatm	pom2k.f	/^      real tatm,/;"	v	program:pom2k
+taver	pom2k.f	/^      real taver,/;"	v	program:pom2k
+tbias	pom2k.c	/^     $  small          ,tbias          ,time           ,tprni          ,$/;"	v
+time	pom2k.c	/^     $  small          ,tbias          ,time           ,tprni          ,$/;"	v
+time0	pom2k.f	/^      real taver,time0$/;"	v	program:pom2k
+tprni	pom2k.c	/^     $  small          ,tbias          ,time           ,tprni          ,$/;"	v
+tsalt	pom2k.f	/^      real vamax,vtot,tsalt$/;"	v	program:pom2k
+umol	pom2k.c	/^     $  umol           ,vmaxl          ,$/;"	v
+umol	pom2k.c	/^     $  umol           ,vmaxl$/;"	v
+vamax	pom2k.f	/^      real vamax,/;"	v	program:pom2k
+vertvl	pom2k.f	/^      subroutine vertvl(/;"	s
+vmaxl	pom2k.c	/^     $  umol           ,vmaxl          ,$/;"	v
+vtot	pom2k.f	/^      real vamax,vtot,/;"	v	program:pom2k
+z	pom2k.c	/^     $  dz             ,dzz            ,z              ,zz$/;"	v
+z0b	pom2k.f	/^      real z0b$/;"	v	program:pom2k

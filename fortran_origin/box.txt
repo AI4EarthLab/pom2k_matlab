@@ -1,0 +1,350 @@
+      subroutine box
+% **********************************************************************
+% *                                                                    *
+% * FUNCTION    :  Sets up conservation box problem.                   *
+% *                                                                    *
+% *                This basin uses the same grid as the seamount       *
+% *                problem, but it has a flat bottom, is surrounded by *
+% *                walls and is initialised with uniform salinity and  *
+% *                temperature. It is forced by a surface input of     *
+% *                water of the same temperature and salinity as the   *
+% *                water in the basin. Therefore, the temperature and  *
+% *                salinity in the basin should not change, and the    *
+% *                free surface should fall at a rate vflux. It is also*
+% *                forced by a steady atmospheric pressure field which *
+% *                depresses the southwestern half of the model by 1 m *
+% *                and elevates the northeastern half of the model by  *
+% *                1 m.                                                *
+% *                                                                    *
+% *                Since this problem defines its own fixed e_atmos,   *
+% *                tatm, satm and e_atmos, comment out corresponding   *
+% *                declarations after the do 9000 statement in main    *
+% *                program.                                            *
+% **********************************************************************
+%
+      implicit none
+      include 'pom2k.c'
+      real depth,delx,tatm,satm
+      integer i,j,k
+ 
+%     Water depth:
+      depth=4500.0
+%     Grid size:
+      delx=8000.0
+%
+%     Set up grid dimensions, areas of free surface cells, and
+%     Coriolis parameter:
+%
+      do j=1,jm
+        do i=1,im
+C
+C     For constant grid size:
+C
+C         dx(i,j)=delx
+C         dy(i,j)=delx
+C
+C     For variable grid size:
+C
+          dx(i,j)=delx-delx*sin(pi*float(i)/float(im))/2.0
+          dy(i,j)=delx-delx*sin(pi*float(j)/float(jm))/2.0
+C
+          cor(i,j)=1.e-4
+C
+        end do
+      end do
+C
+C     Calculate horizontal coordinates of grid points and rotation
+C     angle.
+C
+C     NOTE that this is introduced solely for the benefit of any post-
+C     processing software, and in order to conform with the requirements
+C     of the NetCDF Climate and Forecast (CF) Metadata Conventions.
+C
+C     There are four horizontal coordinate systems, denoted by the
+C     subscripts u, v, e and c ("u" is a u-point, "v" is a v-point,
+C     "e" is an elevation point and "c" is a cell corner), as shown
+C     below. In addition, "east_*" is an easting and "north_*" is a
+C     northing. Hence the coordinates of the "u" points are given by
+C     (east_u,north_u).
+C
+C     Also, if the centre point of the cell shown below is at
+C     (east_e(i,j),north_e(i,j)), then (east_u(i,j),north_u(i,j)) are
+C     the coordinates of the western of the two "u" points,
+C     (east_v(i,j),north_v(i,j)) are the coordinates of the southern of
+C     the two "v" points, and (east_c(i,j),north_c(i,j)) are the
+C     coordinates of the southwestern corner point of the cell. The
+C     southwest corner of the entire grid is at
+C     (east_c(1,1),north_c(1,1)).
+C
+C                      |              |
+C                    --c------v-------c--
+C                      |              |
+C                      |              |
+C                      |              |
+C                      |              |
+C                      u      e       u
+C                      |              |
+C                      |              |
+C                      |              |
+C                      |              |
+C                    --c------v-------c--
+C                      |              |
+C
+C
+C     NOTE that the following calculation of east_c and north_c only
+C     works properly for a rectangular grid with east and north aligned
+C     with i and j, respectively:
+C
+      do j=1,jm
+        east_c(1,j)=0.0
+        do i=2,im
+          east_c(i,j)=east_c(i-1,j)+dx(i-1,j)
+        end do
+      end do
+C
+      do i=1,im
+        north_c(i,1)=0.0
+        do j=2,jm
+          north_c(i,j)=north_c(i,j-1)+dy(i,j-1)
+        end do
+      end do
+C
+C     The following works properly for any grid:
+C
+C     Elevation points:
+C
+      do j=1,jm-1
+        do i=1,im-1
+          east_e(i,j)=(east_c(i,j)+east_c(i+1,j)
+     $                  +east_c(i,j+1)+east_c(i+1,j+1))/4.0
+          north_e(i,j)=(north_c(i,j)+north_c(i+1,j)
+     $                   +north_c(i,j+1)+north_c(i+1,j+1))/4.0
+        end do
+      end do
+C
+C     Extrapolate ends:
+C
+      do i=1,im-1
+        east_e(i,jm)
+     $    =((east_c(i,jm)+east_c(i+1,jm))*3.0
+     $       -east_c(i,jm-1)-east_c(i+1,jm-1))/4.0
+        north_e(i,jm)
+     $    =((north_c(i,jm)+north_c(i+1,jm))*3.0
+     $       -north_c(i,jm-1)-north_c(i+1,jm-1))/4.0
+      end do
+C
+      do j=1,jm-1
+        east_e(im,j)
+     $    =((east_c(im,j)+east_c(im,j+1))*3.0
+     $       -east_c(im-1,j)-east_c(im-1,j+1))/4.0
+        north_e(im,j)
+     $    =((north_c(im,j)+north_c(im,j+1))*3.0
+     $       -north_c(im-1,j)-north_c(im-1,j+1))/4.0
+      end do
+C
+      east_e(im,jm)=east_e(im-1,jm)+east_e(im,jm-1)
+     $               -(east_e(im-2,jm)+east_e(im,jm-2))/2.0
+      north_e(im,jm)=north_e(im-1,jm)+north_e(im,jm-1)
+     $               -(north_e(im-2,jm)+north_e(im,jm-2))/2.0
+C
+C     u-points:
+C
+      do j=1,jm-1
+        do i=1,im
+          east_u(i,j)=(east_c(i,j)+east_c(i,j+1))/2.0
+          north_u(i,j)=(north_c(i,j)+north_c(i,j+1))/2.0
+        end do
+      end do
+C
+C     Extrapolate ends:
+C
+      do i=1,im
+        east_u(i,jm)=(east_c(i,jm)*3.0-east_c(i,jm-1))/2.0
+        north_u(i,jm)=(north_c(i,jm)*3.0-north_c(i,jm-1))/2.0
+      end do
+C
+C     v-points:
+C
+      do j=1,jm
+        do i=1,im-1
+          east_v(i,j)=(east_c(i,j)+east_c(i+1,j))/2.0
+          north_v(i,j)=(north_c(i,j)+north_c(i+1,j))/2.0
+        end do
+      end do
+C
+C     Extrapolate ends:
+C
+      do j=1,jm
+        east_v(im,j)=(east_c(im,j)*3.0-east_c(im-1,j))/2.0
+        north_v(im,j)=(north_c(im,j)*3.0-north_c(im-1,j))/2.0
+      end do
+C
+C     rot is the angle (radians, anticlockwise) of the i-axis relative
+C     to east, averaged to a cell centre:
+C
+C     (NOTE that the following calculation of rot only works properly
+C     for this particular rectangular grid)
+C
+      do j=1,jm
+        do i=1,im
+          rot(i,j)=0.0
+        end do
+      end do
+C
+C     Define depth:
+C
+      do i=1,im
+        do j=1,jm
+          h(i,j)=depth
+        end do
+      end do
+C
+C     Close the north and south boundaries:
+C
+      do i=1,im
+        h(i,1)=1.0
+        h(i,jm)=1.0
+      end do
+C
+C     Close the east and west boundaries:
+C
+      do j=1,jm
+        h(1,j)=1.0
+        h(im,j)=1.0
+      end do
+C
+C     Calculate areas and masks:
+C
+      call areas_masks
+C
+C     Adjust bottom topography so that cell to cell variations
+C     in h do not exceed parameter slmax:
+C
+      if(slmax.lt.1.0) call slpmax
+C
+C     Set tbias and sbias here for test (tbias and sbias would
+C     normally only be set in the main program):
+C
+      tbias=10.0
+      sbias=20.0
+      write(6,1) tbias,sbias
+    1 format(/' tbias and sbias changed in subroutine box to:'/
+     $         2f10.3//)
+C
+C     Set initial conditions:
+C
+      do k=1,kbm1
+        do j=1,jm
+          do i=1,im
+            tb(i,j,k)=20.0-tbias
+            sb(i,j,k)=35.0-sbias
+            tclim(i,j,k)=tb(i,j,k)
+            sclim(i,j,k)=sb(i,j,k)
+          end do
+        end do
+      end do
+C
+C     Initialise uab and vab as necessary
+C     (NOTE that these have already been initialised to zero in the
+C     main program):
+C
+      do j=1,jm
+        do i=1,im
+C     No conditions necessary for this problem
+        end do
+      end do
+C
+C     Set surface boundary conditions, e_atmos, vflux, wusurf,
+C     wvsurf, wtsurf, wssurf and swrad, as necessary
+C     (NOTE:
+C      1. These have all been initialised to zero in the main program.
+C      2. The temperature and salinity of inflowing water must be
+C         defined relative to tbias and sbias.):
+C
+      do j=1,jm
+        do i=1,im
+          if(i+j-57.le.0) then
+            e_atmos(i,j)=1.0
+          else
+            e_atmos(i,j)=-1.0
+          endif
+C
+C     Ensure atmospheric pressure cannot make water depth go negative:
+C
+          e_atmos(i,j)=min(e_atmos(i,j),h(i,j))
+C
+          vfluxf(i,j)=-0.00010
+C
+C     See main program, just after "Begin numerical integration", for
+C     an explanation of these terms:
+C 
+          tatm=20.0
+          satm=35.0
+C
+        end do
+      end do
+C
+C     Initialise elb, etb, dt and aam2d:
+C
+      do j=1,jm
+        do i=1,im
+          elb(i,j)=-e_atmos(i,j)
+          etb(i,j)=-e_atmos(i,j)
+          dt(i,j)=h(i,j)-e_atmos(i,j)
+          aam2d(i,j)=aam(i,j,1)
+        end do
+      end do
+C
+      call dens(sb,tb,rho)
+C
+C     Generated horizontally averaged density field (in this
+C     application, the initial condition for density is a function
+C     of z (the vertical cartesian coordinate) -- when this is not
+C     so, make sure that rmean has been area averaged BEFORE transfer
+C     to sigma coordinates):
+C
+      do k=1,kbm1
+        do j=1,jm
+          do i=1,im
+            rmean(i,j,k)=rho(i,j,k)
+          end do
+        end do
+      end do
+C
+C     Set lateral boundary conditions, for use in subroutine bcond
+C     (in this problem, all lateral boundaries are closed through
+C     the specification of the masks fsm, dum and dvm):
+C
+      rfe=1.0
+      rfw=1.0
+      rfn=1.0
+      rfs=1.0
+C
+C     Set thermodynamic boundary conditions (for the seamount
+C     problem, and other possible applications, lateral thermodynamic
+C     boundary conditions are set equal to the initial conditions and
+C     are held constant thereafter - users may, of course, create
+C     variable boundary conditions):
+C
+      do k=1,kbm1
+C
+        do j=1,jm
+          tbe(j,k)=tb(im,j,k)
+          tbw(j,k)=tb(1,j,k)
+          sbe(j,k)=sb(im,j,k)
+          sbw(j,k)=sb(1,j,k)
+        end do
+C
+        do i=1,im
+          tbn(i,k)=tb(i,jm,k)
+          tbs(i,k)=tb(i,1,k)
+          sbn(i,k)=sb(i,jm,k)
+          sbs(i,k)=sb(i,1,k)
+        end do
+C
+      end do
+C
+      return
+C
+      end
+C

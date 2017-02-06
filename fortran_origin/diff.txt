@@ -1,0 +1,140 @@
+1c1
+<       subroutine seamount
+---
+>       subroutine box
+4c4
+< C * FUNCTION    :  Sets up for seamount problem.                       *
+---
+> C * FUNCTION    :  Sets up conservation box problem.                   *
+5a6,22
+> C *                This basin uses the same grid as the seamount       *
+> C *                problem, but it has a flat bottom, is surrounded by *
+> C *                walls and is initialised with uniform salinity and  *
+> C *                temperature. It is forced by a surface input of     *
+> C *                water of the same temperature and salinity as the   *
+> C *                water in the basin. Therefore, the temperature and  *
+> C *                salinity in the basin should not change, and the    *
+> C *                free surface should fall at a rate vflux. It is also*
+> C *                forced by a steady atmospheric pressure field which *
+> C *                depresses the southwestern half of the model by 1 m *
+> C *                and elevates the northeastern half of the model by  *
+> C *                1 m.                                                *
+> C *                                                                    *
+> C *                Since this problem defines its own fixed e_atmos,   *
+> C *                tatm, satm and e_atmos, comment out corresponding   *
+> C *                declarations after the do 9000 statement in main    *
+> C *                program.                                            *
+12c29
+<       real delh,delx,elejmid,elwjmid,ra,vel
+---
+>       real depth,delx,tatm,satm
+15c32
+< C     Set delh > 1.0 for an island or delh < 1.0 for a seamount:
+---
+> C     Water depth:
+17c34
+<       delh=0.90
+---
+>       depth=4500.0
+23,30d39
+< C     Radius island or seamount:
+< C
+<       ra=25000.0
+< C
+< C     Current velocity:
+< C
+<       vel=0.20
+< C
+194,202c203
+< C
+<           h(i,j)=4500.0*(1.0-delh
+<      $                          *exp(-((east_c(i,j)
+<      $                                   -east_c((im+1)/2,j))**2
+<      $                                +(north_c(i,j)
+<      $                                   -north_c(i,(jm+1)/2))**2)
+<      $                                /ra**2))
+<           if(h(i,j).lt.1.0) h(i,j)=1.0
+< C
+---
+>           h(i,j)=depth
+206c207
+< C     Close the north and south boundaries to form a channel:
+---
+> C     Close the north and south boundaries:
+212a214,220
+> C     Close the east and west boundaries:
+> C
+>       do j=1,jm
+>         h(1,j)=1.0
+>         h(im,j)=1.0
+>       end do
+> C
+221a230,238
+> C     Set tbias and sbias here for test (tbias and sbias would
+> C     normally only be set in the main program):
+> C
+>       tbias=10.0
+>       sbias=20.0
+>       write(6,1) tbias,sbias
+>     1 format(/' tbias and sbias changed in subroutine box to:'/
+>      $         2f10.3//)
+> C
+227c244
+<             tb(i,j,k)=5.0+15.0*exp(zz(k)*h(i,j)/1000.0)-tbias
+---
+>             tb(i,j,k)=20.0-tbias
+231d247
+<             ub(i,j,k)=vel*dum(i,j)
+242c258
+<           uab(i,j)=vel*dum(i,j)
+---
+> C     No conditions necessary for this problem
+255c271,288
+< C     No conditions necessary for this problem
+---
+>           if(i+j-57.le.0) then
+>             e_atmos(i,j)=1.0
+>           else
+>             e_atmos(i,j)=-1.0
+>           endif
+> C
+> C     Ensure atmospheric pressure cannot make water depth go negative:
+> C
+>           e_atmos(i,j)=min(e_atmos(i,j),h(i,j))
+> C
+>           vfluxf(i,j)=-0.00010
+> C
+> C     See main program, just after "Begin numerical integration", for
+> C     an explanation of these terms:
+> C 
+>           tatm=20.0
+>           satm=35.0
+> C
+287,289c320,321
+< C     (in the seamount problem, the east and west boundaries are open,
+< C     while the south and north boundaries are closed through the
+< C     specification of the masks fsm, dum and dvm):
+---
+> C     (in this problem, all lateral boundaries are closed through
+> C     the specification of the masks fsm, dum and dvm):
+296,315d327
+<       do j=2,jmm1
+<         uabw(j)=uab(2,j)
+<         uabe(j)=uab(imm1,j)
+< C
+< C     Set geostrophically conditioned elevations at the boundaries:
+< C
+<         ele(j)=ele(j-1)-cor(imm1,j)*uab(imm1,j)/grav*dy(imm1,j-1)
+<         elw(j)=elw(j-1)-cor(2,j)*uab(2,j)/grav*dy(2,j-1)
+<       end do
+< C
+< C     Adjust boundary elevations so that they are zero in the middle
+< C     of the channel:
+< C
+<       elejmid=ele(jmm1/2)
+<       elwjmid=elw(jmm1/2)
+<       do j=2,jmm1
+<         ele(j)=(ele(j)-elejmid)*fsm(im,j)
+<         elw(j)=(elw(j)-elwjmid)*fsm(2,j)
+<       end do
+< C
