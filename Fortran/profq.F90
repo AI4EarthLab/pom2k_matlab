@@ -18,7 +18,7 @@ subroutine profq(dti2)
   type(Matrix) ::  l0, kn, boygr, gh, dh_3d2, dh, dh_3d,cc,p,utau2
   type(Matrix) :: filter, l0_kappa, tmp
   real(kind=8) :: ghc, coef1, coef2, coef3, coef4, coef5
-  type(Matrix) :: LAA, LBB, sh, sm, temp, temp1, temp2
+  type(Matrix) :: LAA, LBB, sh, sm, temp, temp1, temp2, tmp_d
   integer :: ierr
 
   !l0    = dm_zeros(im,jm,1);
@@ -169,11 +169,11 @@ subroutine profq(dti2)
   !     d(:,:,1)=-(15.8*cbcnst)^(2./3.).*utau2;
   !     d(:,jm,1)=0; d(im,:,1)=0; d(:,:,kb)=-uf(:,:,kb);
   !     temp1=a(:,:,1:kbm1);    temp2=c(:,:,2:kb);
-  d = -2.0*dti2*kn-uf
-  d = d .em. REV_MASK_Z1 - (15.8*cbcnst)**(2./3.) * dm_rep(utau2, 1, 1, kb)
-  d = (1-(MASK_Y2 .em. MASK_Z1)) .em. d
-  d = (1-(MASK_X2 .em. MASK_Z1)) .em. d
-  d = (REV_MASK_Z1 .em. d) - (uf .em. MASK_Z1)
+  tmp_d = -2.0*dti2*kn-uf
+  tmp_d = tmp_d .em. REV_MASK_Z1 - (15.8*cbcnst)**(2./3.) * dm_rep(utau2, 1, 1, kb)
+  tmp_d = (1-(MASK_Y2 .em. MASK_Z1)) .em. tmp_d
+  tmp_d = (1-(MASK_X2 .em. MASK_Z1)) .em .tmp_d
+  tmp_d = (REV_MASK_Z1 .em. tmp_d) - (uf .em. MASK_Z1)
   temp1 = a .em. REV_MASK_Z2
   temp2 = c .em. REV_MASK_Z1
 
@@ -194,7 +194,7 @@ subroutine profq(dti2)
   !(m,n,k) => (k, k, m*n) 
   LAA = dm_trid(temp2, a+c-1-2.0*dti2*dtef, temp1)
   !(m,n,k) => (k, 1, m*n)
-  LBB = dm_trid1(d)
+  LBB = dm_trid1(tmp_d)
   uf = dm_trid2(dm_solve(LAA, LBB), im, jm, kb)
 
   ! %-----------------------------------------------------------------------
@@ -221,13 +221,13 @@ subroutine profq(dti2)
   ! call dm_print_info(d, ierr)
   ! call dm_print_info(REV_MASK_X1, ierr)
   
-  d = -dti2 * e1 * kn .em. l - vf
-  d = dm_rep(-(15.8*cbcnst)**(2./3.) * utau2, 1, 1, kb) .em. MASK_Z1 +&
-       (REV_MASK_Z1 .em. d)
-  d = d .em. REV_MASK_X1
-  d = d .em. REV_MASK_Y1
-  d = d .em. REV_MASK_Z1
-  ! temp = vf .em. MASK_Z1
+  tmp_d = -dti2 * e1 * kn .em. l - vf
+  tmp_d = dm_rep(-(15.8*cbcnst)**(2./3.) * utau2, 1, 1, kb) .em. MASK_Z1 +&
+       (REV_MASK_Z1 .em. tmp_d)
+  tmp_d = tmp_d .em. REV_MASK_X1
+  tmp_d = tmp_d .em. REV_MASK_Y1
+  tmp_d = tmp_d .em. REV_MASK_Z1
+  temp = vf .em. MASK_Z1
   
   print *, "in file: ", __FILE__, "line:", __LINE__
   
@@ -240,9 +240,11 @@ subroutine profq(dti2)
   !       end
   !   end
   LAA = dm_trid(temp2, a+c-1-dti2 * dtef, temp1)
-  LBB = dm_trid1(d)
+  print *, "in file: ", __FILE__, "line:", __LINE__  
+  LBB = dm_trid1(tmp_d)
+  print *, "in file: ", __FILE__, "line:", __LINE__  
   vf = dm_trid2(dm_solve(LAA, LBB), im, jm, kb)
-
+  print *, "in file: ", __FILE__, "line:", __LINE__
   !    vf(:,:,1)=temp;
   vf = vf .em. REV_MASK_Z1 + temp
 
@@ -283,6 +285,8 @@ subroutine profq(dti2)
   sm=coef3 + coef4 * sh .em. gh;
   sm=sm .em. dm_pow(1.0-coef5 * gh, -1);
 
+  print *, "in file: ", __FILE__, "line:", __LINE__
+  
   !     kn=l.*sqrt(abs(q2));
   !     kq=(kn.*.41e0.*sh+kq)*.5e0;
   !     km=(kn.*sm+km)*.5e0;
@@ -308,7 +312,8 @@ subroutine profq(dti2)
   km = km .em. REV_MASK_X1 + MASK_X1 .em. SHIFT(km, 1, 1) .em. fsm_3d    
   kh = kh .em. REV_MASK_X1 + MASK_X1 .em. SHIFT(kh, 1, 1) .em. fsm_3d
   !  end
-
+  print *, "in file: ", __FILE__, "line:", __LINE__
+  
   call dm_destroy(l0, ierr)
   call dm_destroy(kn, ierr)
   call dm_destroy(boygr, ierr)
@@ -320,6 +325,8 @@ subroutine profq(dti2)
   call dm_destroy(cc, ierr)
   call dm_destroy(p, ierr)
   call dm_destroy(utau2, ierr)
+  call dm_destroy(tmp_d, ierr)
   
+  print *, "in file: ", __FILE__, "line:", __LINE__
 end subroutine profq
 

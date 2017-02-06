@@ -11,7 +11,7 @@ subroutine proft(f, wfsurf, dti2)
   type(Matrix), intent(inout) :: f
   type(Matrix), intent(in) ::  wfsurf
 
-  type(Matrix) :: dh_3d, swrad_3d, rad, LAA, LBB, f1  
+  type(Matrix) :: dh_3d, swrad_3d, rad, LAA, LBB, f1 , tmp_d 
 
   ! function [f1] = new_proft(f,wfsurf,fsurf,nbc,h,etf,swrad,kh)
   ! %-----------------------------------------------------------------------
@@ -35,25 +35,25 @@ subroutine proft(f, wfsurf, dti2)
   ! d(:,:,1:kbm2)=-dti2*(kh(:,:,2:kbm1)+umol);
   ! a=DIVISION(d,dz_3d.*dzz_3d.*dh_3d.*dh_3d);
   ! a(:,:,kbm1)= 0.e0;
-  d = -dti2 * ((shift(kh, 3, 1) + umol) .em. shift(REV_MASK_Z2, 3, 1))
-  a = d .ed. (dz_3d .em. dzz_3d .em. dh_3d .em. dh_3d)
+  tmp_d = -dti2 * ((shift(kh, 3, 1) + umol) .em. shift(REV_MASK_Z2, 3, 1))
+  a = tmp_d .ed. (dz_3d .em. dzz_3d .em. dh_3d .em. dh_3d)
 
   ! d(:,:,2:kbm1)=dzz_3d(:,:,1:kbm2);
   ! c=DIVISION(-dti2*(kh+umol),dz_3d.*d.*dh_3d.*dh_3d);
   ! c(:,:,1)  =0.e0;
-  d = d .em. MASK_Z1 + shift(dzz_3d, 3, -1) .em. REV_MASK_Z2
-  c = (-dti2 * (kh + umol)) .ed. (dz_3d .em. d .em. dh_3d .em. dh_3d) &
+  tmp_d = tmp_d .em. MASK_Z1 + shift(dzz_3d, 3, -1) .em. REV_MASK_Z2
+  c = (-dti2 * (kh + umol)) .ed. (dz_3d .em. tmp_d .em. dh_3d .em. dh_3d) &
        .em. REV_MASK_Z1
 
   !     d=-f - dti2 .* DZF(rad) ./(dh_3d .* dz_3d);
   !     d(:,:,1)= -f(:,:,1) + dti2 .* wfsurf(:,:) ./ (dh(:,:) .* dz(1));
   !     d(:,:,kb-1)=-f(:,:,kb-1); 
-  d = -f - dti2 * DZF(rad) .ed. (dh_3d .em. dz_3d)
-  d = d .em. REV_MASK_Z1 + &
+  tmp_d = -f - dti2 * DZF(rad) .ed. (dh_3d .em. dz_3d)
+  tmp_d = tmp_d .em. REV_MASK_Z1 + &
        (-f + dti2 * dm_rep(wfsurf, 1, 1, kb) .ed. &
        (dh_3d .em.dz_3d)) .em. MASK_Z1
 
-  d = d .em. (1 - shift(MASK_Z2, 3, 1)) + &
+  tmp_d = tmp_d .em. (1 - shift(MASK_Z2, 3, 1)) + &
        (-f .em. shift(MASK_Z2, 3, 1))
 
   !   for j=2:jm
@@ -65,7 +65,7 @@ subroutine proft(f, wfsurf, dti2)
   !       end
   !   end
   LAA = dm_trid(c, a + c - 1, a)
-  LBB = dm_trid1(d)
+  LBB = dm_trid1(tmp_d)
   f1 = dm_trid2(dm_solve(LAA, LBB), im, jm, kb) 
 
   call dm_destroy(dh_3d, ierr)
@@ -73,5 +73,5 @@ subroutine proft(f, wfsurf, dti2)
   call dm_destroy(rad, ierr)
   call dm_destroy(LAA, ierr)
   call dm_destroy(LBB, ierr)
-
+  call dm_destroy(tmp_d, ierr)
 end subroutine

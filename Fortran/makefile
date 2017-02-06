@@ -2,7 +2,7 @@
 PNETCDF=${ESM_SOFT}/pnetcdf/
 
 CFLAGS	         =  
-FFLAGS	         =-Wno-tabs -I ${PNETCDF}/include  -J ${DM} -g
+FFLAGS	         =-Wno-tabs -I ${PNETCDF}/include  -J ${DM} -g -fbacktrace
 CPPFLAGS         =
 FPPFLAGS         =
 LOCDIR           = src/ksp/ksp/examples/tutorials/

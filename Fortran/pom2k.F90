@@ -38,7 +38,6 @@ program pom2k
   array1=(/(0,i=1,imm2*jmm2)/)
 
   call file2ic()
-
   
   ! call dm_view(z, ierr)
   ! call dm_view(zz, ierr)
@@ -166,7 +165,6 @@ program pom2k
      else
         ramp=1.0;
      endif
-
      
      ! %       write(6,2) mode,iint,time
      ! %   2   format(' mode,iint,time =',2i5,f9.2)
@@ -190,6 +188,9 @@ program pom2k
      call dm_setvalues(wtsurf, idxm1, idxn1, (/0/), array1, ierr)
      call dm_setvalues(wssurf, idxm1, idxn1, (/0/), array1, ierr)
 
+     if (myrank == 0) &
+          print *, "rank=", myrank, " in file: ", __FILE__, "line:", __LINE__
+
      satm = 0.0
   
      ! %-----------------------------------------------------------------------
@@ -211,9 +212,13 @@ program pom2k
      if(mode/=2) then
         ![advx,advy]=new_advct(u,v,dt_3d,aam,ub,vb);
         call advct()
+     if (myrank == 0) &
+          print *, "rank=", myrank, " in file: ", __FILE__, "line:", __LINE__
         
         ! [rho,drhox,drhoy] = new_baropg(rho, rmean, dt, ramp);
         call baropg()
+     if (myrank == 0) &
+          print *, "rank=", myrank, " in file: ", __FILE__, "line:", __LINE__
         
         ! aam=horcon .* dx_3d .* dy_3d .*sqrt((DXF(u)./dx_3d).^2 + (DYF(v)./dy_3d).^2 ...
         ! +0.5*( DYB(AYF(AXF(u)))./dy_3d + DXB(AXF(AYF(v)))./dx_3d).^2 );
@@ -221,6 +226,9 @@ program pom2k
              dm_squ((DYF(v) .ed. dy_3d)) + 0.5 * dm_squ(DYB(AYF(AXF(u))) .ed. dy_3d + &
              DXB(AXF(AYF(v))) .ed. dx_3d))
 
+     if (myrank == 0) &
+          print *, "rank=", myrank, " in file: ", __FILE__, "line:", __LINE__
+        
         ! aam(:,1,:)=aam_init;
         ! aam(:,jm,:)=aam_init;
         ! aam(1,:,:)=aam_init;
@@ -232,6 +240,9 @@ program pom2k
         aam = aam - (aam .em. MASK_X2 - aam_init * MASK_X2)
         aam = aam - (aam .em. MASK_Z2 - aam_init * MASK_Z2)
 
+     if (myrank == 0) &
+          print *, "rank=", myrank, " in file: ", __FILE__, "line:", __LINE__
+        
         ! % Form vertical averages of 3-D fields for use in external (2-D)
         ! % mode:
         ! adx2d = sum(advx.*dz_3d, 3);
@@ -245,9 +256,15 @@ program pom2k
         dry2d = CSUM(drhoy .em. dz_3d, 4);
         aam2d = CSUM(aam .em. dz_3d, 4);
 
+        if (myrank == 0) &
+             print *, "rank=", myrank, " in file: ", __FILE__, "line:", __LINE__
+
         ! [tps,wubot,wvbot,advua,advva]
         !      = new_advave(tps,wubot,wvbot,mode,aam2d,uab,vab,ua,va,cbc,d);
         call advave(iint)
+        
+     if (myrank == 0) &
+          print *, "rank=", myrank, " in file: ", __FILE__, "line:", __LINE__
 
         adx2d = adx2d - advua;
         ady2d = ady2d - advva;
@@ -281,6 +298,9 @@ program pom2k
            call advave(iint)
         endif
 
+     if (myrank == 0) &
+          print *, "rank=", myrank, " in file: ", __FILE__, "line:", __LINE__
+        
         ! uaf=   DIVISION( (2.0*AXB(h+elb) .* aru .* uab ...
         !        -4.0* dte .* (adx2d + advua - aru .* AXB(cor .* d .* AYF(va)) ...
         !        + grav .* AXB(dy) .* AXB(d)  ...
@@ -318,6 +338,8 @@ program pom2k
            etf=(etf+0.5*elf) .em. fsm;
         endif
 
+     if (myrank == 0) &
+          print *, "rank=", myrank, " in file: ", __FILE__, "line:", __LINE__
       
         ! % Stop if velocity condition violated (generally due to CFL
         ! % criterion not being satisfied):   
@@ -369,7 +391,9 @@ program pom2k
         endif
      enddo
 
-     ! print *, "rank=", myrank, "in file", __FILE__, "line:", __LINE__
+     if (myrank == 0) &
+          print *, "rank=", myrank, " in file: ", __FILE__, "line:", __LINE__
+     
      ! call dm_finalize(ierr)
      ! stop
      ! %===========================================
@@ -437,7 +461,8 @@ program pom2k
            !vf=new_advq(q2lb,q2l,dt,u,v,w,aam,h,etb,etf,dti2);  
            call advq(vf, q2lb, q2l, dti2)
 
-           ! print *, "rank=", myrank, "in file", __FILE__, "line:", __LINE__
+           if (myrank == 0) &
+                print *, "rank=", myrank, " in file: ", __FILE__, "line:", __LINE__
            ! call dm_finalize(ierr)
            ! stop
            
@@ -450,9 +475,10 @@ program pom2k
            !     h,etf,dti2,umol,dzz,grav,rho,kappa,
            !     u,v,dt,small,fsm,im,jm,kb,imm1,jmm1,kbm1,tbias,sbias,dz,...
            !     wusurf,wubot,wvsurf,wvbot,t,s,rhoref,zz,z);
-           call profq(dti2)
+           !call profq(dti2)
 
-           ! print *, "rank=", myrank, "in file", __FILE__, "line:", __LINE__
+           if (myrank == 0) &
+                print *, "rank=", myrank, " in file: ", __FILE__, "line:", __LINE__
            ! call dm_finalize(ierr)
            ! stop
            
@@ -473,9 +499,10 @@ program pom2k
            q2lb = q2l;
            q2l  = vf;
 
-           print *, "rank=", myrank, "in file", __FILE__, "line:", __LINE__
-           call dm_finalize(ierr)
-           stop
+            if (myrank == 0) &
+                 print *, "rank=", myrank, " in file: ", __FILE__, "line:", __LINE__
+           ! call dm_finalize(ierr)
+           ! stop
            
            ! calculate tf and sf using uf, vf, a and c as temporary variables:
            if(mode /= 4) then
@@ -514,7 +541,9 @@ program pom2k
               ! [vf] = new_proft(vf,wssurf,ssurf,nbcs,h,etf,swrad,kh);
               call proft(uf, wtsurf, dti2)
               call proft(vf, wssurf, dti2)
-              
+
+            if (myrank == 0) &
+                 print *, "rank=", myrank, " in file: ", __FILE__, "line:", __LINE__              
               ! [elf,uaf,vaf,uf,vf,w] = new_bcond(4,elf,uaf,vaf,uf,vf,w,...
               !  im,jm,kb,imm1,jmm1,kbm1,...
               !  fsm,grav,ramp,rfe,h,uabe,ele,el,uabw,rfw,elw,rfn,eln,vabs,rfs,els,...
@@ -530,6 +559,8 @@ program pom2k
               s = vf;
 
               call dense()
+               if (myrank == 0) &
+                    print *, "rank=", myrank, " in file: ", __FILE__, "line:", __LINE__              
            endif
            
            !% calculate uf and vf:
@@ -542,11 +573,17 @@ program pom2k
            call advv(dti2)
            !vf0 = vf;
 
+            if (myrank == 0) &
+                 print *, "rank=", myrank, " in file: ", __FILE__, "line:", __LINE__
+           
            ! THIS FUNCTION SHOULD BE REPLACED                                            
            ![uf,wubot] = new_profu(uf,etf,h,km,wusurf,cbc,ub,vb);           
            ![vf,wvbot] = new_profv(vf,etf,h,km,wvsurf,cbc,ub,vb);
            call profu(dti2)
            call profv(dti2)
+
+            if (myrank == 0) &
+                 print *, "rank=", myrank, " in file: ", __FILE__, "line:", __LINE__
            
            ! [elf,uaf,vaf,uf,vf,w] = new_bcond(3,elf,uaf,vaf,uf,vf,w,...
            !    im,jm,kb,imm1,jmm1,kbm1,...
@@ -577,6 +614,9 @@ program pom2k
            u = uf;
            vb = v;
            v = vf;
+           
+            if (myrank == 0) &
+                 print *, "rank=", myrank, " in file: ", __FILE__, "line:", __LINE__           
         end if
 
         egb = egf;
@@ -592,9 +632,18 @@ program pom2k
      if(iint>=iswtch) then
         iprint=floor(prtd2*24.e0*3600.e0/dti + 0.5);
      endif
+
+      if (myrank == 0) &
+           print *, "rank=", myrank, " in file: ", __FILE__, "line:", __LINE__
+
+      if (myrank == 0) &
+           print *, "rank=", myrank, " vamax= ", vamax, "vmaxl=", vmaxl
      
      if(mod(iint,iprint)==0 .or. vamax >= vmaxl) then
 
+        if (myrank == 0) &
+              print *, "rank=", myrank, " in file: ", __FILE__, "line:", __LINE__
+        
         if(myrank == 0) then
            print*, "**************************************************"
            write(*, "(A,F15.3,A,I10, A, I10,A, I10)") &
@@ -622,6 +671,9 @@ program pom2k
         taver = dm_sum_all(tb .em. tmp_dvol)
         saver = dm_sum_all(sb .em. tmp_dvol)
 
+         if (myrank == 0) &
+              print *, "rank=", myrank, " in file: ", __FILE__, "line:", __LINE__
+        
         !darea = dx.*dy.*fsm;
         darea = dx .em. dy .em. fsm;
 
@@ -669,7 +721,8 @@ program pom2k
            stop
         end if
      end if
-    
+     if(myrank == 0) &
+          print *, "rank=", myrank, " in file: ", __FILE__, "line:", __LINE__    
      ! %-----------------------------------------------------------------------
      ! %
      ! %  End of internal (3-D) mode
