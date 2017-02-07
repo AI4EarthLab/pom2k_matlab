@@ -1,16 +1,11 @@
-function[dx,dy,cor,...
-    east_c,north_c,east_e,north_e,east_u,north_u,east_v,north_v,...
-    h,art,aru,arv,fsm,dum,dvm,tb,sb,tclim,sclim,ub,uab,elb,etb,dt,...
-    aam2d,rho,rmean,rfe,rfw,rfn,rfs,uabw,uabe,ele,elw,tbe,tbw,sbe,...
-    sbw,tbn,tbs,sbn,sbs,rot,els,eln,vabs,vabn,ubw,ube,vbs,vbn,...
-    dx_3d,dy_3d,cor_3d,h_3d,art_3d,aru_3d,arv_3d,fsm_3d,dum_3d,dvm_3d, ...
-    dt_3d,z,zz,dz,dzz,z_3d,zz_3d,dz_3d,dzz_3d] = file2ic(dx,dy,cor,...
-    east_c,north_c,east_e,north_e,east_u,north_u,east_v,north_v,...
-    h,art,aru,arv,fsm,dum,dvm,...
-    tb,sb,tclim,sclim,ub,uab,elb,etb,dt,...
-    aam2d,rho,rmean,rfe,rfw,rfn,rfs,...
-    uabw,uabe,ele,elw,tbe,tbw,sbe,sbw,tbn,tbs,sbn,sbs,...
-    e_atmos,aam,im,jm,kb,imm1,jmm1,kbm1,slmax,zz,tbias,sbias,grav,rhoref,rot,els,eln,vabs,vabn,ubw,ube,vbs,vbn)
+function[dx,dy,cor,east_c,north_c,east_e,north_e,east_u,north_u,east_v,...
+         north_v,h,art,aru,arv,fsm,dum,dvm,tb,sb,...
+         tclim,sclim,ub,vb,elb,etb,dt,aam2d,rmean,rfe,rfw,...
+         rfn,rfs,uabw,uabe,ele,elw,tbe,tbw,sbe,sbw,...
+         tbn,tbs,sbn,sbs,rot,els,eln,vabs,vabn,ubw,...
+         ube,vbs,vbn,ssurf,tsurf,dx_3d,dy_3d,cor_3d,h_3d,art_3d,...
+         aru_3d,arv_3d,fsm_3d,dum_3d,dvm_3d,dt_3d,z,zz,dz,dzz,...
+         z_3d,zz_3d,dz_3d,dzz_3d] = file2ic(aam);
 % **********************************************************************
 % *                                                                    *
 % * FUNCTION    :  Sets up my own problem.                             *
@@ -21,12 +16,12 @@ function[dx,dy,cor,...
 % *                                                                    *
 % **********************************************************************
 %
-load('grid.mat');load('operator.mat');load('para.mat');
+global im jm kb
 field = '';
 name  = ' ';
 rad=0.01745329;
 re=6371.E3;
-fprintf('(/,'' Read grid and initial conditions '',/');
+fprintf('(/,'' Read grid and initial conditions '',/) \n');
 %
 %---start read--------------
 %--- 1D ---
@@ -74,15 +69,22 @@ end
 % (for time dep. read in loop 9000 & interpolate in time)
 %---------------2 D
 name=fscanf(fid,'%s',[1]);
-wusurf(:,:)=fscanf(fid,'%f',[65,49]);
+wusurf(:,:)=fscanf(fid,'%f',[im,jm]);
 
 name=fscanf(fid,'%s',[1]);
-wvsurf(:,:)=fscanf(fid,'%f',[65,49]);
+wvsurf(:,:)=fscanf(fid,'%f',[im,jm]);
 
 %-----------------read end-------------------
 %
 % --- calc. surface & lateral BC from climatology
 %
+for k=1:kb
+    z_3d(:,:,k)=repmat(z(k),im,jm);
+    zz_3d(:,:,k)=repmat(zz(k),im,jm);
+    dz_3d(:,:,k)=repmat(dz(k),im,jm);
+    dzz_3d(:,:,k)=repmat(dzz(k),im,jm);
+end
+
 for j=1:jm
     for i=1:im
         tsurf(i,j)=t(i,j,1);
@@ -132,10 +134,9 @@ tb = t;
 sb = s;
 ub = zeros(im,jm,kb);
 vb=zeros(im,jm,kb);
-%
 h_3d=repmat(h,1,1,kb);
-fsm_3d=repmat(fsm,1,1,kb);
-[rho]=dens(sb,tb,h_3d,fsm_3d);
+
+%[rho]=dens(sb,tb,h_3d,fsm_3d);
 %
 % --- calc. Curiolis Parameter
 %
@@ -170,6 +171,7 @@ end
 %     Calculate areas and masks:
 %
 [art,aru,arv,fsm,dum,dvm]=areas_masks(dx,dy,h);
+fsm_3d=repmat(fsm,1,1,kb);
 %
 %
 % --- the following grids are needed only for netcdf plotting
@@ -260,15 +262,6 @@ cor_3d=repmat(cor,1,1,kb);  art_3d=repmat(art,1,1,kb);
 aru_3d=repmat(aru,1,1,kb);  arv_3d=repmat(arv,1,1,kb);
 dum_3d=repmat(dum,1,1,kb);  dvm_3d=repmat(dvm,1,1,kb);
 dt_3d=repmat(dt,1,1,kb);    
-
-z_3d=zeros(im,jm,kb); zz_3d=zeros(im,jm,kb); dz_3d=zeros(im,jm,kb); dzz_3d=zeros(im,jm,kb); 
-for k=1:kb
-    z_3d(:,:,k)=repmat(z(k),im,jm);
-    zz_3d(:,:,k)=repmat(zz(k),im,jm);
-    dz_3d(:,:,k)=repmat(dz(k),im,jm);
-    dzz_3d(:,:,k)=repmat(dzz(k),im,jm);
-end
-
 %
 return
 end
