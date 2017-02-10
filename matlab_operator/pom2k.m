@@ -606,6 +606,7 @@ for iint=1:iend
             ua=uaf;
             vab=va;
             va=vaf;
+            d_3d=repmat(d,1,1,kb);  %add by hx
             
             if(iext~=isplit)
                 egf=egf+el*ispi;
@@ -828,7 +829,8 @@ for iint=1:iend
         utb=utf;
         vtb=vtf;
         vfluxb=vfluxf;
-        %
+        dt_3d=repmat(dt,1,1,kb);        %add by hx
+	%
     end   % end if
     
   
