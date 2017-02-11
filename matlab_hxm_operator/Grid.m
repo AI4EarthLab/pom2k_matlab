@@ -28,6 +28,7 @@ classdef Grid
         area_map
         mask_map
         
+        
         grid_size_initialized
         grid_mask_initialized
     end
@@ -38,16 +39,16 @@ classdef Grid
             obj.grid_size_initialized = false;
             obj.grid_mask_initialized = false;
             
-            obj.dx_f_map = containers.Map('KeyType', 'int32', 'ValueType', 'any');
-            obj.dy_f_map = containers.Map('KeyType', 'int32', 'ValueType', 'any');
-            obj.dz_f_map = containers.Map('KeyType', 'int32', 'ValueType', 'any');
+            obj.dx_f_map    = containers.Map('KeyType', 'int32', 'ValueType', 'any');
+            obj.dy_f_map    = containers.Map('KeyType', 'int32', 'ValueType', 'any');
+            obj.dz_f_map    = containers.Map('KeyType', 'int32', 'ValueType', 'any');
 
-            obj.dx_b_map = containers.Map('KeyType', 'int32', 'ValueType', 'any');
-            obj.dy_b_map = containers.Map('KeyType', 'int32', 'ValueType', 'any');
-            obj.dz_b_map = containers.Map('KeyType', 'int32', 'ValueType', 'any');
+            obj.dx_b_map    = containers.Map('KeyType', 'int32', 'ValueType', 'any');
+            obj.dy_b_map    = containers.Map('KeyType', 'int32', 'ValueType', 'any');
+            obj.dz_b_map    = containers.Map('KeyType', 'int32', 'ValueType', 'any');
             
-            obj.area_map = containers.Map('KeyType', 'int32', 'ValueType', 'any');
-            obj.mask_map = containers.Map('KeyType', 'int32', 'ValueType', 'any');
+            obj.area_map    = containers.Map('KeyType', 'int32', 'ValueType', 'any');
+            obj.mask_map    = containers.Map('KeyType', 'int32', 'ValueType', 'any');
             
             dxf_map = containers.Map('KeyType', 'int32', 'ValueType', 'any');
             dxb_map = containers.Map('KeyType', 'int32', 'ValueType', 'any');
@@ -87,7 +88,6 @@ classdef Grid
             end
         end
 
-        
         function ierr = set_grid_size(obj,dx,dy,dz)
             dx_3d=repmat(dx,1,1,obj.dim(3));
             dy_3d=repmat(dy,1,1,obj.dim(3));

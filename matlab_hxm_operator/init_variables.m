@@ -1,6 +1,8 @@
 aam2d=zeros(im,jm)   ;advua=zeros(im,jm)   ;advva=zeros(im,jm)   ;adx2d=zeros(im,jm)   ;
 ady2d=zeros(im,jm)   ;art=zeros(im,jm)     ;aru=zeros(im,jm)     ;arv=zeros(im,jm)     ;
-cbc=zeros(im,jm)     ;cor=zeros(im,jm)     ;d=zeros(im,jm)       ;drx2d=zeros(im,jm)   ;
+cbc=zeros(im,jm)     ;
+%cor=zeros(im,jm)     ;
+d=zeros(im,jm)       ;drx2d=zeros(im,jm)   ;
 dry2d=zeros(im,jm)   ;dt=zeros(im,jm)      ;dum=zeros(im,jm)     ;dvm=zeros(im,jm)     ;
 dx=zeros(im,jm)      ;dy=zeros(im,jm)      ;
 east_c=zeros(im,jm)  ;east_e=zeros(im,jm)  ;

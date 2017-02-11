@@ -20,19 +20,18 @@ init_variables();
 
 ierr                = init_operators(im,jm,kb);
 
-[dx,dy,dz,z,zz,dzz,east_c,north_c,rot]=init_coordinates();
-
-h                   = init_seamount(east_c,north_c);
-
 grid                = init_grid(im,jm,kb,'C');
 
+[dx,dy,dz,z,zz,dzz,east_c,north_c,rot]=init_coordinates();
+
 ierr                = set_grid_size(grid,dx,dy,dz);
+
+h                   = init_seamount(east_c,north_c);
 
 fsm(h>1.e0)=1.e0;
 ierr                = set_grid_mask(grid,fsm);
 
 cor                 = init_coriolis(grid);
-
 
 return
 

@@ -15,10 +15,10 @@ DATA_V   = rand(m, n, k);
 DATA_VB  = rand(m, n, k);
 DATA_AAM = rand(m, n, k);
 
-%gs = create_grid(m, n, k, 'C');
+gs = init_grid(m, n, k, 'C');
 
 %matlab does not support modifying an input parameter inside call
-gs = init_grid('C', dx, dy, dz);
+gs = set_grid_size(gs, dx, dy, dz);
 
 D   = create_field(DATA_D,   gs, 3);
 AAM = create_field(DATA_AAM, gs, 3);

@@ -1,5 +1,4 @@
 function cor=init_coriolis(grid)
-    global im jm
-    cor=create_field(zeros(im,jm,kb),
-    cor=;
+    global im jm kb
+    cor=create_field(zeros(im,jm,kb), grid, 3);
 end
