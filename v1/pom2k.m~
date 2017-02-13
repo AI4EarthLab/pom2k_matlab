@@ -11,255 +11,8 @@ global small pi netcdf_file iproblem mode nadv nitera ...
      horcon tprni umol hmax vmaxl slmax ntp nbct nbcs ispadv...
      smoth alpha dti dte2 dti2 iend iprint iswtch ispi isp2i;
 
-im=7; jm=5; kb=6; 
-%im=65; jm=49; kb=21;
-imm1=im-1; imm2=im-2; jmm1=jm-1; jmm2=jm-2; kbm1=kb-1; kbm2=kb-2;
-
-alpha          =0.0;dte            =0.0;dti            =0.0;dti2           =0.0;
-grav           =0.0;hmax           =0.0;kappa          =0.0;pi             =0.0;
-ramp           =0.0;rfe            =0.0;rfn            =0.0;rfs            =0.0;
-rfw            =0.0;rhoref         =0.0;sbias          =0.0;slmax          =0.0;
-small          =0.0;tbias          =0.0;time           =0.0;tprni          =0.0;
-umol           =0.0;vmaxl 		    =0.0;
-
-iint           =0;iprint         =0;iskp           =0;jskp         =0;
-kl1            =0;kl2            =0;mode           =0;ntp			=0;
-
-%     Integers defining the number of logarithmic layers at the
-%     surface and bottom (used by subroutine depth). The number of
-%     logarithmic layers are kl1-2 at the surface and kb-kl2-1
-%     at the bottom. For no log portions, set kl1=2 and kl2=kb-1:
-kl1=6;
-kl2=kb-2;
-
-source='pom2k  2006-05-03';
-
-small=1.e-9;          							% Small value
-
-pi=atan(1.0)*4.0;    							% PI
-
-title='Run 1'; 									% run's title
-
-netcdf_file='pom2k.nc';  						% netCDF output file
-
-%     Problem number:
-%     iproblem      problem      initialisation
-%                    type          subroutine
-%         1        seamount       seamount
-%         2        conservation   box
-%                  box
-%         3        IC from file   file2ic
-iproblem=1;
-
-%       mode                     description
-%        2        2-D calculation (bottom stress calculated in advave)
-%        3        3-D calculation (bottom stress calculated in profu,v)
-%        4        3-D calculation with t and s held fixed
-mode=3;
-
-%     Advection scheme:
-%      nadv     Advection scheme
-%        1       Centred scheme, as originally provide in POM
-%        2       Smolarkiewicz iterative upstream scheme, based on
-%                subroutines provided by Gianmaria Sannino and Vincenzo
-%                Artale
-nadv=1;
-
-%     Constants for Smolarkiewicz iterative upstream scheme.
-%
-%     Number of iterations. This should be in the range 1 - 4. 1 is
-%     standard upstream differencing; 3 adds 50% CPU time to POM:
-nitera=2;
-
-%     Smoothing parameter. This should preferably be 1, but 0 < sw < 1
-%     gives smoother solutions with less overshoot when nitera > 1:
-sw=0.50;
-
-%     Index to indicate whether run to start from restart file
-%     (nread=0: no restart input file; nread=1: restart input file):
-nread=0;
-
-%     External (2-D) time step (secs.) according to CFL:
-dte=6.0;
-
-%     <Internal (3-D) time step>/<External (2-D) time step> (dti/dte; dimensionless):
-isplit=30;
-
-%     Date and time of start of initial run of model in format (i.e. UDUNITS convention)
-%
-%       YYYY-MM-DD HH:MM:SS <+/->HH:MM
-%
-%     where "<+/->HH:MM" is the time zone (positive eastwards from
-%     Coordinated Universal Time). NOTE that the climatological time
-%     axis (i.e. beginning of year zero, which does not exist in the
-%     real-world calendar) has been used here. Insert your own date
-%     and time as required:
-time_start='2000-01-01 00:00:00 +00:00';
-
-
-days=0.125;       % run duration in days
-% days=1.5;       % run duration in days
-
-prtd1=0.0125;     % Initial print interval (days)
-
-prtd2=1.0;         % Final print interval (days)
-
-swtch=1000.0;      % Time to switch from prtd1 to prtd2
-
-iskp=4;             % Printout skip interval in i
-
-jskp=3;             % Printout skip interval in j
-
-%     Logical for inertial ramp (true if inertial ramp to be applied
-%     to wind stress and baroclinic forcing, otherwise false)
-lramp=false;
-
-%     Reference density (recommended values: 1025 for seawater, 1000 for freswater; S.I. units):
-rhoref=1025.0;
-
-tbias=0.0;         % Temperature bias (deg. C)
-
-sbias=0.0;         % Salinity bias
-
-grav=9.8060;       % gravity constant (S.I. units)
-
-kappa=0.40;        % von Karman's constant
-
-z0b=.010;          % Bottom roughness (metres)
-
-cbcmin=.00250;     % Minimum bottom friction coeff.
-
-cbcmax=1.0;        % Maximum bottom friction coeff.
-
-horcon=0.20;       % Smagorinsky diffusivity coeff.
-
-%     Inverse horizontal turbulent Prandtl number (ah/am; dimensionless):
-%
-%     NOTE that tprni=0.0 yields zero horizontal diffusivity!
-tprni=.20;
-
-%     Background viscosity used in subroutines profq, proft, profu and profv (S.I. units):
-umol=2.e-5;
-
-%     Maximum depth used in radiation boundary condition in subroutine bcond (metres):
-hmax=4500.0;
-
-%     Maximum magnitude of vaf (used in check that essentially tests for CFL violation):
-vmaxl=100.0;
-
-%     Maximum allowable value of:
-%
-%       <difference of depths>/<sum of depths>
-%
-%     for two adjacent cells (dimensionless). This is used in subroutine
-%     slpmax. If >= 1, then slpmax is not applied:
-slmax=2.0;
-
-
-%     Water type, used in subroutine proft.
-%       ntp    Jerlov water type
-%        1            i
-%        2            ia
-%        3            ib
-%        4            ii
-%        5            iii
-ntp=2;
-
-%     Surface temperature boundary condition, used in subroutine proft:
-%       nbct   prescribed    prescribed   short wave
-%              temperature      flux      penetration
-%        1        no           yes           no
-%        2        no           yes           yes
-%        3        yes          no            no
-%        4        yes          no            yes
-%
-nbct=1;
-
-%     Surface salinity boundary condition, used in subroutine proft:
-%       nbcs   prescribed    prescribed
-%               salinity      flux
-%        1        no           yes
-%        3        yes          no
-%     NOTE that only 1 and 3 are allowed for salinity.
-nbcs=1;
-
-%     Step interval during which external (2-D) mode advective terms are
-%     not updated (dimensionless):
-ispadv=5;
-
-%     Constant in temporal filter used to prevent solution splitting
-%     (dimensionless):
-smoth=0.100;
-
-%     Weight used for surface slope term in external (2-D) dynamic
-%     equation (a value of alpha = 0.0 is perfectly acceptable, but the
-%     value, alpha=.2250 permits a longer time step):
-alpha=0.2250;
-
-%     Initial value of aam:
-aam_init=500.0;
-
-% ramp is not assigned in fortran pom2k before used in barop
-ramp=0.0;
-
-tatm = 0.0;
-satm = 0.0;
-io = zeros(100);
-jo = zeros(100);
-ko = zeros(100);
-
-%     End of input of constants
-%***********************************************************************
-
-
-%     Calculate some constants:
-dti=dte*isplit;
-
-dte2=dte*2;
-dti2=dti*2;
-iend=max(floor(days*24.0*3600.0/dti+0.5),2);
-
-iprint=floor(prtd1*24.0*3600.0/dti+0.5);
-iswtch=floor(swtch*24.0*3600.0/dti+0.5);
-
-ispi=1.0/isplit;
-isp2i=1.0/(2.0*isplit);
-     
-aam2d=zeros(im,jm)   ;advua=zeros(im,jm)   ;advva=zeros(im,jm)   ;adx2d=zeros(im,jm)   ;
-ady2d=zeros(im,jm)   ;art=zeros(im,jm)     ;aru=zeros(im,jm)     ;arv=zeros(im,jm)     ;
-cbc=zeros(im,jm)     ;cor=zeros(im,jm)     ;d=zeros(im,jm)       ;drx2d=zeros(im,jm)   ;
-dry2d=zeros(im,jm)   ;dt=zeros(im,jm)      ;dum=zeros(im,jm)     ;dvm=zeros(im,jm)     ;
-dx=zeros(im,jm)      ;dy=zeros(im,jm)      ;east_c=zeros(im,jm)  ;east_e=zeros(im,jm)  ;
-east_u=zeros(im,jm)  ;east_v=zeros(im,jm)  ;e_atmos=zeros(im,jm) ;egb=zeros(im,jm)     ;
-egf=zeros(im,jm)     ;el=zeros(im,jm)      ;elb=zeros(im,jm)     ;elf=zeros(im,jm)     ;
-et=zeros(im,jm)      ;etb=zeros(im,jm)     ;etf=zeros(im,jm)     ;fluxua=zeros(im,jm)  ;
-fluxva=zeros(im,jm)  ;fsm=zeros(im,jm)     ;h=zeros(im,jm)       ;north_c=zeros(im,jm) ;
-north_e=zeros(im,jm) ;north_u=zeros(im,jm) ;north_v=zeros(im,jm) ;psi=zeros(im,jm)     ;
-rot=zeros(im,jm)     ;ssurf=zeros(im,jm)   ;swrad=zeros(im,jm)   ;vfluxb=zeros(im,jm)  ;
-tps=zeros(im,jm)     ;tsurf=zeros(im,jm)   ;ua=zeros(im,jm)      ;vfluxf=zeros(im,jm)  ;
-uab=zeros(im,jm)     ;uaf=zeros(im,jm)     ;utb=zeros(im,jm)     ;utf=zeros(im,jm)     ;
-va=zeros(im,jm)      ;vab=zeros(im,jm)     ;vaf=zeros(im,jm)     ;
-vtb=zeros(im,jm)     ;vtf=zeros(im,jm)     ;wssurf=zeros(im,jm)  ;wtsurf=zeros(im,jm)  ;
-wubot=zeros(im,jm)   ;wusurf=zeros(im,jm)  ;wvbot=zeros(im,jm)   ;wvsurf=zeros(im,jm)  ;
-wubot1=zeros(im,jm)  ;wvbot1=zeros(im,jm)  ;
-
-aam=zeros(im,jm,kb)  ;advx=zeros(im,jm,kb) ;advy=zeros(im,jm,kb) ;a=zeros(im,jm,kb)    ;
-c=zeros(im,jm,kb)    ;drhox=zeros(im,jm,kb);drhoy=zeros(im,jm,kb);dtef=zeros(im,jm,kb) ;
-ee=zeros(im,jm,kb)   ;gg=zeros(im,jm,kb)   ;kh=zeros(im,jm,kb)   ;km=zeros(im,jm,kb)   ;
-kq=zeros(im,jm,kb)   ;l=zeros(im,jm,kb)    ;q2b=zeros(im,jm,kb)  ;q2=zeros(im,jm,kb)   ;
-q2lb=zeros(im,jm,kb) ;q2l=zeros(im,jm,kb)  ;rho=zeros(im,jm,kb)  ;rmean=zeros(im,jm,kb);
-sb=zeros(im,jm,kb)   ;sclim=zeros(im,jm,kb);s=zeros(im,jm,kb)    ;tb=zeros(im,jm,kb)   ;
-tclim=zeros(im,jm,kb);t=zeros(im,jm,kb)    ;ub=zeros(im,jm,kb)   ;uf=zeros(im,jm,kb)   ;
-u=zeros(im,jm,kb)    ;vb=zeros(im,jm,kb)   ;vf=zeros(im,jm,kb)   ;v=zeros(im,jm,kb)    ;
-w=zeros(im,jm,kb)    ;zflux=zeros(im,jm,kb);
-
-ele=zeros(1,jm)      ;eln=zeros(1,im)      ;els=zeros(1,im)      ;elw=zeros(1,jm)      ;
-sbe=zeros(jm,kb)     ;sbn=zeros(im,kb)     ;sbs=zeros(im,kb)     ;sbw=zeros(jm,kb)     ;
-tbe=zeros(jm,kb)     ;tbn=zeros(im,kb)     ;tbs=zeros(im,kb)     ;tbw=zeros(jm,kb)     ;
-uabe=zeros(1,jm)     ;uabw=zeros(1,jm)     ;ube=zeros(jm,kb)     ;ubw=zeros(jm,kb)     ;
-vabn=zeros(1,im)     ;vabs=zeros(1,im)     ;vbn=zeros(im,kb)     ;vbs=zeros(im,kb)     ;
-
-d_3d=zeros(im,jm,kb) ;dt_3d=zeros(im,jm,kb);
+init_constants();
+init_variables();
 
 if(iproblem ~= 3)
     [z,zz,dz,dzz,z_3d,zz_3d,dz_3d,dzz_3d]=depth(im, jm, kb, kl1, kl2);
@@ -309,11 +62,12 @@ else
     return
 end
 
-% save('grid.mat','im','jm','kb','imm1','imm2','jmm1','jmm2','kbm1','kbm2','kl1','kl2',...
-%                 'z','zz','dz','dzz','z_3d','zz_3d','dz_3d','dzz_3d',...
-%                 'dx','dy','dz','art','aru','arv','art','aru','arv','fsm','dum','dvm',...
-%                 'dx_3d','dy_3d','art_3d','aru_3d','arv_3d','art_3d','aru_3d','arv_3d','fsm_3d','dum_3d','dvm_3d');
+% create grid and setup the grid size
+global gs
+gs = create_grid(im, jm, kb, 'C');
+gs = init_grid(gs, dx_3d, dy_3d, dz_3d);
 
+init_fields();
 %     Inertial period for temporal filter:
 period=(2.0*pi)/abs(cor(floor(im/2),floor(jm/2)))/86400.0;
 
@@ -344,7 +98,7 @@ q2lb        = l.*q2b;
 kh          = l.*sqrt(q2b);
 km          = kh;
 kq          = kh;
-aam(:,:,:)= aam_init;
+aam(:,:,:)  = aam_init;
 
 q2 =q2b;
 q2l=q2lb;
@@ -354,13 +108,18 @@ u  =ub;
 v  =vb;
 
 [rho]=dens(s,t,h_3d,fsm_3d);
-                      
-[rho,drhox,drhoy] = baropg(rho, rmean, dt, ramp);
 
-for k=1:kbm1
-    drx2d=drx2d+drhox(:,:,k)*dz(k);
-    dry2d=dry2d+drhoy(:,:,k)*dz(k);
-end
+                      
+[rho,drhox,drhoy] = baropg(rho, rmean, dt_3d, ramp);
+
+
+% % % for k=1:kbm1
+% % %     drx2d=drx2d+drhox(:,:,k)*dz(k);
+% % %     dry2d=dry2d+drhoy(:,:,k)*dz(k);
+% % % end
+
+drx2d=SUMZ(drhox.*dz_3d);
+dry2d=SUMZ(drhoy.*dz_3d);
 
 %     Calculate bottom friction coefficient:
 cbc=(kappa./log((1.0+zz(kbm1))*h/z0b)).^2;
@@ -369,7 +128,6 @@ cbc=max(cbcmin,cbc);
 %     choice of z0b or vertical spacing has been made:
 cbc=min(cbcmax,cbc);
 
-%
 %     Calculate external (2-D) CFL time step:
 tps=0.5./sqrt(1.0./dx.^2+1.0./dy.^2) ./ sqrt(grav*(h+small)) .* fsm;
 
@@ -412,7 +170,6 @@ for iint=1:iend
     for j=2:jmm1
         for i=2:imm1
             if(iproblem~=3) % constant wind read in file2ic
-                
     %           wusurf(i,j)=ramp*(1.e-4*cos(pi*(j-1)/jmm1));
                 wusurf(i,j)=1.00*(1.e-4*cos(pi*(j-1)/jmm1))  ...
                     *0.25*(dvm(i,j+1)+dvm(i-1,j+1)     ...
@@ -481,10 +238,10 @@ for iint=1:iend
 % % %         [rho,drhox,drhoy] = baropg(rho,drhox,drhoy,...
 % % %             im,jm,imm1,jmm1,kb,kbm1,grav,...
 % % %             zz,dt,dum,dvm,ramp,rmean,dx,dy);   
-        [rho,drhox,drhoy] = baropg(rho, rmean, dt, ramp);   
-     
-        aam=horcon .* dx_3d .* dy_3d .*sqrt( (DXF(u)./dx_3d).^2 + (DYF(v)./dy_3d).^2    ...
-                +0.5*( DYB(AYF(AXF(u)))./dy_3d + DXB(AXF(AYF(v)))./dx_3d).^2 );
+        [rho,drhox,drhoy] = baropg(rho, rmean, dt_3d, ramp);   
+%         aam=horcon .* dx_3d .* dy_3d .*sqrt( (DXF(u)./dx_3d).^2 + (DYF(v)./dy_3d).^2    ...
+%                 +0.5*( DYB(AYF(AXF(u)))./dy_3d + DXB(AXF(AYF(v)))./dx_3d).^2 );     
+        aam=horcon .* sqrt( DXF(u).^2 + DYF(v).^2 +0.5*DYB(AYF(AXF(u)))+ DXB(AXF(AYF(v))).^2 );
         aam(:,1,:)=aam_init;
         aam(:,jm,:)=aam_init;
         aam(1,:,:)=aam_init;
