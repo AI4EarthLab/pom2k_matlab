@@ -168,7 +168,11 @@ classdef Field
         function r = abs(a)
             r = Field(abs(a.data), a.grid, a.pos);
         end
-        
+    
+        function [vamax, vapos] = field_max(a)
+            [vamax, vapos] = max(a.data);
+        end
+
         function r = max(a, b)
             grid = get_valid_grid(a, b);
             pos = get_valid_pos(a, b);
@@ -180,7 +184,11 @@ classdef Field
             pos = get_valid_pos(a, b);
             r = Field(min(double(a), double(b)), grid, pos);
         end
-        
+      
+        function r = size(a)
+            r = Field(size(a.data), a.grid, a.pos);
+        end
+
         function r = repmat(a, varargin)
             switch(length(varargin))
               case 1

@@ -379,7 +379,7 @@ for iint=1:iend
 %             end
 %         end
         
-        [vamax, vapos]=max(abs(vaf(:)));
+        [vamax, vapos]=field_max(abs(vaf(:)));
         [imax, jmax]=ind2sub(size(vaf), vapos);
 %         fprintf('diff_vmax:%.18f\n', vamax-vamax);
 %         fprintf('diff_imax:%d\n', imax1-imax);
@@ -427,7 +427,7 @@ for iint=1:iend
 %             end
 %?
             tps=sum(u(:,:,1:kbm1).*dz_3d(:,:,1:kbm1), 3);
-            
+            tps1=sum(u.*dz_3d, 3);            
 %             for k=1:kbm1
 %                 u(:,:,k)=(u(:,:,k)-tps)+   DIVISION((utb+utf), 2.0*AXB(dt));
 %             end
