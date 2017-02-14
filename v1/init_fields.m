@@ -23,6 +23,7 @@ advua   = create_field(zeros(im,jm,1),   gs, 2);
 advva   = create_field(zeros(im,jm,1),   gs, 1);
 curv2d  = create_field(zeros(im,jm,1),   gs, 3);
 
+
 drhox   = create_field(zeros(im,jm,kb),   gs, 2);
 drhoy   = create_field(zeros(im,jm,kb),   gs, 1);
 

@@ -150,11 +150,11 @@ classdef Field
         end   
         
         function r = ctranspose(a)            
-            r = Field(a.var', a.grid, a.pos);
+            r = Field(a.data', a.grid, a.pos);
         end 
  
         function r = transpose(a)            
-            r = Field(a.var.', a.grid, a.pos);
+            r = Field(a.data.', a.grid, a.pos);
         end 
 
         function r = uminus(a)
