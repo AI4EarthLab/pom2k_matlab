@@ -1,3 +1,4 @@
+
 function [elf,uaf,vaf,uf,vf,w] = bcond(idx,elf,uaf,vaf,uf,vf,w,...
                                  im,jm,kb,imm1,jmm1,kbm1,...
                                  fsm,grav,ramp,rfe,h,uabe,ele,el,uabw,rfw,elw,rfn,eln,vabs,rfs,els,...
@@ -70,7 +71,6 @@ function [elf,uaf,vaf,uf,vf,w] = bcond(idx,elf,uaf,vaf,uf,vf,w,...
 
 
 % **********************************************************************
-global fsm_3d
 
 if(idx==1)
     %
@@ -87,79 +87,81 @@ if(idx==1)
     %
     %     Elevation (in this application, elevation is not a primary
     %     boundary condition):
+    %
     
-    %%%%%%%%%%%%%%%%%%%%%%%%
-    %     |0 0 ... 0 0|      |0 1 ... 0 0|
-    %     |1 1 ... 0 0|      |0 1 ... 0 0|
-    % R = |0 0 1 ... 0|  L = |0 0 1 ... 0|
-    %     |0 0 ... 1 1|      |0 0 ... 1 0|
-    %     |0 0 ... 0 0|      |0 0 ... 1 0|
-    %%%%%%%%%%%%%%%%%%%%%%%%
-%     L = eye(im);
-%     R = eye(jm);
-%     elf = (L * elf) * R;
-%     elf = elf .* fsm;   
-    elf(1, :) = elf(2, :);
-    elf(im, :) = elf(imm1, :);
-    elf(:, 1) = elf(:, 2);
-    elf(:, jm) = elf(:, jmm1);
-    elf = elf .* fsm; 
+    for j=1:jm
+        elf(1,j)=elf(2,j);
+        elf(im,j)=elf(imm1,j);
+    end
+    %
+    for i=1:im
+        elf(i,1)=elf(i,2);
+        elf(i,jm)=elf(i,jmm1);
+    end
+    %
+    for j=1:jm
+        for i=1:im
+            elf(i,j)=elf(i,j)*fsm(i,j);
+        end
+    end
+    %
     return
-    
+    %
 elseif(idx==2)
     %
     %     External (2-D) velocity:
-      tmph = h;
-      tmpel = el;
-      tmph(im, :) = tmph(imm1, :);
-      tmpel(im, :) = tmpel(imm1, :);
-      uab1 = repmat(uabe, im, 1);
-      el1 = repmat(ele, im, 1);
-      tmpuaf = uab1 + rfe .* sqrt(grav ./(tmph)) .* (tmpel - el1);
-      tmpuaf = ramp .* tmpuaf;
-      uaf(im, 2:jmm1) = tmpuaf(im, 2:jmm1);
-     
-      
-      tmph(1, :) = tmph(2, :);
-      tmpel(1, :) = tmpel(2, :);
-      uab2 = repmat(uabw, im, 1);
-      el2 = repmat(elw, im, 1);
-      tmpuaf = uab2 - rfw .* sqrt(grav ./(tmph)) .* (tmpel - el2);
-      tmpuaf = ramp .* tmpuaf;
-      uaf(1, 2:jmm1) = tmpuaf(1, 2:jmm1);
-      uaf(2, 2:jmm1) = tmpuaf(1, 2:jmm1);
-      
-      vaf(im, 2:jmm1) = 0.e0;
-      vaf(1, 2:jmm1) = 0.e0;
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-      tmph = h;
-      tmpel = el;
-      tmph(:, jm) = tmph(:, jmm1);
-      tmpel(:, jm) = tmpel(:, jmm1);
-      vab1 = repmat(vabn, jm, 1);
-      vab1 = vab1';
-      el3 = repmat(eln, jm, 1);
-      el3 = el3';
-      tmpvaf = vab1 + rfn .* sqrt(grav./(tmph)).*(tmpel - el3);
-      tmpvaf = ramp .* tmpvaf;
-      vaf(2:imm1, jm) = tmpvaf(2:imm1, jm);
-      
-      tmph(:, 1) = tmph(:, 2);
-      tmpel(:, 1) = tmpel(:, 2);
-      vab2 = repmat(vabs, jm, 1);
-      vab2 = vab2';
-      el4 = repmat(els, jm, 1);
-      el4 = el4';
-      tmpvaf = vab2 - rfs .* sqrt(grav./(tmph)).*(tmpel - el4);
-      tmpvaf = ramp .* tmpvaf;
-      vaf(2:imm1, 1) = tmpvaf(2:imm1, 1);
-      vaf(2:imm1, 2) = tmpvaf(2:imm1, 1);
-      
-      uaf(2:imm1, jm) = 0.e0;
-      uaf(2:imm1, 1) = 0.e0;
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    uaf(:,:) = uaf(:,:) .* dum(:,:);
-    vaf(:,:) = vaf(:,:) .* dvm(:,:);
+    %
+    for j=2:jmm1
+        %
+        %     East:
+        %
+        uaf(im,j)=uabe(j)...
+            +rfe*sqrt(grav/h(imm1,j))     ...
+            *(el(imm1,j)-ele(j));
+        uaf(im,j)=ramp*uaf(im,j);
+        vaf(im,j)=0.e0;
+        %
+        %     West:
+        %
+        uaf(2,j)=uabw(j)     ...
+            -rfw*sqrt(grav/h(2,j))     ...
+            *(el(2,j)-elw(j));
+        uaf(2,j)=ramp*uaf(2,j);
+        uaf(1,j)=uaf(2,j);
+        vaf(1,j)=0.0;
+        %
+    end
+    %
+    for i=2:imm1
+        %
+        %     North:
+        %
+        vaf(i,jm)=vabn(i)     ...
+            +rfn*sqrt(grav/h(i,jmm1))     ...
+            *(el(i,jmm1)-eln(i));
+        vaf(i,jm)=ramp*vaf(i,jm);
+        uaf(i,jm)=0.e0;
+        %
+        %     South:
+        %
+        vaf(i,2)=vabs(i)     ...
+            -rfs*sqrt(grav/h(i,2))     ...
+            *(el(i,2)-els(i));
+        vaf(i,2)=ramp*vaf(i,2);
+        vaf(i,1)=vaf(i,2);
+        uaf(i,1)=0.e0;
+        %
+    end
+    %
+    %for j=1:jm
+    %    for i=1:im
+    %        uaf(i,j)=uaf(i,j)*dum(i,j);
+    %        vaf(i,j)=vaf(i,j)*dvm(i,j);
+    %    end
+    %end
+    uaf = uaf.*dum;
+    vaf = vaf.*dvm;
+    %
     return
     %
 elseif(idx==3)
@@ -170,365 +172,243 @@ elseif(idx==3)
     %
     %     Velocity (radiation conditions; smoothing is used in the direction
     %     tangential to the boundaries):
-      h_3d = repmat(h, 1, 1, kb);
-      tmpu1 = u(imm1, :, :);
-      tmpu2 = u(im, :, :);
-      tmpga = sqrt(h_3d(im, :, :) ./ hmax);
-      
-      tmpuf = tmpga .* (AXF1(AXB1(tmpu1))) + (1.e0 - tmpga) .* (AXF1(AXB1(tmpu2)));
-      uf(im, 2:jmm1, 1:kbm1) = tmpuf(1, 2:jmm1, 1:kbm1);
-      vf(im, 2:jmm1, 1:kbm1) = 0.e0;
-      
-      tmpu1 = u(3, :, :);
-      tmpu2 = u(2, :, :);
-      tmpga = sqrt(h_3d(1, :, :) ./ hmax);
-      
-      tmpuf = tmpga .* (AXF1(AXB1(tmpu1))) + (1.e0 - tmpga) .* (AXF1(AXB1(tmpu2)));
-      uf(2, 2:jmm1, 1:kbm1) = tmpuf(1, 2:jmm1, 1:kbm1);
-      uf(1, 2:jmm1, 1:kbm1) = tmpuf(1, 2:jmm1, 1:kbm1);
-      vf(1, 2:jmm1, 1:kbm1) = 0.e0;
-      
-   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%    
-
-      tmpv1 = v(:, jmm1, :);
-      tmpv2 = v(:, jm, :);
-      tmpga = sqrt(h_3d(:, jm, :) ./ hmax);
-      
-      tmpvf = tmpga .* (AXF2(AXB2(tmpv1))) + (1.e0 - tmpga) .* (AXF2(AXB2(tmpv2)));
-      vf(2:imm1, jm, 1:kbm1) = tmpvf(2:imm1,1,1:kbm1);
-      uf(2:imm1, jm, 1:kbm1) = 0.e0;
-      
-      tmpv1 = v(:, 3, :);
-      tmpv2 = v(:, 2, :);
-      tmpga = sqrt(h_3d(:, 1, :) ./ hmax);
-      
-      tmpvf = tmpga .* (AXF2(AXB2(tmpv1))) + (1.e0 - tmpga) .* (AXF2(AXB2(tmpv2)));
-      vf(2:imm1, 2, 1:kbm1) = tmpvf(2:imm1,1,1:kbm1);
-      vf(2:imm1, 1, 1:kbm1) = tmpvf(2:imm1,1,1:kbm1);
-      uf(2:imm1, 1, 1:kbm1) = 0.e0;
-    
- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-     tmpdum=repmat(dum,1,1,kb);
-     tmpdvm=repmat(dvm,1,1,kb);
-     
-     tmpdum(:, :, kb) = 1.e0;
-     tmpdvm(:, :, kb) = 1.e0;
-     
-     uf = uf .* tmpdum;
-     vf = vf .* tmpdvm;
-
+    %
+    for k=1:kbm1
+        for j=2:jmm1
+            %
+            %     East:
+            %
+            ga=sqrt(h(im,j)/hmax);
+            uf(im,j,k)=ga*(.25e0*u(imm1,j-1,k)+.5e0*u(imm1,j,k)     ...
+                +.25e0*u(imm1,j+1,k))     ...
+                +(1.e0-ga)*(.25e0*u(im,j-1,k)+.5e0*u(im,j,k)     ...
+                +.25e0*u(im,j+1,k));
+            vf(im,j,k)=0.e0;
+            %
+            %     West:
+            %
+            ga=sqrt(h(1,j)/hmax);
+            uf(2,j,k)=ga*(.25e0*u(3,j-1,k)+.5e0*u(3,j,k)     ...
+                +.25e0*u(3,j+1,k))     ...
+                +(1.0-ga)*(.25e0*u(2,j-1,k)+.5e0*u(2,j,k)     ...
+                +.25e0*u(2,j+1,k));
+            uf(1,j,k)=uf(2,j,k);
+            vf(1,j,k)=0.e0;
+        end
+    end
+    %
+    for k=1:kbm1
+        for i=2:imm1
+            %
+            %     North:
+            %
+            ga=sqrt(h(i,jm)/hmax);
+            vf(i,jm,k)=ga*(0.25*v(i-1,jmm1,k)+0.5*v(i,jmm1,k)     ...
+                +0.25*v(i+1,jmm1,k))     ...
+                +(1.0-ga)*(0.25*v(i-1,jm,k)+0.5*v(i,jm,k)     ...
+                +0.25*v(i+1,jm,k));
+            uf(i,jm,k)=0.0;
+            %
+            %     South:
+            %
+            ga=sqrt(h(i,1)/hmax);
+            vf(i,2,k)=ga*(.25e0*v(i-1,3,k)+.5e0*v(i,3,k)     ...
+                +.25e0*v(i+1,3,k))     ...
+                +(1.0-ga)*(.25e0*v(i-1,2,k)+.5e0*v(i,2,k)     ...
+                +.25e0*v(i+1,2,k));
+            vf(i,1,k)=vf(i,2,k);
+            uf(i,1,k)=0.e0;
+        end
+    end
+    %
+    for k=1:kbm1
+        for j=1:jm
+            for i=1:im
+                uf(i,j,k)=uf(i,j,k)*dum(i,j);
+                vf(i,j,k)=vf(i,j,k)*dvm(i,j);
+            end
+        end
+    end
+    %
     return
     %
 elseif(idx==4)
     %
     %     Temperature and salinity boundary conditions (using uf and vf:
     %     respectively):
-    %      
-     dx_3d = repmat(dx, 1, 1, kb);
-     dt_3d = repmat(dt, 1, 1, kb);
-     tmpdtx = dt_3d(imm1, :, :);
-     tmpdx1 = dx_3d(im, :, :);
-     tmpdx2 = dx_3d(imm1, :, :);  
-     tmpzzx = zeros(1, jm, kb);
-     tmpzzx(1,:,:) = repmat(zz, jm, 1);
-     
-     B1x = zeros(1, jm, kb);
-     B2x = zeros(1, jm ,kb);
-     
-     tmpu1x = (2.e0 .* u(im, :, :) .* dti) ./ (tmpdx1 + tmpdx2);
-     A1x = tmpu1x;
-     A2x = tmpu1x;
-     
-     A1x(tmpu1x > 0.e0) = 0.e0;
-     A1x(tmpu1x <= 0.e0) = 1.e0;
-     A2x(tmpu1x > 0.e0) = 1.e0;
-     A2x(tmpu1x <= 0.e0) = 0.e0;
-     B1x(:,:,2:kb-2) = 1.e0;
-     B2x(B1x < .9e0) = 1.e0;
-
-     tmptbe(1,:,:) = tbe;
-     tmpsbe(1,:,:) = sbe;
-     
-     tmpt1x = t(im, :, :) - tmpu1x .* (tmptbe - t(im, :, :));
-     tmps1x = s(im, :, :) - tmpu1x .* (tmpsbe - s(im, :, :));
-     
-     tmpt2x = t(im, :, :) - tmpu1x .* (t(im, :, :) - t(imm1, :, :));
-     tmps2x = s(im, :, :) - tmpu1x .* (s(im, :, :) - s(imm1, :, :));
-     
-     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-     %       |1  1  0 ...   0  0|
-     %       |0  0  1 ...   0  0|
-     % R1 =  |0 -1  0 ...   1  0|
-     %       |0  0 -1 ...   0  0|
-     %       |0  0  0 ...  -1  1|
-     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-     tmpwmx = AZF1(w(imm1, :, :)) .* dti ./ (Rk1(tmpzzx) .* tmpdtx);
-     tmpt3x = tmpt2x - tmpwmx .*  (Rk1(t(imm1, :, :)));
-     tmps3x = tmps2x - tmpwmx .* (Rk1(s(imm1, :, :)));
-     
-     tmptx = tmpt1x .* A1x + (tmpt2x .* B2x + B1x .* tmpt3x).*A2x;
-     tmpsx = tmps1x .* A1x + (tmps2x .* B2x + B1x .* tmps3x).*A2x;
-     
-     uf(im, 1:jm, 1:kbm1) = tmptx(1, :, 1:kbm1);
-     vf(im, 1:jm, 1:kbm1) = tmpsx(1, :, 1:kbm1);
-
-     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-     
-     tmpdtx = dt_3d(2, :, :);   
-     tmpdx1 = dx_3d(1, :, :);
-     tmpdx2 = dx_3d(2, :, :);
-     
-     tmpu1x = (2.e0 .* u(2, :, :) .* dti) ./ (tmpdx1 + tmpdx2);
-     A1x = tmpu1x;
-     A2x = tmpu1x;
-     
-     A1x(tmpu1x >= 0.e0) = 1.e0;
-     A1x(tmpu1x < 0.e0) = 0.e0;
-     A2x(tmpu1x >= 0.e0) = 0.e0;
-     A2x(tmpu1x < 0.e0) = 1.e0;
-     
-     tmptbw(1,:,:) = tbw;
-     tmpsbw(1,:,:) = sbw;
-     
-     tmpt1x = t(1, :, :) - tmpu1x .* (t(1, :, :) - tmptbw);
-     tmps1x = s(1, :, :) - tmpu1x .* (s(1, :, :) - tmpsbw);
-     
-     tmpt2x = t(1, :, :) - tmpu1x .* (t(2, :, :) - t(1, :, :));
-     tmps2x = s(1, :, :) - tmpu1x .* (s(2, :, :) - s(1, :, :));
-     
-     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-     %       |1  1  0 ...   0  0|
-     %       |0  0  1 ...   0  0|
-     % R1 =  |0 -1  0 ...   1  0|
-     %       |0  0 -1 ...   0  0|
-     %       |0  0  0 ...  -1  1|
-     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-     
-     tmpwmx = AZF1(w(2, :, :)) .* dti ./ (Rk1(tmpzzx) .* tmpdtx);
-     tmpt3x = tmpt2x - tmpwmx .* (Rk1(t(2, :, :)));
-     tmps3x = tmps2x - tmpwmx .* (Rk1(s(2, :, :)));
-     
-     tmptx = tmpt1x .* A1x + (tmpt2x .* B2x + B1x .* tmpt3x).*A2x;
-     tmpsx = tmps1x .* A1x + (tmps2x .* B2x + B1x .* tmps3x).*A2x;
-     
-     uf(1, 1:jm, 1:kbm1) = tmptx(1, :, 1:kbm1);
-     vf(1, 1:jm, 1:kbm1) = tmpsx(1, :, 1:kbm1);
-     
-     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-     
-     dy_3d = repmat(dy, 1, 1, kb);
-     tmpdty = dt_3d(:, jmm1, :); 
-     tmpdy1 = dy_3d(:, jm, :);
-     tmpdy2 = dy_3d(:, jmm1, :);
-     tmpzzy(:,1,:) = repmat(zz, im, 1);
-
-     B1y = zeros(im, 1, kb);
-     B2y = zeros(im, 1, kb);
-   
-     tmpu1y = (2.e0 .* v(:, jm, :) .* dti) ./ (tmpdy1 + tmpdy2);
-     A1y = tmpu1y;
-     A2y = tmpu1y;
-     
-     A1y(tmpu1y > 0.e0) = 0.e0;
-     A1y(tmpu1y <= 0.e0) = 1.e0;
-     A2y(tmpu1y > 0.e0) = 1.e0;
-     A2y(tmpu1y <= 0.e0) = 0.e0;
-     B1y(:,:, 2:kb-2) = 1;
-     B2y(B1y < .9e0) = 1;
-
-     tmptbn(:,1,:) = tbn;
-     tmpsbn(:,1,:) = sbn;
-     
-     tmpt1y = t(:, jm, :) - tmpu1y .* (tmptbn - t(:, jm, :));
-     tmps1y = s(:, jm, :) - tmpu1y .* (tmpsbn - s(:, jm, :));
-     
-     tmpt2y = t(:, jm, :) - tmpu1y .* (t(:, jm, :) - t(:, jmm1, :));
-     tmps2y = s(:, jm, :) - tmpu1y .* (s(:, jm, :) - s(:, jmm1, :));
-     
-     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-     %       |1  1  0 ...   0  0|
-     %       |0  0  1 ...   0  0|
-     % R1 =  |0 -1  0 ...   1  0|
-     %       |0  0 -1 ...   0  0|
-     %       |0  0  0 ...  -1  1|
-     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-     tmpwmy = AZF(w(:, jmm1, :)) .* dti ./ (Rk2(tmpzzy) .* tmpdty);
-     tmpt3y = tmpt2y - tmpwmy .* (Rk2(t(:, jmm1, :)));
-     tmps3y = tmps2y - tmpwmy .* (Rk2(s(:, jmm1, :)));
-     
-     tmpty = tmpt1y .* A1y + (tmpt2y .* B2y + B1y .* tmpt3y).*A2y;
-     tmpsy = tmps1y .* A1y + (tmps2y .* B2y + B1y .* tmps3y).*A2y;
-
-     uf(1:im, jm, 1:kbm1) = tmpty(:,1, 1:kbm1);
-     vf(1:im, jm, 1:kbm1) = tmpsy(:,1, 1:kbm1);       
-     
-     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-     tmpdty = dt_3d(:, 2, :);     
-     tmpdy1 = dy_3d(:, 1, :);
-     tmpdy2 = dy_3d(:, 2, :);
-     
-     tmpu1y = (2.e0 .* v(:, 2, :) .* dti) ./ (tmpdy1 + tmpdy2);
-     A1y = tmpu1y;
-     A2y = tmpu1y;
-     
-     A1y(tmpu1y >= 0.e0) = 1.e0;
-     A1y(tmpu1y < 0.e0) = 0.e0;
-     A2y(tmpu1y >= 0.e0) = 0.e0;
-     A2y(tmpu1y < 0.e0) = 1.e0;
-     
-     tmptbs(:,1,:) = tbs;
-     tmpsbs(:,1,:) = sbs;
-     
-     tmpt1y = t(:, 1, :) - tmpu1y .* (t(:, 1, :) - tmptbs);
-     tmps1y = s(:, 1, :) - tmpu1y .* (s(:, 1, :) - tmpsbs);
-     
-     tmpt2y = t(:, 1, :) - tmpu1y .* (t(:, 2, :) - t(:, 1, :));
-     tmps2y = s(:, 1, :) - tmpu1y .* (s(:, 2, :) - s(:, 1, :));
-     
-     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-     %       |1  1  0 ...   0  0|
-     %       |0  0  1 ...   0  0|
-     % R1 =  |0 -1  0 ...   1  0|
-     %       |0  0 -1 ...   0  0|
-     %       |0  0  0 ...  -1  1|
-     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-     
-     tmpwmy = AZF(w(:, 2, :)) .* dti ./ (Rk2(tmpzzy) .* tmpdty);
-     tmpt3y = tmpt2y - tmpwmy .* (Rk2(t(:, 2, :)));
-     tmps3y = tmps2y - tmpwmy .* (Rk2(s(:, 2, :)));
-     
-     tmpty = tmpt1y .* A1y + (tmpt2y .* B2y + B1y .* tmpt3y).*A2y;
-     tmpsy = tmps1y .* A1y + (tmps2y .* B2y + B1y .* tmps3y).*A2y;
-     
-     uf(1:im, 1, 1:kbm1) = tmpty(:,1, 1:kbm1);
-     vf(1:im, 1, 1:kbm1) = tmpsy(:,1, 1:kbm1); 
-     
-     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-     
-     tmpfsm = repmat(fsm, 1, 1, kb);
-     tmpfsm(:, :, kb) = 1;
-     
-     uf = uf .* tmpfsm;
-     vf = vf .* tmpfsm;           
-            
+    %
+    for k=1:kbm1
+        for j=1:jm
+            %
+            %     East:
+            %
+            u1=2.e0*u(im,j,k)*dti/(dx(im,j)+dx(imm1,j));
+            if(double(u1<=0.e0))
+                uf(im,j,k)=t(im,j,k)-u1*(tbe(j,k)-t(im,j,k));
+                vf(im,j,k)=s(im,j,k)-u1*(sbe(j,k)-s(im,j,k));
+            else
+                uf(im,j,k)=t(im,j,k)-u1*(t(im,j,k)-t(imm1,j,k));
+                vf(im,j,k)=s(im,j,k)-u1*(s(im,j,k)-s(imm1,j,k));
+                if(k~=1 && k~=kbm1)
+                    wm=.5e0*(w(imm1,j,k)+w(imm1,j,k+1))*dti     ...
+                        /((zz(k-1)-zz(k+1))*dt(imm1,j));
+                    uf(im,j,k)=uf(im,j,k)-wm*(t(imm1,j,k-1)-t(imm1,j,k+1));
+                    vf(im,j,k)=vf(im,j,k)-wm*(s(imm1,j,k-1)-s(imm1,j,k+1));
+                end
+            end
+            %
+            %     West:
+            %
+            u1=2.e0*u(2,j,k)*dti/(dx(1,j)+dx(2,j));
+            if(double(u1>=0.0))
+                uf(1,j,k)=t(1,j,k)-u1*(t(1,j,k)-tbw(j,k));
+                vf(1,j,k)=s(1,j,k)-u1*(s(1,j,k)-sbw(j,k));
+            else
+                uf(1,j,k)=t(1,j,k)-u1*(t(2,j,k)-t(1,j,k));
+                vf(1,j,k)=s(1,j,k)-u1*(s(2,j,k)-s(1,j,k));
+                if(k~=1 && k~=kbm1)
+                    wm=.5e0*(w(2,j,k)+w(2,j,k+1))*dti     ...
+                        /((zz(k-1)-zz(k+1))*dt(2,j));
+                    uf(1,j,k)=uf(1,j,k)-wm*(t(2,j,k-1)-t(2,j,k+1));
+                    vf(1,j,k)=vf(1,j,k)-wm*(s(2,j,k-1)-s(2,j,k+1));
+                end
+            end
+        end
+    end
+    %
+    for k=1:kbm1
+        for i=1:im
+            %
+            %     North:
+            %
+            u1=2.e0*v(i,jm,k)*dti/(dy(i,jm)+dy(i,jmm1));
+            if(double(u1<=0.0))
+                uf(i,jm,k)=t(i,jm,k)-u1*(tbn(i,k)-t(i,jm,k));
+                vf(i,jm,k)=s(i,jm,k)-u1*(sbn(i,k)-s(i,jm,k));
+            else
+                uf(i,jm,k)=t(i,jm,k)-u1*(t(i,jm,k)-t(i,jmm1,k));
+                vf(i,jm,k)=s(i,jm,k)-u1*(s(i,jm,k)-s(i,jmm1,k));
+                if(k~=1 && k~=kbm1)
+                    wm=.5e0*(w(i,jmm1,k)+w(i,jmm1,k+1))*dti     ...
+                        /((zz(k-1)-zz(k+1))*dt(i,jmm1));
+                    uf(i,jm,k)=uf(i,jm,k)-wm*(t(i,jmm1,k-1)-t(i,jmm1,k+1));
+                    vf(i,jm,k)=vf(i,jm,k)-wm*(s(i,jmm1,k-1)-s(i,jmm1,k+1));
+                end
+            end
+            %
+            %     South:
+            %
+            u1=2.e0*v(i,2,k)*dti/(dy(i,1)+dy(i,2));
+            if(double(u1>=0.e0))
+                uf(i,1,k)=t(i,1,k)-u1*(t(i,1,k)-tbs(i,k));
+         
+                vf(i,1,k)=s(i,1,k)-u1*(s(i,1,k)-sbs(i,k));
+            else
+                uf(i,1,k)=t(i,1,k)-u1*(t(i,2,k)-t(i,1,k));
+                vf(i,1,k)=s(i,1,k)-u1*(s(i,2,k)-s(i,1,k));
+                if(k~=1 && k~=kbm1)
+                    wm=.5e0*(w(i,2,k)+w(i,2,k+1))*dti     ...
+                        /((zz(k-1)-zz(k+1))*dt(i,2));
+                    uf(i,1,k)=uf(i,1,k)-wm*(t(i,2,k-1)-t(i,2,k+1));
+                    vf(i,1,k)=vf(i,1,k)-wm*(s(i,2,k-1)-s(i,2,k+1));
+                end
+            end
+        end
+    end
+    %
+    for k=1:kbm1
+        for j=1:jm
+            for i=1:im
+                uf(i,j,k)=uf(i,j,k)*fsm(i,j);
+                vf(i,j,k)=vf(i,j,k)*fsm(i,j);
+            end
+        end
+    end
+    %
     return
     %
-elseif(idx==5) 
+elseif(idx==5)
+    %
     %     Vertical velocity boundary conditions:
-%     tmpfsm = repmat(fsm, 1, 1, kb);
-%     tmpfsm(:, :, kb) = 1;
-%     w = w .* tmpfsm;   
-    w=w.*fsm_3d;
+    %
+    for k=1:kbm1
+        for j=1:jm
+            for i=1:im
+                w(i,j,k)=w(i,j,k)*fsm(i,j);
+            end
+        end
+    end
+    %
     return
     %
 elseif(idx==6)
     %
     %     q2 and q2l boundary conditions:
     %
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    
-     dx_3d = repmat(dx, 1, 1, kb); 
-     tmpdx1 = dx_3d(im, :, :);
-     tmpdx2 = dx_3d(imm1, :, :);
-
-     
-     tmpu1x = (2.e0 * u(im,:,:) * dti) ./ (tmpdx1 + tmpdx2);
-     A1x = tmpu1x;
-     A2x = tmpu1x;
-     
-%     tmp1=create_field((tmpu1x > 0.e0)
-     A1x(double(tmpu1x > 0.e0)) = 0.e0;
-     A1x(double(tmpu1x <= 0.e0)) = 1.e0;
-     A2x(double(tmpu1x > 0.e0)) = 1.e0;
-     A2x(double(tmpu1x <= 0.e0)) = 0.e0;
-     
-     tmpq21x = q2(im, :, :) - (tmpu1x .* (small - q2(im, :, :)));
-     tmpq2l1x = q2l(im, :, :) - (tmpu1x .* (small - q2l(im, :, :)));
-     
-     tmpq22x = q2(im, :, :) - (tmpu1x .* (q2(im, :, :) - q2(imm1, :, :)));
-     tmpq2l2x = q2l(im, :, :) - (tmpu1x .* (q2l(im, :, :) - q2l(imm1, :, :)));         
-     
-     uf(im, :, :) = A1x(:,:,:) .* tmpq21x(:,:,:)+ A2x(:,:,:) .* tmpq22x(:,:,:);
-     vf(im, :, :) = A1x(:,:,:) .* tmpq2l1x(:,:,:)+ A2x(:,:,:) .* tmpq2l2x(:,:,:);
-     
-     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%     
-     
-     tmpdx1 = dx_3d(1, :, :);
-     tmpdx2 = dx_3d(2, :, :);
-     
-     tmpu1x = (2.e0 .* u(2, :, :) .* dti) ./ (tmpdx1 + tmpdx2);
-     A1x = tmpu1x;
-     A2x = tmpu1x;
-     
-     A1x(double(tmpu1x >= 0.e0)) = 1.e0;
-     A1x(double(tmpu1x < 0.e0)) = 0.e0;
-     A2x(double(tmpu1x >= 0.e0)) = 0.e0;
-     A2x(double(tmpu1x < 0.e0)) = 1.e0;
-     
-     tmpq21x = q2(1, :, :) - tmpu1x .* (q2(1, :, :) - small);
-     tmpq2l1x = q2l(1, :, :) - tmpu1x .* (q2l(1, :, :) - small);
-     
-     tmpq22x = q2(1, :, :) - tmpu1x .* (q2(2, :, :) - q2(1, :, :));
-     tmpq2l2x = q2l(1, :, :) - tmpu1x .* (q2l(2, :, :) - q2l(1, :, :));
-     
-     uf(1, :, :) = A1x(1,:,:) .* tmpq21x(1,:,:) + A2x(1,:,:) .* tmpq22x(1,:,:);
-     vf(1, :, :) = A1x(1,:,:) .* tmpq2l1x(1,:,:) + A2x(1,:,:) .* tmpq2l2x(1,:,:);
-     
-     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-     
-     dy_3d = repmat(dy, 1, 1, kb);
-     tmpdy1 = dy_3d(:, jm, :);
-     tmpdy2 = dy_3d(:, jmm1, :);
-     
-     tmpu1y = (2.e0 .* v(:, jm, :) .* dti) ./ (tmpdy1 + tmpdy2);
-     A1y = tmpu1y;
-     A2y = tmpu1y;
-     
-     A1y(double(tmpu1y > 0.e0)) = 0.e0;
-     A1y(double(tmpu1y <= 0.e0)) = 1.e0;
-     A2y(double(tmpu1y > 0.e0)) = 1.e0;
-     A2y(double(tmpu1y <= 0.e0)) = 0.e0;
-     
-     tmpq21y = q2(:, jm, :) - tmpu1y .* (small - q2(:, jm, :));
-     tmpq2l1y = q2l(:, jm, :) - tmpu1y .* (small - q2l(:, jm, :));
-     
-     tmpq22y = q2(:, jm, :) - tmpu1y .* (q2(:, jm, :) - q2(:, jmm1, :));
-     tmpq2l2y = q2l(:, jm, :) - tmpu1y .* (q2l(:, jm, :) - q2l(:, jmm1, :));
-     
-     uf(:, jm, :) = tmpq21y(:,1,:) .* A1y(:,1,:) + tmpq22y(:,1,:) .* A2y(:,1,:);
-     vf(:, jm, :) = tmpq2l1y(:,1,:) .* A1y(:,1,:) + tmpq2l2y(:,1,:) .* A2y(:,1,:);
-       
-     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-     
-     tmpdy1 = dy_3d(:, 1, :);
-     tmpdy2 = dy_3d(:, 2, :);
-     
-     tmpu1y = (2.e0 .* v(:, 2, :) .* dti) ./ (tmpdy1 + tmpdy2);
-     A1y = tmpu1y;
-     A2y = tmpu1y;
-     
-     A1y(double(tmpu1y >= 0.e0)) = 1.e0;
-     A1y(double(tmpu1y < 0.e0)) = 0.e0;
-     A2y(double(tmpu1y >= 0.e0)) = 0.e0;
-     A2y(double(tmpu1y < 0.e0)) = 1.e0;
-     
-     tmpq21y = q2(:, 1, :) - tmpu1y .* (q2(:, 1, :) - small);
-     tmpq2l1y = q2l(:, 1, :) - tmpu1y .* (q2l(:, 1, :) - small);
-     
-     tmpq22y = q2(:, 1, :) - tmpu1y .* (q2(:, 2, :) - q2(:, 1, :));
-     tmpq2l2y = q2l(:, 1, :) - tmpu1y .* (q2l(:, 2, :) - q2l(:, 1, :));
-     
-     uf(:, 1, :) = tmpq21y(:,1,:) .* A1y(:,1,:) + tmpq22y(:,1,:) .* A2y(:,1,:);
-     vf(:, 1, :) = tmpq2l1y(:,1,:) .* A1y(:,1,:) + tmpq2l2y(:,1,:) .* A2y(:,1,:);
-     
-     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-     
-     ssmall = 1.e-10;
-     tmpfsm = repmat(fsm, 1, 1, kb);
-     
-     uf = uf .* tmpfsm + ssmall;
-     vf = vf .* tmpfsm + ssmall;            
-
+    for k=1:kb
+        for j=1:jm
+            %
+            %     East:
+            %
+            u1=2.e0*u(im,j,k)*dti/(dx(im,j)+dx(imm1,j));
+            if(double(u1<=0.e0))
+                uf(im,j,k)=q2(im,j,k)-u1*(small-q2(im,j,k));
+                vf(im,j,k)=q2l(im,j,k)-u1*(small-q2l(im,j,k));
+            else
+                uf(im,j,k)=q2(im,j,k)-u1*(q2(im,j,k)-q2(imm1,j,k));
+                vf(im,j,k)=q2l(im,j,k)-u1*(q2l(im,j,k)-q2l(imm1,j,k));
+            end
+            %
+            %     West:
+            %
+            u1=2.e0*u(2,j,k)*dti/(dx(1,j)+dx(2,j));
+            if(double(u1>=0.e0))
+                uf(1,j,k)=q2(1,j,k)-u1*(q2(1,j,k)-small);
+                vf(1,j,k)=q2l(1,j,k)-u1*(q2l(1,j,k)-small);
+            else
+                uf(1,j,k)=q2(1,j,k)-u1*(q2(2,j,k)-q2(1,j,k));
+                vf(1,j,k)=q2l(1,j,k)-u1*(q2l(2,j,k)-q2l(1,j,k));
+            end
+        end
+    end
+    %
+    for k=1:kb
+        for i=1:im
+            %
+            %     North:
+            %
+            u1=2.e0*v(i,jm,k)*dti/(dy(i,jm)+dy(i,jmm1));
+            if(double(u1<=0.e0))
+                uf(i,jm,k)=q2(i,jm,k)-u1*(small-q2(i,jm,k));
+                vf(i,jm,k)=q2l(i,jm,k)-u1*(small-q2l(i,jm,k));
+            else
+                uf(i,jm,k)=q2(i,jm,k)-u1*(q2(i,jm,k)-q2(i,jmm1,k));
+                vf(i,jm,k)=q2l(i,jm,k)-u1*(q2l(i,jm,k)-q2l(i,jmm1,k));
+            end
+            %
+            %     South:
+            %
+            u1=2.e0*v(i,2,k)*dti/(dy(i,1)+dy(i,2));
+            if(double(u1>=0.e0))
+                uf(i,1,k)=q2(i,1,k)-u1*(q2(i,1,k)-small);
+                vf(i,1,k)=q2l(i,1,k)-u1*(q2l(i,1,k)-small);
+            else
+                uf(i,1,k)=q2(i,1,k)-u1*(q2(i,2,k)-q2(i,1,k));
+                vf(i,1,k)=q2l(i,1,k)-u1*(q2l(i,2,k)-q2l(i,1,k));
+            end
+        end
+    end
+    %
+    for k=1:kb
+        for j=1:jm
+            for i=1:im
+                uf(i,j,k)=uf(i,j,k)*fsm(i,j)+1.e-10;
+                vf(i,j,k)=vf(i,j,k)*fsm(i,j)+1.e-10;
+            end
+        end
+    end
+    %
     return
+    %
 end
+%

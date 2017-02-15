@@ -43,7 +43,7 @@ h_3d    = create_field(h_3d,    gs, 3);
 psi     = create_field(psi,     gs, 3);
 rot     = create_field(rot,     gs, 3);
 
-swrad   = create_field(swrad,   gs, 3);
+swrad   = create_field(swrad,   gs, 7);
 vfluxb  = create_field(vfluxb,  gs, 3);
 vfluxf  = create_field(vfluxf,  gs, 3);
 

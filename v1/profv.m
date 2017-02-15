@@ -1,11 +1,9 @@
 function [vf,wvbot] = profv(vf,etf,h,km,wvsurf,cbc,ub,vb)
-% **********************************************************************
-%                                                                      *
+% **********************************************************************                                                                      *
 % * FUNCTION    :  Solves for vertical diffusion of y-momentum using   *
 % *                method described by Richmeyer and Morton.           *
 % *                                                                    *
-% *                See:                                                *
-% *                                                                    *
+% *                See:                                                *                                                 *
 % *                Richtmeyer R.D., and K.W. Morton, 1967. Difference  *
 % *                  Methods for Initial-Value Problems, 2nd edition,  *
 % *                  Interscience, New York, 198-201.                  *
@@ -14,13 +12,13 @@ function [vf,wvbot] = profv(vf,etf,h,km,wvsurf,cbc,ub,vb)
 % *                speed.                                              *
 % *                                                                    *
 % **********************************************************************
-global im  jm kb dz_3d dzz_3d kbm1 dti2 umol kbm2 dz dvm
-
-a=zeros(im,jm,kb);
+global im  jm kb dz_3d dzz_3d kbm1 dti2 umol kbm2 dz dvm gs
 dh = AYB(h+etf); dh(1,:)=1.e0; dh(:,1)=1.e0;
 dh_3d=repmat(dh,1,1,kb);
+a = create_field(zeros(im,jm,kb),gs,1);
 c = AYB(km); c(1,:,:)=0.e0;c(:,1,:)=0.e0;
-la=zeros(kbm1);d=zeros(im,jm,kb);
+la=create_field(zeros(kb,kb,1),gs,1);
+d = create_field(zeros(im,jm,kb),gs,1);
 
     a(:,:,1:kbm2)=-dti2*(c(:,:,2:kbm1)+umol);
     a=DIVISION(a,dz_3d.*dzz_3d.*dh_3d.*dh_3d);

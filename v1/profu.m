@@ -1,12 +1,10 @@
 function [uf,wubot] = profu(uf,etf,h,km,wusurf,cbc,ub,vb)
-
 % **********************************************************************
 % *                                                                    *
 % * FUN%TION    :  Solves for vertical diffusion of x-momentum using   *
 % *                method described by Richmeyer and Morton.           *
 % *                                                                    *
-% *                See:                                                *
-% *                                                                    *
+% *                See:                                                *                                                            *
 % *                Richtmeyer R.D., and K.W. Morton, 1967. Difference  *
 % *                  Methods for Initial-Value Problems, 2nd edition,  *
 % *                  Interscience, New York, 198-201.                  *
@@ -15,12 +13,13 @@ function [uf,wubot] = profu(uf,etf,h,km,wusurf,cbc,ub,vb)
 % *                speed.                                              *
 % *                                                                    *
 % **********************************************************************
-global im  jm kb dz_3d dzz_3d kbm1 dti2 umol kbm2 dz dum
+global im  jm kb dz_3d dzz_3d kbm1 dti2 umol kbm2 dz dum gs
 dh = AXB(h+etf);dh(1,:)=1.e0;dh(:,1)=1.e0;
 dh_3d=repmat(dh,1,1,kb);
-a=zeros(im,jm,kb);
+a = create_field(zeros(im,jm,kb),gs,2);
 c = AXB(km); c(1,:,:)=0.e0; c(:,1,:)=0.e0;
-la=zeros(kbm1);d=zeros(im,jm,kb);
+la=create_field(zeros(kb,kb,1),gs,2);
+d = create_field(zeros(im,jm,kb),gs,2);
 
     a(:,:,1:kbm2)=-dti2*(c(:,:,2:kbm1)+umol);
     a=DIVISION(a,dz_3d.*dzz_3d.*dh_3d.*dh_3d);

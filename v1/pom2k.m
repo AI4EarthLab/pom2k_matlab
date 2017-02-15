@@ -550,8 +550,9 @@ for iint=1:iend
                 [rho]=dens(s,t,h_3d,fsm_3d);
             end  % end if
             % calculate uf and vf:
-            uf = advu(advx,cor,dt,e_atmos,drhox,h,ub,u,v,w,egf,egb,etf,etb);
-            vf = advv(advy,cor,dt,e_atmos,drhoy,h,vb,u,v,w,egf,egb,etf,etb);
+%           uf = advu(advx,cor,dt_3d,e_atmos,drhox,h_3d,ub,u,v,w,egf,egb,etf,etb);
+            uf = advu(advx,cor,dt_3d,e_atmos,drhox,h_3d,ub,u,v,w,egf,egb,etf,etb);
+            vf = advv(advy,cor,dt_3d,e_atmos,drhoy,h_3d,vb,u,v,w,egf,egb,etf,etb);
             
             vf0=vf;
             
@@ -704,14 +705,14 @@ for iint=1:iend
             
             fprintf('time = %.6f, iint = %.6f, iexit = %.6f, iprint = %.6f\n',time,iint,iext,iprint);
            
-            printall(im,jm,imm1,jmm1,iskp,jskp,uab,vab,elb,d,dx,dy,time,u,v,w,t,s,rho,aam,km,kb,mode,dt,zz,z);
+%             printall(im,jm,imm1,jmm1,iskp,jskp,uab,vab,elb,d,dx,dy,time,u,v,w,t,s,rho,aam,km,kb,mode,dt,zz,z);
            
             disp        '************************************************'
             disp        '************ abnormal job end ******************'
             disp        '************* user terminated ******************'
             disp        '************************************************'
             
-            fprintf('vamax = %d, imax = %d ,jmax = %d \n',vmax,imax,jmax);
+            fprintf('vamax = %d, imax = %d ,jmax = %d \n',vamax,imax,jmax);
             return;
             %
         end
