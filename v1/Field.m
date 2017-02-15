@@ -186,7 +186,7 @@ classdef Field
         end
       
         function r = size(a)
-            r = Field(size(a.data), a.grid, a.pos);
+            r = size(a.data);
         end
 
         function r = repmat(a, varargin)

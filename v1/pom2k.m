@@ -460,8 +460,8 @@ for iint=1:iend
 
             %     vertvl calculates w from u, v, dt (h+et), etf and etb:
             %
-            
-            [a,c,w]=vertvl(a,c,w,dx,dy,dz,dt,u,v,vfluxb,vfluxf,etf,etb,dti2,im,jm,imm1,jmm1,kbm1);  
+            dt_3d=repmat(dt,1,1,kb);
+            [a,c,w]=vertvl (w,dt_3d,u,v,vfluxb,vfluxf,etf,etb,dti2);  
             %[a0,c0,w0]=vertvl(a,c,w,dx,dy,dz,dt,u,v,vfluxb,vfluxf,etf,etb,dti2,im,jm,imm1,jmm1,kbm1);  
 
             [elf,uaf,vaf,uf,vf,w] = bcond(5,elf,uaf,vaf,uf,vf,w,...
@@ -475,10 +475,10 @@ for iint=1:iend
             % calculate q2f and q2lf using uf, vf, a and c as temporary variables:
            % [q2b,q2,uf,a,c]=advq(q2b,q2,uf,a,c,...
            %     dt,dx,dy,dz,u,v,w,aam,h,dum,dvm,art,etb,etf,im,jm,imm1,jmm1,kbm1,dti2);
-           uf=advq(q2b,q2,dt,u,v,w,aam,h,etb,etf,dti2);    
+           uf=advq(q2b,q2,dt_3d,u,v,w,aam,h,etb,etf,dti2);    
            % [q2lb,q2l,vf,a,c]=advq(q2lb,q2l,vf,a,c,...
            %     dt,dx,dy,dz,u,v,w,aam,h,dum,dvm,art,etb,etf,im,jm,imm1,jmm1,kbm1,dti2);
-           vf=advq(q2lb,q2l,dt,u,v,w,aam,h,etb,etf,dti2);  
+           vf=advq(q2lb,q2l,dt_3d,u,v,w,aam,h,etb,etf,dti2);  
           
             [a,c,tps,dtef,...
                 ee,gg,l,kq,km,kh,...

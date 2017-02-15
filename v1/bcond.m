@@ -70,6 +70,7 @@ function [elf,uaf,vaf,uf,vf,w] = bcond(idx,elf,uaf,vaf,uf,vf,w,...
 
 
 % **********************************************************************
+global fsm_3d
 
 if(idx==1)
     %
@@ -415,9 +416,10 @@ elseif(idx==4)
     %
 elseif(idx==5) 
     %     Vertical velocity boundary conditions:
-    tmpfsm = repmat(fsm, 1, 1, kb);
-    tmpfsm(:, :, kb) = 1;
-    w = w .* tmpfsm;   
+%     tmpfsm = repmat(fsm, 1, 1, kb);
+%     tmpfsm(:, :, kb) = 1;
+%     w = w .* tmpfsm;   
+    w=w.*fsm_3d;
     return
     %
 elseif(idx==6)
