@@ -6,11 +6,11 @@ function [qf]=advq(qb,q,dt_3d,u,v,w,aam,h,etb,etf,dti2)
 % *                                                                    *
 % **********************************************************************
 %load('grid.mat');load('operator.mat');
-global im jm kb dy_3d dum_3d dvm_3d art_3d dx_3d dz_3d
+global im jm kb dum_3d dvm_3d 
 
-xflux = zeros(im,jm,kb);
-yflux = zeros(im,jm,kb);
-qf=zeros(im,jm,kb);
+xflux = Field(zeros(im,jm,kb),gs,6);
+yflux = Field(zeros(im,jm,kb),gs,5);
+qf=Field(zeros(im,jm,kb),gs,7);
 
 h_3d =repmat(h,1,1,kb);
 
@@ -22,7 +22,7 @@ xflux=( AXB(q) .* AXB(dt_3d) .* AZB(u) -AZB( AXB( aam )).*AXB(h_3d) .*DXB( qb ).
 %     do vertical advection: add flux terms, then step forward in time:
 yflux=( AYB(q) .* AYB(dt_3d) .* AZB(v) -AZB( AYB( aam )).*AYB(h_3d) .*DYB( qb ).* dvm_3d);
 
-qf= ( (h_3d+repmat(etb,1,1,kb)) .* qb  ...
+qf= ( (h_3d+repmat(etb,1,1,kb)) .* qb   ...
       -dti2*( -DZB(AZF(w.*q)) + DXF(xflux)+DYF(yflux)) ...
     )./  ( h_3d+repmat(etf,1,1,kb) ) ;
 qf(1,:,:) =0;  qf(im,:,:)=0;

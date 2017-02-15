@@ -93,6 +93,7 @@ dt_3d=repmat(dt,1,1,kb);
 
 
 l           = 0.1*dt_3d;
+%q2b(:,:,:)  = small;
 q2b(:,:,:)  = small;
 q2lb        = l.*q2b;
 kh          = l.*sqrt(q2b);

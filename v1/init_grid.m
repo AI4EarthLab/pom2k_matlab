@@ -29,7 +29,7 @@ function obj = init_grid(obj, dx, dy, dz)
  
         obj.dx_map(4) = AYB(AXB(dx));
         obj.dy_map(4) = AYB(AXB(dy));
-        obj.dz_map(4) = dz;
+        obj.dz_map(4) = AZB(dz);
 
         obj.dx_map(5) = AYB(dx);
         obj.dy_map(5) = AYB(dy);
