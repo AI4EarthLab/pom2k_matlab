@@ -437,10 +437,11 @@ elseif(idx==6)
      A1x = tmpu1x;
      A2x = tmpu1x;
      
-     A1x(tmpu1x > 0.e0) = 0.e0;
-     A1x(tmpu1x <= 0.e0) = 1.e0;
-     A2x(tmpu1x > 0.e0) = 1.e0;
-     A2x(tmpu1x <= 0.e0) = 0.e0;
+%     tmp1=create_field((tmpu1x > 0.e0)
+     A1x(double(tmpu1x > 0.e0)) = 0.e0;
+     A1x(double(tmpu1x <= 0.e0)) = 1.e0;
+     A2x(double(tmpu1x > 0.e0)) = 1.e0;
+     A2x(double(tmpu1x <= 0.e0)) = 0.e0;
      
      tmpq21x = q2(im, :, :) - (tmpu1x .* (small - q2(im, :, :)));
      tmpq2l1x = q2l(im, :, :) - (tmpu1x .* (small - q2l(im, :, :)));
@@ -460,10 +461,10 @@ elseif(idx==6)
      A1x = tmpu1x;
      A2x = tmpu1x;
      
-     A1x(tmpu1x >= 0.e0) = 1.e0;
-     A1x(tmpu1x < 0.e0) = 0.e0;
-     A2x(tmpu1x >= 0.e0) = 0.e0;
-     A2x(tmpu1x < 0.e0) = 1.e0;
+     A1x(double(tmpu1x >= 0.e0)) = 1.e0;
+     A1x(double(tmpu1x < 0.e0)) = 0.e0;
+     A2x(double(tmpu1x >= 0.e0)) = 0.e0;
+     A2x(double(tmpu1x < 0.e0)) = 1.e0;
      
      tmpq21x = q2(1, :, :) - tmpu1x .* (q2(1, :, :) - small);
      tmpq2l1x = q2l(1, :, :) - tmpu1x .* (q2l(1, :, :) - small);
@@ -484,10 +485,10 @@ elseif(idx==6)
      A1y = tmpu1y;
      A2y = tmpu1y;
      
-     A1y(tmpu1y > 0.e0) = 0.e0;
-     A1y(tmpu1y <= 0.e0) = 1.e0;
-     A2y(tmpu1y > 0.e0) = 1.e0;
-     A2y(tmpu1y <= 0.e0) = 0.e0;
+     A1y(double(tmpu1y > 0.e0)) = 0.e0;
+     A1y(double(tmpu1y <= 0.e0)) = 1.e0;
+     A2y(double(tmpu1y > 0.e0)) = 1.e0;
+     A2y(double(tmpu1y <= 0.e0)) = 0.e0;
      
      tmpq21y = q2(:, jm, :) - tmpu1y .* (small - q2(:, jm, :));
      tmpq2l1y = q2l(:, jm, :) - tmpu1y .* (small - q2l(:, jm, :));
@@ -507,10 +508,10 @@ elseif(idx==6)
      A1y = tmpu1y;
      A2y = tmpu1y;
      
-     A1y(tmpu1y >= 0.e0) = 1.e0;
-     A1y(tmpu1y < 0.e0) = 0.e0;
-     A2y(tmpu1y >= 0.e0) = 0.e0;
-     A2y(tmpu1y < 0.e0) = 1.e0;
+     A1y(double(tmpu1y >= 0.e0)) = 1.e0;
+     A1y(double(tmpu1y < 0.e0)) = 0.e0;
+     A2y(double(tmpu1y >= 0.e0)) = 0.e0;
+     A2y(double(tmpu1y < 0.e0)) = 1.e0;
      
      tmpq21y = q2(:, 1, :) - tmpu1y .* (q2(:, 1, :) - small);
      tmpq2l1y = q2l(:, 1, :) - tmpu1y .* (q2l(:, 1, :) - small);

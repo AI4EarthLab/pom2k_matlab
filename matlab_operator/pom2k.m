@@ -12,7 +12,7 @@ global small pi netcdf_file iproblem mode nadv nitera ...
      smoth alpha dti dte2 dti2 iend iprint iswtch ispi isp2i;
 
 im=7; jm=5; kb=6; 
-%im=65; jm=49; kb=21;
+% im=65; jm=49; kb=21;
 imm1=im-1; imm2=im-2; jmm1=jm-1; jmm2=jm-2; kbm1=kb-1; kbm2=kb-2;
 
 alpha          =0.0;dte            =0.0;dti            =0.0;dti2           =0.0;
