@@ -17,5 +17,5 @@ vf = AYB(w) .* AZB(v);
 %               ,AYB(etf_3d+h_3d).*arv_3d );
 vf = ( AYB(etb_3d+h_3d).*vb-dti2*( advy+drhoy+AYB( cor_3d.*dt_3d.*AXF(u) )...
      +grav*AYB(dt_3d).*( DYB(egf_3d+egb_3d)+DYB(e_atmos_3d)*2.0 )/2.e0-DZF(vf)))./AYB(etf_3d+h_3d);
-              
+vf(:,:,kb)=0.e0;    %add by hx 
 return

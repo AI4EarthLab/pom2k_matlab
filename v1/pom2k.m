@@ -111,16 +111,16 @@ v  =vb;
 [rho]=dens(s,t,h_3d,fsm_3d);
 
                       
-[rho,drhox,drhoy] = baropg(rho, rmean, dt_3d, ramp);
+ [rho,drhox,drhoy] = baropg(rho, rmean, dt_3d, ramp);
 
 
-% % % for k=1:kbm1
-% % %     drx2d=drx2d+drhox(:,:,k)*dz(k);
-% % %     dry2d=dry2d+drhoy(:,:,k)*dz(k);
-% % % end
+for k=1:kbm1
+    drx2d=drx2d+drhox(:,:,k)*dz(k);
+    dry2d=dry2d+drhoy(:,:,k)*dz(k);
+end
 
-drx2d=sum(drhox.*dz_3d, 3);
-dry2d=sum(drhoy.*dz_3d, 3);
+% drx2d=sum(drhox.*dz_3d, 3);
+% dry2d=sum(drhoy.*dz_3d, 3);
 
 %     Calculate bottom friction coefficient:
 cbc=(kappa./log((1.0+zz(kbm1))*h/z0b)).^2;
@@ -238,8 +238,8 @@ for iint=1:iend
         [advx,advy]=advct(u,v,dt_3d,aam,ub,vb);        
 % % %         [rho,drhox,drhoy] = baropg(rho,drhox,drhoy,...
 % % %             im,jm,imm1,jmm1,kb,kbm1,grav,...
-% % %             zz,dt,dum,dvm,ramp,rmean,dx,dy);   
-        [rho,drhox,drhoy] = baropg(rho, rmean, dt_3d, ramp);   
+% % %             zz,dt,dum,dvm,ramp,rmean,dx,dy); 
+         [rho,drhox,drhoy] = baropg(rho, rmean, dt_3d, ramp);   
 % % %           aam=horcon .* dx_3d .* dy_3d .*sqrt( (DXF(u)./dx_3d).^2 + (DYF(v)./dy_3d).^2    ...
 % % %                   +0.5*( DYB(AYF(AXF(u)))./dy_3d + DXB(AXF(AYF(v)))./dx_3d).^2 );     
         aam=horcon .* dx_3d .* dy_3d .*sqrt( DXF(u).^2 + DYF(v).^2    ...
@@ -250,6 +250,7 @@ for iint=1:iend
         aam(im,:,:)=aam_init;
         aam(:,:,kb)=aam_init;
 
+        
         %     Form vertical averages of 3-D fields for use in external (2-D)
         %     mode:
         
@@ -258,18 +259,19 @@ for iint=1:iend
         drx2d=zeros(im,jm);
         dry2d=zeros(im,jm);
         aam2d=zeros(im,jm);
+
        %
-%         for k=1:kbm1
-%             for j=1:jm
-%                 for i=1:im
-%                     adx2d(i,j)=adx2d(i,j)+advx(i,j,k)*dz(k);
-%                     ady2d(i,j)=ady2d(i,j)+advy(i,j,k)*dz(k);
-%                     drx2d(i,j)=drx2d(i,j)+drhox(i,j,k)*dz(k);
-%                     dry2d(i,j)=dry2d(i,j)+drhoy(i,j,k)*dz(k);
-%                     aam2d(i,j)=aam2d(i,j)+aam(i,j,k)*dz(k);
-%                 end
-%             end
-%         end       
+        for k=1:kbm1
+            for j=1:jm
+                for i=1:im
+                    adx2d(i,j)=adx2d(i,j)+advx(i,j,k)*dz(k);
+                    ady2d(i,j)=ady2d(i,j)+advy(i,j,k)*dz(k);
+                    drx2d(i,j)=drx2d(i,j)+drhox(i,j,k)*dz(k);
+                    dry2d(i,j)=dry2d(i,j)+drhoy(i,j,k)*dz(k);
+                    aam2d(i,j)=aam2d(i,j)+aam(i,j,k)*dz(k);
+                end
+            end
+        end       
 %         for k=1:kb
 %             adx2d=adx2d+advx(:,:,k)*dz(k);
 %             ady2d=ady2d+advy(:,:,k)*dz(k);
@@ -278,11 +280,11 @@ for iint=1:iend
 %             aam2d=aam2d+aam(:,:,k)*dz(k);
 %         end
 
-        adx2d = sum(advx.*dz_3d, 3);
-        ady2d = sum(advy.*dz_3d, 3);
-        drx2d = sum(drhox.*dz_3d, 3);
-        dry2d = sum(drhoy.*dz_3d, 3);
-        aam2d = sum(aam.*dz_3d, 3);
+%         adx2d = sum(advx.*dz_3d, 3);
+%         ady2d = sum(advy.*dz_3d, 3);
+%         drx2d = sum(drhox.*dz_3d, 3);
+%         dry2d = sum(drhoy.*dz_3d, 3);
+%         aam2d = sum(aam.*dz_3d, 3);
         
         %[tps2,advua,advva,fluxua,fluxva,wubot,wvbot,tps0] = advave(tps,advua,advva,fluxua,fluxva,wubot,wvbot,tps,...
         %    mode,im,jm,imm1,jmm1,aam2d,...
@@ -329,13 +331,9 @@ for iint=1:iend
 % % %                + drx2d + aru .* (wusurf-wubot))) , (2.0*AXB(h+elf) .* aru));      
  
         % compute u in the external model equation 
-        uaf=    (AXB(h+elb) .* uab ...
-                    -2.0* dte .*  ...
-                    (adx2d + advua - AXB(cor .* d .* AYF(va)) ...
+        uaf=    (AXB(h+elb) .* uab -2.0* dte .* (adx2d + advua - AXB(cor .* d .* AYF(va)) ...
                      + grav.* AXB(d).*( (1.0-2.0*alpha) .* DXB(el) + alpha* (DXB(elb)+ DXB(elf)) + DXB(e_atmos) ) ...
-                     + drx2d +  (wusurf-wubot) ...
-                    ) ...
-                 )./ AXB(h+elf) ;    
+                     + drx2d +  (wusurf-wubot) ) )./ AXB(h+elf) ;    
 
 % % %         vaf=   DIVISION( (2.0*AYB(h+elb) .* arv .* vab ...
 % % %                -4.0* dte .* (ady2d + advva + arv .* AYB(cor .* d .* AXF(ua)) ...
@@ -445,7 +443,7 @@ for iint=1:iend
 %             for k=1:kbm1
 %                 tps=tps+v(:,:,k)*dz(k);
 %             end
-%?
+%
             tps = sum(v(:,:,1:kbm1) .* dz_3d(:,:,1:kbm1), 3);
             
 %             for k=1:kbm1

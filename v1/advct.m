@@ -8,10 +8,9 @@ function [advx,advy]=advct(u,v,dt_3d,aam,ub,vb)
 % *                mode calculation.                                   *
 % *                                                                    *
 % **********************************************************************
-global im jm kb dx_3d dy_3d aru_3d arv_3d gs;
+global im jm kb dx_3d dy_3d gs;
 
 curv    = create_field(zeros(im,jm,kb),    gs, 3);
-
 xflux   = create_field(zeros(im,jm,kb),    gs, 3);
 yflux   = create_field(zeros(im,jm,kb),    gs, 3);
 

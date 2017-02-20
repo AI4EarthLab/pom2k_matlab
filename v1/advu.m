@@ -13,5 +13,5 @@ uf = AXB(w) .* AZB(u);
 bond = uf(im,:,:);
 uf=(AXB(etb_3d+h_3d).*ub-dti2*( advx + drhox - AXB( cor_3d.*dt_3d.*AYF(v) )...
    +grav*AXB(dt_3d).*( DXB(egf_3d+egb_3d)+DXB(e_atmos_3d)*2.0 )/2.e0-DZF(uf)))./AXB(etf_3d+h_3d);
-uf(im,:,:) = bond;
+uf(im,:,:) = bond; uf(:,:,kb)=0.e0;    %add by hx
 
