@@ -6,15 +6,14 @@ function r = AZF(obj_field)
     A(:,:,idx) = 0.5*(A(:,:,idx) + A(:,:,idx+1));
     
     if(~isnumeric(obj_field))
-        % choose "constant" boundary condition or "zero gradient" boundary condition
-        switch obj_field.pos
-            case {0,1,2,3}
-                 
-            case {4,5,6,7}
-                A(: ,: ,1 )=0;  A(: ,: ,kz)=0;
-            otherwise
-                disp('Unknown position.');
-        end      
+%         switch obj_field.pos
+%             case {0,1,2,3}
+%                  
+%             case {4,5,6,7}
+%              A(: ,: ,kz)=0;
+%             otherwise
+%                 disp('Unknown position.');
+%         end      
         r = Field(A, obj_field.grid, obj_field.grid.z_map(obj_field.pos));
     else
         r = A;

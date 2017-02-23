@@ -1,23 +1,23 @@
 
 aam2d   = create_field(aam2d,   gs, 3);
 
-adx2d   = create_field(adx2d,   gs, 3);
-ady2d   = create_field(ady2d,   gs, 3);
+adx2d   = create_field(adx2d,   gs, 2);
+ady2d   = create_field(ady2d,   gs, 1);
 art_3d  = create_field(art_3d,  gs, 3);
-aru_3d  = create_field(aru_3d,  gs, 1);
-arv_3d  = create_field(arv_3d,  gs, 2);
+aru_3d  = create_field(aru_3d,  gs, 2);
+arv_3d  = create_field(arv_3d,  gs, 1);
 cbc     = create_field(cbc,     gs, 3);
 cor     = create_field(cor,     gs, 3);
 d       = create_field(d,       gs, 3);
-drx2d   = create_field(drx2d,   gs, 3);
-dry2d   = create_field(dry2d,   gs, 3);
+drx2d   = create_field(drx2d,   gs, 2);
+dry2d   = create_field(dry2d,   gs, 1);
 dt      = create_field(dt,      gs, 3);
 fsm     = create_field(fsm,     gs, 3);
 dum     = create_field(dum,     gs, 2);
 dvm     = create_field(dvm,     gs, 1);
 
-advx    = create_field(zeros(im,jm,kb),    gs, 3);
-advy    = create_field(zeros(im,jm,kb),    gs, 3);
+advx    = create_field(zeros(im,jm,kb),    gs, 2);
+advy    = create_field(zeros(im,jm,kb),    gs, 1);
 
 advua   = create_field(zeros(im,jm,1),   gs, 2);
 advva   = create_field(zeros(im,jm,1),   gs, 1);
@@ -98,7 +98,7 @@ u       = create_field(u,       gs, 2);
 vb      = create_field(vb,      gs, 1);
 vf      = create_field(vf,      gs, 1);
 v       = create_field(v,       gs, 1);
-w       = create_field(w,       gs, 3);
+w       = create_field(w,       gs, 7);
 zflux   = create_field(zflux,   gs, 3);
 
 ele     = create_field(ele,     gs, 3);

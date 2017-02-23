@@ -7,7 +7,6 @@ function [qf]=advq(qb,q,dt_3d,u,v,w,aam,h,etb,etf,dti2)
 % **********************************************************************
 %load('grid.mat');load('operator.mat');
 global im jm kb dum_3d dvm_3d gs
-
 xflux = Field(zeros(im,jm,kb),gs,6);
 yflux = Field(zeros(im,jm,kb),gs,5);
 qf=Field(zeros(im,jm,kb),gs,7);

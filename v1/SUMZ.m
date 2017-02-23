@@ -4,7 +4,7 @@ function r = SUMZ(obj_field)
     
     B=zeros(mx,ny,kz);
     B(:,:,1)=A(:,:,1);
-    for k=2:kz
+    for k=2:kz-1
         B(:,:,k)=B(:,:,k-1)+A(:,:,k);
     end   
     if(~isnumeric(obj_field))

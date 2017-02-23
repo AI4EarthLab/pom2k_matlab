@@ -7,9 +7,9 @@ function r = AZB(obj_field)
     
     if(~isnumeric(obj_field))
         switch obj_field.pos
-            case {0,1,2,3}
-                 
-            case {4,5,6,7}
+            case {3}
+                A(: ,: ,kz)=0; 
+            case {0,1,2,4,5,6,7}
                 A(: ,: ,1 )=0;  A(: ,: ,kz)=0;
             otherwise
                 disp('Unknown position.');

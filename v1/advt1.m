@@ -22,7 +22,7 @@ xflux=AXB(dt_3d).*AXB(f).*u-AXB(aam).*AXB(h_3d)*tprni.*DXB(fb).*dum_3d;
 yflux=AYB(dt_3d).*AYB(f).*v-AYB(aam).*AYB(h_3d)*tprni.*DYB(fb).*dvm_3d;
 % for vertical advection:
 zflux=AZB(f).*w;
-xflux(:,:,kb)=0.0; yflux(:,:,kb)=0.0; zflux(:,:,kb)=0.0;
+xflux(:,:,kb)=0.0; yflux(:,:,kb)=0.0;
 
 %     Add net horizontal fluxes and then step forward in time:
 % ff= DIVISION((fb.*(h_3d+repmat(etb,1,1,kb)).* art_3d - dti2 .* (DXF(xflux)+ DYF(yflux)-DZF(zflux)./dz_3d) )  ...
