@@ -157,9 +157,7 @@
             q2b(i,j,k)=abs(q2b(i,j,k));
             q2lb(i,j,k)=abs(q2lb(i,j,k));
             boygr(i,j,k)=grav*(rho(i,j,k-1)-rho(i,j,k))     ...
-                    /(dzz(k-1)* h(i,j));
-% *** NOTE: comment out next line if dens fores not include pressure     ... 
-     +(grav^2)*2.e0/(cc(i,j,k-1)^2+cc(i,j,k)^2);
+                    /(dzz(k-1)* h(i,j))+(grav^2)*2.e0/(cc(i,j,k-1)^2+cc(i,j,k)^2);      %add by hx 
           end
         end
       end
@@ -196,9 +194,7 @@
                       +u(i+1,j,k)-u(i+1,j,k-1))^2     ...
                      +(v(i,j,k)-v(i,j,k-1)     ...
                       +v(i,j+1,k)-v(i,j+1,k-1))^2)     ... 
-                  /(dzz(k-1)*dh(i,j))^2;
-%   Add shear due to internal wave field     ...
-             -shiw*km(i,j,k)*boygr(i,j,k);
+                  /(dzz(k-1)*dh(i,j))^2 -shiw*km(i,j,k)*boygr(i,j,k);           %add by hx
             kn(i,j,k)=kn(i,j,k)+kh(i,j,k)*boygr(i,j,k);
           end
         end
