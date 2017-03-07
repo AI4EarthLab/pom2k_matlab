@@ -23,9 +23,8 @@ classdef Operator
         OP_R_YZ, 
         OP_SUMZ1, 
         OP_SUMZ2,
-        OP_AXB1,
-        OP_AXF1,
-        OP_Rk,
+%         OP_AXB1,
+%         OP_AXF1,
     end
     
     methods

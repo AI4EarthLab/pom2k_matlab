@@ -7,10 +7,10 @@ function r = AXF(obj_field)
 
     if(~isnumeric(obj_field))
         switch obj_field.pos
-            case {0,2,4,6}
+            case {3,7}
+                A(mx,: ,: )=0;
+            case {0,1,2,4,5,6}
                 A(1 ,: ,: )=0;  A(mx,: ,: )=0;
-            case {1,3,5,7}
-                
             otherwise
                 disp('Unknown position.');
         end

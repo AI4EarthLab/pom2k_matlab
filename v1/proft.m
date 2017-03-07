@@ -1,4 +1,4 @@
-function [f1] = proft(f,wfsurf,fsurf,nbc,h,etf,swrad,kh)
+function [f1] = proft(f,wfsurf,fsurf,nbc,etf,swrad,kh)
 %-----------------------------------------------------------------------
 %     Irradiance parameters after Paulson and Simpson:
 %       ntp               1      2       3       4       5
@@ -7,21 +7,20 @@ r=[0.58,0.62,0.67,0.77,0.78];
 ad1=[0.35,0.60,1.0,1.5,1.4];
 ad2=[0.23,20.0,17.0,14.0,7.90];
 % solves the equation:dti2*(kh*f')'-f=-fb
-global im  jm kb dz_3d dzz_3d kbm1 dti2 umol kbm2 dz gs
+global im  jm kb dz_3d dzz_3d kbm1 dti2 umol kbm2 dz gs h
 
 rad=create_field(zeros(im,jm,kb),gs,7);
 a = create_field(zeros(im,jm,kb),gs,7);
 c = create_field(zeros(im,jm,kb),gs,7);
-d = create_field(zeros(im,jm,kb),gs,7);
+% d = create_field(zeros(im,jm,kb),gs,7);
 
 dh = h+etf;
 dh_3d=repmat(dh,1,1,kb);
-swrad_3d=repmat(swrad,1,1,kb);
 la=create_field(zeros(kb,kb,1),gs,3);
 f1=create_field(zeros(im,jm,kb),gs,3);
 
 if(nbc==2||nbc==4)
-   rad=swrad_3d.*(r(ntp)*exp(z_3d.*dh_3d/ad1(ntp))+(1.e0-r(ntp))*exp(z_3d.*dh_3d/ad2(ntp)));
+   rad=repmat(swrad,1,1,kb) .*(r(ntp)*exp(z_3d.*dh_3d/ad1(ntp))+(1.e0-r(ntp))*exp(z_3d.*dh_3d/ad2(ntp)));
    rad(:,:,kb)=0.0;
 end
 

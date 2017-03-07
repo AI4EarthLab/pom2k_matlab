@@ -5,6 +5,8 @@ cor=zeros(im,jm)     ;
 d=zeros(im,jm)       ;drx2d=zeros(im,jm)   ;
 dry2d=zeros(im,jm)   ;dt=zeros(im,jm)      ;dum=zeros(im,jm)     ;dvm=zeros(im,jm)     ;
 dx=zeros(im,jm)      ;dy=zeros(im,jm)      ;
+z=zeros(kb)          ;zz=zeros(kb)         ;dz=zeros(kb)         ;dzz=zeros(kb)        ;
+z_3d=zeros(im,jm,kb) ;zz_3d=zeros(im,jm,kb);dz_3d=zeros(im,jm,kb);dzz_3d=zeros(im,jm,kb);
 east_c=zeros(im,jm)  ;east_e=zeros(im,jm)  ;
 east_u=zeros(im,jm)  ;east_v=zeros(im,jm)  ;e_atmos=zeros(im,jm) ;egb=zeros(im,jm)     ;
 egf=zeros(im,jm)     ;el=zeros(im,jm)      ;elb=zeros(im,jm)     ;elf=zeros(im,jm)     ;
@@ -17,7 +19,6 @@ uab=zeros(im,jm)     ;uaf=zeros(im,jm)     ;utb=zeros(im,jm)     ;utf=zeros(im,j
 va=zeros(im,jm)      ;vab=zeros(im,jm)     ;vaf=zeros(im,jm)     ;
 vtb=zeros(im,jm)     ;vtf=zeros(im,jm)     ;wssurf=zeros(im,jm)  ;wtsurf=zeros(im,jm)  ;
 wubot=zeros(im,jm)   ;wusurf=zeros(im,jm)  ;wvbot=zeros(im,jm)   ;wvsurf=zeros(im,jm)  ;
-wubot1=zeros(im,jm)  ;wvbot1=zeros(im,jm)  ;
 
 aam=zeros(im,jm,kb)  ;advx=zeros(im,jm,kb) ;advy=zeros(im,jm,kb) ;a=zeros(im,jm,kb)    ;
 c=zeros(im,jm,kb)    ;drhox=zeros(im,jm,kb);drhoy=zeros(im,jm,kb);dtef=zeros(im,jm,kb) ;
@@ -28,6 +29,7 @@ sb=zeros(im,jm,kb)   ;sclim=zeros(im,jm,kb);s=zeros(im,jm,kb)    ;tb=zeros(im,jm
 tclim=zeros(im,jm,kb);t=zeros(im,jm,kb)    ;ub=zeros(im,jm,kb)   ;uf=zeros(im,jm,kb)   ;
 u=zeros(im,jm,kb)    ;vb=zeros(im,jm,kb)   ;vf=zeros(im,jm,kb)   ;v=zeros(im,jm,kb)    ;
 w=zeros(im,jm,kb)    ;zflux=zeros(im,jm,kb);
+q2f=zeros(im,jm,kb)  ;q2lf=zeros(im,jm,kb) ;sf=zeros(im,jm,kb)   ;tf=zeros(im,jm,kb)   ;
 
 ele=zeros(1,jm)      ;eln=zeros(1,im)      ;els=zeros(1,im)      ;elw=zeros(1,jm)      ;
 sbe=zeros(jm,kb)     ;sbn=zeros(im,kb)     ;sbs=zeros(im,kb)     ;sbw=zeros(jm,kb)     ;

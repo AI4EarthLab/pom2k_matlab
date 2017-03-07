@@ -1,4 +1,3 @@
-
 aam2d   = create_field(aam2d,   gs, 3);
 
 adx2d   = create_field(adx2d,   gs, 2);
@@ -18,12 +17,9 @@ dvm     = create_field(dvm,     gs, 1);
 
 advx    = create_field(zeros(im,jm,kb),    gs, 2);
 advy    = create_field(zeros(im,jm,kb),    gs, 1);
-
 advua   = create_field(zeros(im,jm,1),   gs, 2);
 advva   = create_field(zeros(im,jm,1),   gs, 1);
 curv2d  = create_field(zeros(im,jm,1),   gs, 3);
-
-
 drhox   = create_field(zeros(im,jm,kb),   gs, 2);
 drhoy   = create_field(zeros(im,jm,kb),   gs, 1);
 
@@ -44,8 +40,8 @@ psi     = create_field(psi,     gs, 3);
 rot     = create_field(rot,     gs, 3);
 
 swrad   = create_field(swrad,   gs, 7);
-vfluxb  = create_field(vfluxb,  gs, 3);
-vfluxf  = create_field(vfluxf,  gs, 3);
+vfluxb  = create_field(vfluxb,  gs, 7);
+vfluxf  = create_field(vfluxf,  gs, 7);
 
 tsurf   = create_field(tsurf,   gs, 3);
 ssurf   = create_field(ssurf,   gs, 3);
@@ -66,8 +62,6 @@ wubot   = create_field(wubot,   gs, 2);
 wusurf  = create_field(wusurf,  gs, 2);
 wvbot   = create_field(wvbot,   gs, 1);
 wvsurf  = create_field(wvsurf,  gs, 1);
-wubot1  = create_field(wubot1,  gs, 2);
-wvbot1  = create_field(wubot1,  gs, 1);
 aam     = create_field(aam,     gs, 3);
 
 a       = create_field(a,       gs, 3);
@@ -82,15 +76,19 @@ kq      = create_field(kq,      gs, 7);
 l       = create_field(l,       gs, 7);
 q2b     = create_field(q2b,     gs, 7);
 q2      = create_field(q2,      gs, 7);
+q2f     = create_field(q2f,     gs, 7);
 q2lb    = create_field(q2lb,    gs, 7);
 q2l     = create_field(q2l,     gs, 7);
+q2lf    = create_field(q2lf,    gs, 7);
 rho     = create_field(rho,     gs, 3);
 rmean   = create_field(rmean,   gs, 3);
 sb      = create_field(sb,      gs, 3);
+sf      = create_field(sf,      gs, 3);
 sclim   = create_field(sclim,   gs, 3);
 s       = create_field(s,       gs, 3);
 t       = create_field(t,       gs, 3);
 tb      = create_field(tb,      gs, 3);
+tf      = create_field(tf,      gs, 3);
 tclim   = create_field(tclim,   gs, 3);
 ub      = create_field(ub,      gs, 2);
 uf      = create_field(uf,      gs, 2);

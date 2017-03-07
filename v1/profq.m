@@ -1,25 +1,17 @@
- function [sm,sh,dh,l,kq,km,kh,uf,vf,q2b,q2lb]=profq(l,kq,km,kh,uf,...
-           vf,q2,q2b,q2lb,etf,h,rho,u,v,dt,wusurf,wubot,wvsurf,wvbot,t,s)
+ function [l,kq,km,kh,uf,vf,q2b,q2lb]=profq(kq,km,kh,uf,...
+           vf,q2,q2b,q2lb,etf,rho,u,v,dt,wusurf,wubot,wvsurf,wvbot,t,s)
 
 global im jm kb imm1 jmm1 kbm1 kbm2 fsm_3d dzz_3d dz_3d zz_3d z_3d gs ...
-       small umol dti2 grav kappa tbias sbias rhoref z
+       small umol dti2 grav kappa tbias sbias rhoref z h h_3d
 
 a1=0.92; b1=16.6 ; a2=0.74 ; b2=10.1    ; c1=0.08;
 e1=1.8 ; e2=1.33 ; sef=1.0 ; cbcnst=100.; surfl=2.e5 ; shiw=0.0;
       
-l0=create_field(zeros(im,jm,1),gs,7);
-kn =create_field(zeros(im,jm,kb),gs,7);
-boygr=create_field(zeros(im,jm,kb),gs,7);
-gh=create_field(zeros(im,jm,kb),gs,7);
-stf=create_field(zeros(im,jm,kb),gs,7);
-la=create_field(zeros(kb,kb,1),gs,7);
 dh=h+etf;
 dh_3d=repmat(dh,1,1,kb);
 
-
 a = create_field(zeros(im,jm,kb),gs,7);
 c = create_field(zeros(im,jm,kb),gs,7);
-d = create_field(zeros(im,jm,kb),gs,7);
 
 a(:,:,2:kbm1)=dzz_3d(:,:,1:kbm2).*dz_3d(:,:,2:kbm1);
 c(:,:,2:kbm1)=dzz_3d(:,:,1:kbm2).*dz_3d(:,:,1:kbm2);
@@ -33,21 +25,12 @@ c= DIVISION(-dti2 .* (AZB(kq)+umol) , (c .* dh_3d .* dh_3d));
 %
 %     Surface and bottom boundary conditions:
 %
-const1=(16.6e0^(2.e0/3.e0))*sef;
-
-% initialize fields that are not calculated on all boundaries
-% but are later used there
-l0(:,jm)  =0; l0(im,:)=0;
-kn(:,:,:)=0;
-      
+const1=(16.6e0^(2.e0/3.e0))*sef;      
 utau2 = sqrt( AXF(wusurf).^2 +AYF(wvsurf).^2 );
-% Wave breaking energy- a variant of Craig & Banner (1994), see Mellor and Blumberg, 2003.
- % Surface length scale following Stacey (1999).
 l0 = surfl*utau2/grav;                     
 uf(:,:,kb) = sqrt( AXF(wubot).^2 +AYF(wvbot).^2 ) .* const1;
         
-%    Calculate speed of sound squared:
-h_3d=repmat(h,1,1,kb);      
+%    Calculate speed of sound squared:    
 p=grav*rhoref*(-zz_3d .* h_3d)*1.e-4;     %     Calculate pressure in units of decibars:
 cc=1449.10+.00821*p+4.55*(t+tbias) -.045e0*(t+tbias).^2 +1.34*(s+sbias-35.0e0);
 cc=cc./sqrt((1.0-.01642.*p./cc) .*(1.0-0.40.*p./cc.^2));      
@@ -56,12 +39,6 @@ cc(:,:,kb)=0;
 %     Calculate buoyancy gradient:
 q2b =abs(q2b);
 q2lb=abs(q2lb);
-% tmp = zeros(im,jm,kb);
-% for k=2:kbm1
-%     tmp(:,:,k)=dzz(k-1);
-% end
-% boygr=DIVISION(-grav* DZB(rho) , tmp .* h_3d ) + DIVISION(grav^2 , AZB(cc.^2));
-% boygr(:,:,1)=0.e0; boygr(:,:,kb)=0.e0;
 boygr=-grav* DZB(rho)./h_3d + DIVISION(grav^2 , AZB(cc.^2));
 boygr(:,:,1)=0.e0;
 l=q2lb ./ q2b;
@@ -76,17 +53,12 @@ l(:,:,1)=kappa*l0; l(:,:,kb)=0;
 gh(:,:,1)=0      ; gh(:,:,kb)=0;
 
 %    Calculate production of turbulent kinetic energy:
-% kn= DIVISION(km.*sef.*(AXF(DZB(u)).^2 + AYF(DZB(v)).^2) , (tmp.*dh_3d).^2) -shiw.*km.*boygr + kh.*boygr;
 kn= km.*sef.*(DZB(AXF(u)).^2 + DZB(AYF(v)).^2)./(dh_3d.^2) -shiw.*km.*boygr + kh.*boygr;
 %
 %  NOTE: Richardson # dep. dissipation correction (Mellor: 2001; Ezer, 2000),
 %  depends on ghc the critical number (empirical -6 to -2) to increase mixing.
 ghc=-6.0e0;
 stf=ones(im,jm,kb);
-% It is unclear yet if diss. corr. is needed when surf. waves are included.
-%           if(gh(i,j,k).lt.0.e0)
-%    ...        stf(i,j,k)=1.0e0-0.9e0*(gh(i,j,k)/ghc)**1.5e0
-%           if(gh(i,j,k).lt.ghc) stf(i,j,k)=0.1e0
 dtef=sqrt(q2b).*stf./(b1.*l+small);
 dtef(:,:,1)=0.e0;dtef(:,:,kb)=0.e0;
 

@@ -1,5 +1,6 @@
-function [OP] = gen_operator(m,n,k)
-      OP = Operator();
+function init_operator()
+global im jm kb imm1 jmm1 kbm1 OP
+%       OP = Operator();
 % Computing the basic averaging and differencing operators to smplify
 % code.
 
@@ -32,15 +33,15 @@ function [OP] = gen_operator(m,n,k)
 %             [0  0  0  0  1  1  0]                 [ X51+X61  X52+X62  X53+X63  X54+X64  X55+X65 ]
 %             [0  0  0  0  0  1  1]                 [ X61+X71  X62+X72  X63+X73  X64+X74  X65+X75 ]
 %             [0  0  0  0  0  0  2]                 [    2X71     2X72     2X73     2X74     2X75 ]
-L1= eye(m,m); 
-L2=[zeros(m,1) eye(m,m-1)];
-L3=zeros(m,m); L3(m,m)=1;
+L1= eye(im,im); 
+L2=[zeros(im,1) eye(im,imm1)];
+L3=zeros(im,im); L3(im,im)=1;
 OP.OP_AXF=0.5*(L1+L2+L3);
 
-L1= eye(n,n); 
-L2=[zeros(n,1) eye(n,n-1)];
-L3=zeros(n,n); L3(n,n)=1;
-OP.OP_AXF1=0.5*(L1+L2+L3);
+% L1= eye(jm,jm); 
+% L2=[zeros(jm,1) eye(jm,jmm1)];
+% L3=zeros(jm,jm); L3(jm,jm)=1;
+% OP.OP_AXF1=0.5*(L1+L2+L3);
 %  OP_AXB= 0.5*[2  0  0  0  0  0  0]   OP_AXB*X= 0.5*[    2X11     2X12     2X13     2X14     2X15 ]
 %              [1  1  0  0  0  0  0]                 [ X11+X21  X12+X22  X13+X23  X14+X24  X15+X25 ]
 %              [0  1  1  0  0  0  0]                 [ X21+X31  X22+X32  X23+X33  X24+X34  X25+X35 ]
@@ -48,15 +49,15 @@ OP.OP_AXF1=0.5*(L1+L2+L3);
 %              [0  0  0  1  1  0  0]                 [ X41+X51  X42+X52  X43+X53  X44+X54  X45+X55 ]
 %              [0  0  0  0  1  1  0]                 [ X51+X61  X52+X62  X53+X63  X54+X64  X55+X65 ]
 %              [0  0  0  0  0  1  1]                 [ X61+X71  X62+X72  X63+X73  X64+X74  X65+X75 ]
-L1= eye(m,m); 
-L2=[zeros(1,m); eye(m-1,m)];
-L3=zeros(m,m); L3(1,1)=1;
+L1= eye(im,im); 
+L2=[zeros(1,im); eye(imm1,im)];
+L3=zeros(im,im); L3(1,1)=1;
 OP.OP_AXB=0.5*(L1+L2+L3);
 
-L1= eye(n,n); 
-L2=[zeros(1,n); eye(n-1,n)];
-L3=zeros(n,n); L3(1,1)=1;
-OP.OP_AXB1=0.5*(L1+L2+L3);
+% L1= eye(jm,jm); 
+% L2=[zeros(1,jm); eye(jmm1,jm)];
+% L3=zeros(jm,jm); L3(1,1)=1;
+% OP.OP_AXB1=0.5*(L1+L2+L3);
 % OP_AYF= 0.5*[1  0  0  0  0]        Y*OP_AYF= 0.5*[ Y11+Y12  Y12+Y13  Y13+Y14  Y14+Y15  2Y15 ]
 %             [1  1  0  0  0]                      [ Y21+Y22  Y22+Y23  Y23+Y24  Y24+Y25  2Y25 ]
 %             [0  1  1  0  0]                      [ Y31+Y32  Y32+Y33  Y33+Y34  Y34+Y35  2Y35 ]
@@ -64,9 +65,9 @@ OP.OP_AXB1=0.5*(L1+L2+L3);
 %             [0  0  0  1  2]                      [ Y51+Y52  Y52+Y53  Y53+Y54  Y54+Y55  2Y55 ]
 %                                                  [ Y61+Y62  Y62+Y63  Y63+Y64  Y64+Y65  2Y65 ]
 %                                                  [ Y71+Y72  Y72+Y73  Y73+Y74  Y74+Y75  2Y75 ]
-R1= eye(n,n); 
-R2=[zeros(1,n); eye(n-1,n)];
-R3=zeros(n,n); R3(n,n)=1;
+R1= eye(jm,jm); 
+R2=[zeros(1,jm); eye(jmm1,jm)];
+R3=zeros(jm,jm); R3(jm,jm)=1;
 OP.OP_AYF=0.5*(R1+R2+R3);
 
 
@@ -78,20 +79,20 @@ OP.OP_AYF=0.5*(R1+R2+R3);
 %             [0  0  0  0  1]                      [ 2Y51  Y51+Y52  Y52+Y53  Y53+Y54  Y54+Y55 ]
 %                                                  [ 2Y61  Y61+Y62  Y62+Y63  Y63+Y64  Y64+Y65 ]
 %                                                  [ 2Y71  Y71+Y72  Y72+Y73  Y73+Y74  Y74+Y75 ]
-R1= eye(n,n); 
-R2=[zeros(n,1), eye(n,n-1)];
-R3=zeros(n,n); R3(1,1)=1;
+R1= eye(jm,jm); 
+R2=[zeros(jm,1), eye(jm,jmm1)];
+R3=zeros(jm,jm); R3(1,1)=1;
 OP.OP_AYB=0.5*(R1+R2+R3);
 
 %%%%%%%%%%%%%%%%%%%%%%%% A operator in XZ plate %%%%%%%%%%%%%%%%%%
-R1= eye(k,k); 
-R2=[zeros(1,k); eye(k-1,k)];
-R3=zeros(k,k); R3(k,k)=1;
+R1= eye(kb,kb); 
+R2=[zeros(1,kb); eye(kbm1,kb)];
+R3=zeros(kb,kb); R3(kb,kb)=1;
 OP.OP_AZF=0.5*(R1+R2+R3);
 
-R1= eye(k,k); 
-R2=[zeros(k,1), eye(k,k-1)];
-R3=zeros(k,k); R3(1,1)=1;
+R1= eye(kb,kb); 
+R2=[zeros(kb,1), eye(kb,kbm1)];
+R3=zeros(kb,kb); R3(1,1)=1;
 OP.OP_AZB=0.5*(R1+R2+R3);
 
 
@@ -103,9 +104,9 @@ OP.OP_AZB=0.5*(R1+R2+R3);
 %            [  0  0  0  0 -1  1  0]                  [ X61-X51  X62-X52   X63-X53   X64-X54   X65-X55 ]
 %            [  0  0  0  0  0 -1  1]                  [ X71-X61  X72-X62   X73-X63   X74-X64   X75-X65 ]
 %            [  0  0  0  0  0  0  0]                  [       0        0         0         0         0 ]
-L1= -eye(m,m); 
-L2=[zeros(m,1) eye(m,m-1)];
-L3=zeros(m,m); L3(m,m)=1;
+L1= -eye(im,im); 
+L2=[zeros(im,1) eye(im,imm1)];
+L3=zeros(im,im); L3(im,im)=1;
 OP.OP_DXF=(L1+L2+L3);
 
 % OP_DXB1_XY=[  0  0  0  0  0  0  0]    OP_DXB1_XY*X =[       0        0         0         0         0 ]
@@ -115,9 +116,9 @@ OP.OP_DXF=(L1+L2+L3);
 %            [  0  0  0 -1  1  0  0]                  [ X51-X41  X52-X42   X53-X43   X54-X44   X55-X45 ]
 %            [  0  0  0  0 -1  1  0]                  [ X61-X51  X62-X52   X63-X53   X64-X54   X65-X55 ]
 %            [  0  0  0  0  0 -1  1]                  [ X71-X61  X72-X62   X73-X63   X74-X64   X75-X65 ]
-L1=eye(m,m); 
-L2=[zeros(1,m); -eye(m-1,m)];
-L3=zeros(m,m); L3(1,1)=-1;
+L1=eye(im,im); 
+L2=[zeros(1,im); -eye(imm1,im)];
+L3=zeros(im,im); L3(1,1)=-1;
 OP.OP_DXB=(L1+L2+L3);
 
 % OP_DYF1_XY=[ -1  0  0  0  0 ]         Y*OP_DYF1_XY =[ Y12-Y11   Y13-Y12   Y14-Y13   Y15-Y14  0 ]
@@ -127,9 +128,9 @@ OP.OP_DXB=(L1+L2+L3);
 %            [  0  0  0  1  0 ]                       [ Y22-Y21   Y53-Y52   Y54-Y53   Y55-Y54  0 ]
 %                                                     [ Y22-Y21   Y63-Y62   Y64-Y63   Y65-Y64  0 ]
 %                                                     [ Y22-Y21   Y73-Y72   Y74-Y73   Y75-Y74  0 ]
-R1= -eye(n,n); 
-R2=[zeros(1,n); eye(n-1,n)];
-R3=zeros(n,n); R3(n,n)=1;
+R1= -eye(jm,jm); 
+R2=[zeros(1,jm); eye(jmm1,jm)];
+R3=zeros(jm,jm); R3(jm,jm)=1;
 OP.OP_DYF=(R1+R2+R3);
 
 % OP_DYB1_XY=[  0 -1  0  0  0 ]         Y*OP_DYB1_XY =[ 0  Y12-Y11   Y13-Y12   Y14-Y13   Y15-Y14 ]
@@ -139,34 +140,34 @@ OP.OP_DYF=(R1+R2+R3);
 %            [  0  0  0  0  1 ]                       [ 0  Y52-Y51   Y53-Y52   Y54-Y53   Y55-Y54 ]
 %                                                     [ 0  Y62-Y61   Y63-Y62   Y64-Y63   Y65-Y64 ]
 %                                                     [ 0  Y72-Y71   Y73-Y72   Y74-Y73   Y75-Y74 ]
-R1= eye(n,n); 
-R2=[zeros(n,1), -eye(n,n-1)];
-R3=zeros(n,n); R3(1,1)=-1;
+R1= eye(jm,jm); 
+R2=[zeros(jm,1), -eye(jm,jmm1)];
+R3=zeros(jm,jm); R3(1,1)=-1;
 OP.OP_DYB=(R1+R2+R3);
 
 
-R1= -eye(k,k); 
-R2=[zeros(1,k); eye(k-1,k)];
-R3=zeros(k,k); R3(k,k)=1;
+R1= -eye(kb,kb); 
+R2=[zeros(1,kb); eye(kbm1,kb)];
+R3=zeros(kb,kb); R3(kb,kb)=1;
 OP.OP_DZF=(R1+R2+R3);
 
-R1= eye(k,k); 
-R2=[zeros(k,1), -eye(k,k-1)];
-R3=zeros(k,k); R3(1,1)=-1;
+R1= eye(kb,kb); 
+R2=[zeros(kb,1), -eye(kb,kbm1)];
+R3=zeros(kb,kb); R3(1,1)=-1;
 OP.OP_DZB=(R1+R2+R3);
 %%%%%%%%%%%%%%%%%%%%%%%% OP_L and OP_R operator %%%%%%%%%%%%%%%%%%
-L=eye(m,m); L(1,1)=0;L(m,m)=0;
-R=eye(n,n); R(1,1)=0;R(n,n)=0;
+L=eye(im,im); L(1,1)=0;L(im,im)=0;
+R=eye(jm,jm); R(1,1)=0;R(jm,jm)=0;
 OP.OP_L_XY = L;
 OP.OP_R_XY = R;
 
-L=eye(m,m); L(1,1)=0;L(m,m)=0;
-R=eye(k,k); R(1,1)=0;R(k,k)=0;
+L=eye(im,im); L(1,1)=0;L(im,im)=0;
+R=eye(kb,kb); R(1,1)=0;R(kb,kb)=0;
 OP.OP_L_XZ = L;
 OP.OP_R_XZ = R;
 
-L=eye(n,n); L(1,1)=0;L(n,n)=0;
-R=eye(k,k); R(1,1)=0;R(k,k)=0;
+L=eye(jm,jm); L(1,1)=0;L(jm,jm)=0;
+R=eye(kb,kb); R(1,1)=0;R(kb,kb)=0;
 OP.OP_L_YZ = L;
 OP.OP_R_YZ = R;
 
@@ -179,10 +180,10 @@ OP.OP_R_YZ = R;
 %      [0 0 0 0 1 0]        [0 0 0 0 0 1]
 %      [0 0 0 0 0 0]        [0 0 0 0 0 0]
 
-R1=triu(ones(k,k)); R1(:,k)=0;
+R1=triu(ones(kb,kb)); R1(:,kb)=0;
 OP.OP_SUMZ1= R1;
 
-R2=triu(ones(k,k))-eye(k);
+R2=triu(ones(kb,kb))-eye(kb);
 OP.OP_SUMZ2= R2;
 
 end

@@ -84,7 +84,7 @@ isplit=30;
 time_start='2000-01-01 00:00:00 +00:00';
 
 
-days=0.025;       % run duration in days
+days=1.225;       % run duration in days
 % days=1.5;       % run duration in days
 
 prtd1=0.0125;     % Initial print interval (days)
@@ -195,6 +195,8 @@ io = zeros(100);
 jo = zeros(100);
 ko = zeros(100);
 
+% gridtype is based on Arakawa grid system;
+gridtype = 'C';
 %     End of input of constants
 %***********************************************************************
 
@@ -211,3 +213,4 @@ iswtch=floor(swtch*24.0*3600.0/dti+0.5);
 
 ispi=1.0/isplit;
 isp2i=1.0/(2.0*isplit);
+OP = Operator();

@@ -20,7 +20,7 @@ function [rhoo]=dens(si,ti,h_3d,fsm_3d)
 
 %load('grid.mat');
 %load('para.mat');
-global im jm kb tbias sbias rhor rhoref grav zz_3d 
+global im jm kb tbias sbias rhor rhoref grav zz_3d
 
 rhoo=zeros(im,jm,kb);
 
