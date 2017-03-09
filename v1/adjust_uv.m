@@ -1,18 +1,6 @@
-            tps=sum(u(:,:,1:kbm1).*dz_3d(:,:,1:kbm1), 3);
-            tps1=sum(u.*dz_3d, 3);            
-            
-            utb_3d = repmat(utb, 1, 1, kbm1);
-            utf_3d = repmat(utf, 1, 1, kbm1);
-            tps_3d = repmat(tps, 1, 1, kbm1);
-            dt_3d1 = repmat(dt, 1, 1, kbm1);
-            dt_axb = 2.0 * AXB(dt_3d1);
-%             u(:,:,1:kbm1) = u(:,:,1:kbm1)-tps_3d + (utb_3d+utf_3d) ./ dt_axb;
-            u(:,:,1:kbm1) = u(:,:,1:kbm1)-tps_3d + DIVISION(utb_3d+utf_3d, dt_axb);            
-            tps = sum(v(:,:,1:kbm1) .* dz_3d(:,:,1:kbm1), 3);
-            
-           
-            vtb_3d = repmat(vtb, 1, 1, kbm1);
-            vtf_3d = repmat(vtf, 1, 1, kbm1);
-            tps_3d = repmat(tps, 1, 1, kbm1);
-            dt_ayb = 2.0 * AYB(dt_3d1);
-            v(:,:,1:kbm1) = v(:,:,1:kbm1) - tps_3d + (vtb_3d+vtf_3d) ./ dt_ayb;
+function [u,v] = adjust_uv(u,utb,utf,v,vtb,vtf,dt_3d)
+global kb dz_3d
+            u = u - repmat(sum(u.*dz_3d, 3),1,1,kb) + DIVISION(repmat(utb+utf,1,1,kb),2.0 * AXB(dt_3d));            
+            v = v - repmat(sum(v.*dz_3d, 3),1,1,kb) + DIVISION(repmat(vtb+vtf,1,1,kb),2.0 * AYB(dt_3d));
+            u(:,:,kb)=0.0;    v(:,:,kb)=0.0;
+return

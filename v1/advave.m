@@ -1,23 +1,9 @@
 function  [advua,advva] = advave(aam2d,uab,vab,ua,va,d)
-% **********************************************************************
-% *                                                                    *
-% * FUNCTION    :  Calculates horizontal advection and diffusion.      *
-% *                                                                    *
-% **********************************************************************
 tps = AYB(AXB(d)) .* AXB(AYB(aam2d)) .*  ( DYB(uab)  + DXB(vab)  );
-
 advua = DXB( AXF(AXB(d).*ua) .* AXF(ua)-2.0*d .* aam2d .* DXF(uab) ) ...
         +DYF( ( AXB(AYB(d).*va) .* AYB(ua)-tps ) );
-%advva = DXF( ( AYB(AXB(d).*ua) .* AXB(va)-tps ) .* AYB(AXB(dy)) )...
-%        +DYB( ( AYF(AYB(d).*va) .* AYF(va) - 2.0*d .* aam2d .* DYF(vab)./dy ) .* dx );
-
 advva = DXF( ( AYB(AXB(d).*ua) .* AXB(va)-tps ) )...
         +DYB( ( AYF(AYB(d).*va) .* AYF(va) - 2.0*d .* aam2d .* DYF(vab) ) );
-
-%%%%%%%%%%%%%%%%%%% 
-%wubot = zeros(im,jm);
-%wvbot = zeros(im,jm);
-
 % if(mode==2)
 %     wubot = -AXB(cbc) .* sqrt( uab.^2+AXB(AYF(vab)).^2 ) .* uab;
 %     wvbot = -AYB(cbc) .* sqrt( vab.^2+AYB(AXF(uab)).^2 ) .* vab;

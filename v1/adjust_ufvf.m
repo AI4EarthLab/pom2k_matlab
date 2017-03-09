@@ -1,14 +1,9 @@
-            tps = sum((uf+ub-2.e0*u).*dz_3d, 3);
-            
-            tps_3d = repmat(tps, 1, 1, kbm1);
-            u(:,:,1:kbm1)=u(:,:,1:kbm1)+  .5e0*smoth*(uf(:,:,1:kbm1)+ub(:,:,1:kbm1)-2.e0*u(:,:,1:kbm1)-tps_3d);
+function [u,v,ub,vb] = adjust_ufvf(u,ub,uf,v,vb,vf)
+global kb dz_3d smoth
+    u=u+.5e0*smoth*(uf+ub-2.e0*u-repmat(sum((uf+ub-2.e0*u).*dz_3d, 3),1,1,kb)); 
+    u(:,:,kb)=0.0;
 
-            tps = sum((vf+vb-2.e0*v).*dz_3d, 3);
-            
-            tps_3d = repmat(tps,1,1,kbm1);
-            v(:,:,1:kbm1) = v(:,:,1:kbm1)+ .5e0*smoth*(vf(:,:,1:kbm1)+vb(:,:,1:kbm1)-2.e0*v(:,:,1:kbm1)-tps_3d);
-            
-            ub=u;
-            u=uf;
-            vb=v;
-            v=vf;
+    v = v+ .5e0*smoth*(vf+vb-2.e0*v-repmat(sum((vf+vb-2.e0*v).*dz_3d, 3),1,1,kb));
+    v(:,:,kb)=0.0;
+    ub=u;   u=uf;   vb=v;   v=vf;
+return
