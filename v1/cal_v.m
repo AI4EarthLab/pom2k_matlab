@@ -36,4 +36,6 @@ d = create_field(zeros(im,jm,kb),gs,1);
 
    vf=vf.*dvm_3d;
    wvbot=-tps .* vf(:,:,kbm1);
+   
+   [vf] = bcond3_v(vf, v);
 return

@@ -1,4 +1,4 @@
-function [tf]=cal_ts(tb,t,dt_3d,u,v,aam,w,etb,etf,wtsurf,tsurf,nbct,swrad,kh)
+function [tf,t,tb]=cal_s(tb,t,dt,dt_3d,u,v,aam,w,etb,etf,wtsurf,tsurf,nbct,swrad,kh)
 global kb dum_3d dvm_3d dti2 tprni h_3d im jm dz_3d dzz_3d kbm1 umol kbm2 dz gs h
 
 tf=((h_3d+repmat(etb,1,1,kb)).*tb - dti2 .* (DXF( AXB(dt_3d).*AXB(t).*u-AXB(aam).*AXB(h_3d)*tprni.*DXB(tb).*dum_3d ) ...
@@ -46,4 +46,7 @@ end
    tf(i,j,:)=la\reshape(d(i,j,:),kb,1); 
       end
   end
+  
+[tf,t,tb] = bcond4_s(tf,tb,u,v,w,t,dt);
+[~,t,~,tb]=smoth_update(0,tf,0,t,0,tb);
 return

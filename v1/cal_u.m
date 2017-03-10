@@ -36,5 +36,8 @@ d = create_field(zeros(im,jm,kb),gs,2);
   end
    uf=uf.*dum_3d;
    wubot=-tps.*uf(:,:,kbm1);
+   
+   [uf] = bcond3_u(uf,u);
+   
 return
 
