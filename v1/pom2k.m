@@ -54,18 +54,18 @@ for iint=1:iend
           
             w     = vertvl (dt_3d,u,v,vfluxb,vfluxf,etf,etb);  
 
-            [q2f,q2,q2b,q2lf,q2l,q2lb,km,kq,kh]=cal_q(q2b,q2,q2lb,q2l,dt_3d,u,...
+            [q2f,q2,q2b,q2lf,q2l,q2lb,km,kq,kh]=cal_q1(q2b,q2,q2lb,q2l,dt_3d,u,...
                     v,w,aam,etb,etf,rho,wusurf,wubot,wvsurf,wvbot,km,kq,kh,t,s);
 
-            [tf,t,tb]=cal_t(tb,t,dt,dt_3d,u,v,aam,w,etb,etf,wtsurf,tsurf,nbct,swrad,kh);
+            [tf,t,tb]=cal_t1(tb,t,dt,dt_3d,u,v,aam,w,etb,etf,wtsurf,tsurf,nbct,swrad,kh);
             
-            [sf,s,sb]=cal_s(sb,s,dt,dt_3d,u,v,aam,w,etb,etf,wssurf,ssurf,nbcs,swrad,kh); 
+            [sf,s,sb]=cal_s1(sb,s,dt,dt_3d,u,v,aam,w,etb,etf,wssurf,ssurf,nbcs,swrad,kh); 
             
             [rho]=dens(s,t,h_3d,fsm_3d);
             
-            [uf,wubot] =cal_u(advx,dt_3d,e_atmos,drhox,ub,u,v,w,egf,egb,etf,etb,km,vb,wusurf,cbc);
+            [uf,wubot] =cal_u1(advx,dt_3d,e_atmos,drhox,ub,u,v,w,egf,egb,etf,etb,km,vb,wusurf,cbc);
             
-            [vf,wvbot] =cal_v(advy,dt_3d,e_atmos,drhoy,vb,u,v,w,egf,egb,etf,etb,km,ub,wvsurf,cbc);
+            [vf,wvbot] =cal_v1(advy,dt_3d,e_atmos,drhoy,vb,u,v,w,egf,egb,etf,etb,km,ub,wvsurf,cbc);
             
             [u,v,ub,vb] = adjust_ufvf(u,ub,uf,v,vb,vf);
 

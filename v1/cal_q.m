@@ -2,7 +2,7 @@ function [q2f,q2,q2b,q2lf,q2l,q2lb,km,kq,kh]=cal_q(q2b,q2,q2lb,q2l,dt_3d,u,v,w,a
                                             wusurf,wubot,wvsurf,wvbot,km,kq,kh,t,s)
 
 global im jm kb imm1 jmm1 kbm1 kbm2 dum_3d dvm_3d dti2 h_3d dzz_3d dz_3d zz_3d z_3d ...
-       gs small umol grav kappa tbias sbias rhoref h z fsm_3d smoth;
+       gs small umol grav kappa tbias sbias rhoref h z fsm_3d;
 
 q2f= ( (h_3d+repmat(etb,1,1,kb)) .* q2b -dti2*( -DZB(AZF(w.*q2)) + DXF(AXB(q2) .* AXB(dt_3d) .* AZB(u) ... 
      -AZB( AXB( aam )).*AXB(h_3d) .*DXB( q2b ).* dum_3d) + DYF(AYB(q2) .* AYB(dt_3d) .* AZB(v) ...
@@ -25,10 +25,10 @@ c(:,:,2:kbm1)=dzz_3d(:,:,1:kbm2).*dz_3d(:,:,1:kbm2);
 a= DIVISION(-dti2 .* (AZF(kq)+umol) , (a .* dh_3d .* dh_3d));
 c= DIVISION(-dti2 .* (AZB(kq)+umol) , (c .* dh_3d .* dh_3d));
 
-const1=(16.6e0^(2.e0/3.e0))*sef;      
+% const1=(16.6e0^(2.e0/3.e0))*sef;      
 utau2 = sqrt( AXF(wusurf).^2 +AYF(wvsurf).^2 );
 l0 = surfl*utau2/grav;                     
-q2f(:,:,kb) = sqrt( AXF(wubot).^2 +AYF(wvbot).^2 ) .* const1;
+q2f(:,:,kb) = sqrt( AXF(wubot).^2 +AYF(wvbot).^2 ) .* (16.6e0^(2.e0/3.e0))*sef;
         
 %    Calculate speed of sound squared:    
 p=grav*rhoref*(-zz_3d .* h_3d)*1.e-4;     %     Calculate pressure in units of decibars:
@@ -53,7 +53,7 @@ gh(:,:,1)=0      ; gh(:,:,kb)=0;
 %    Calculate production of turbulent kinetic energy:
 kn= km.*sef.*(DZB(AXF(u)).^2 + DZB(AYF(v)).^2)./(dh_3d.^2) -shiw.*km.*boygr + kh.*boygr;
 
-ghc=-6.0e0;
+% ghc=-6.0e0;
 stf=ones(im,jm,kb);
 dtef=sqrt(q2b).*stf./(b1.*l+small);
 dtef(:,:,1)=0.e0;dtef(:,:,kb)=0.e0;
@@ -94,8 +94,6 @@ end
   end
    q2lf(:,:,1)=temp;
 
-% dt_3d=repmat(dt,1,1,kb);
-
 filter = (q2f<=small | q2lf<=small);
 filter(:,:,1) = false;
 filter(:,:,kb) = false;
@@ -104,30 +102,20 @@ q2lf(filter.data) = 0.1 * dt_3d(filter.data) * small;
 
 %-----------------------------------------------------------------------
 %     The following section solves for km and kh:
-    coef4=18.e0*a1*a1+9.e0*a1*a2;
-    coef5=9.e0*a1*a2;
 %     Note that sm and sh limit to infinity when gh approaches 0.0288:
-    coef1=a2*(1.e0-6.e0*a1/b1*stf);
-    coef2=3.e0*a2*b2/stf+18.e0*a1*a2;
-    coef3=a1*(1.e0-3.e0*c1-6.e0*a1/b1*stf);
-    sh=coef1./(1.e0-coef2.*gh);
-    sm=coef3+sh.*coef4.*gh;
-    sm=sm./(1.0-coef5.*gh);
-            
+
+    sh=a2*(1.e0-6.e0*a1/b1*stf)./(1.e0-(3.e0*a2*b2/stf+18.e0*a1*a2).*gh);
+    sm=( a1*(1.e0-3.e0*c1-6.e0*a1/b1*stf) + sh.*(18.e0*a1*a1+9.e0*a1*a2).*gh )./(1.0-(9.e0*a1*a2).*gh);
     kn=l.*sqrt(abs(q2));
     kq=(kn.*.41e0.*sh+kq)*.5e0;
     km=(kn.*sm+km)*.5e0;
     kh=(kn.*sh+kh)*.5e0;
        
-      km(:,jm,:)=km(:,jmm1,:).*fsm_3d(:,jm,:);
-      kh(:,jm,:)=km(:,jmm1,:).*fsm_3d(:,jm,:);
-      km(:,1,:)=km(:,2,:).*fsm_3d(:,1,:);
-      kh(:,1,:)=kh(:,2,:).*fsm_3d(:,1,:);
+    km(:,jm,:)=km(:,jmm1,:).*fsm_3d(:,jm,:);    kh(:,jm,:)=km(:,jmm1,:).*fsm_3d(:,jm,:);
+    km(:,1,:)=km(:,2,:).*fsm_3d(:,1,:);         kh(:,1,:)=kh(:,2,:).*fsm_3d(:,1,:);
       
-      km(im,:,:)=km(imm1,:,:).*fsm_3d(im,:,:);
-      kh(im,:,:)=kh(imm1,:,:).*fsm_3d(im,:,:);
-      km(1,:,:)=km(2,:,:).*fsm_3d(1,:,:);
-      kh(1,:,:)=kh(2,:,:).*fsm_3d(1,:,:);
+    km(im,:,:)=km(imm1,:,:).*fsm_3d(im,:,:);    kh(im,:,:)=kh(imm1,:,:).*fsm_3d(im,:,:);
+    km(1,:,:)=km(2,:,:).*fsm_3d(1,:,:);         kh(1,:,:)=kh(2,:,:).*fsm_3d(1,:,:);
 
     [q2f, q2lf] = bcond6(q2f, q2lf, u, v, q2, q2l);
     [q2,q2l,q2b,q2lb]=smoth_update(q2f,q2lf,q2,q2l,q2b,q2lb);
