@@ -1,6 +1,7 @@
-im=7; jm=5; kb=6;
+% im=7; jm=5; kb=6;
+% im=21; jm=21; kb=6;
 % im=11; jm=9; kb=6;
-%im=65; jm=49; kb=21;
+im=65; jm=49; kb=21;
 imm1=im-1; imm2=im-2; jmm1=jm-1; jmm2=jm-2; kbm1=kb-1; kbm2=kb-2;
 
 alpha          =0.0;dte            =0.0;dti            =0.0;dti2           =0.0;
@@ -85,7 +86,7 @@ isplit=30;
 time_start='2000-01-01 00:00:00 +00:00';
 
 
-days=1.225;       % run duration in days
+days=0.0125;       % run duration in days
 % days=1.5;       % run duration in days
 
 prtd1=0.0125;     % Initial print interval (days)

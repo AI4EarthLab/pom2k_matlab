@@ -9,10 +9,10 @@ function r = DYF(obj_field)
         switch obj_field.pos
             case {0,1,4,5}              
                 A(: ,1 ,: )=0;  A(: ,ny,: )=0; 
-            case {2,3,6,7}
-                 
-            otherwise
-                disp('Unknown position.');
+%             case {2,3,6,7}
+%                  
+%             otherwise
+%                 disp('Unknown position.');
         end       
         r = Field(A, obj_field.grid, obj_field.grid.y_map(obj_field.pos));
         dist=r.dy();
