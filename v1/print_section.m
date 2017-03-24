@@ -18,8 +18,8 @@ global kbm1 dz_3d dx dy dx_3d dy_3d fsm_3d fsm iswtch prtd2 dti vmaxl sbias ipri
         eaver = sum(reshape(et.*darea,[],1));       
         taver=taver/vtot;       saver=saver/vtot;
         eaver=eaver/atot;       tsalt=(saver+sbias)*vtot;      
-        fprintf('vtot = %.6f,atot = %.6f\n',vtot,atot);
-        fprintf('eaver = %.6f,taver = %.6f,saver=%.6f,tsalt = %.6f\n',eaver,taver,saver,tsalt);
+        fprintf('vtot = %.9f,atot = %.9f\n',vtot,atot);
+        fprintf('eaver = %.9f,taver = %.9f,saver=%.9f,tsalt = %.9f\n',eaver,taver,saver,tsalt);
                 
         if(vamax>vmaxl)            
             fprintf('time = %.6f, iint = %.6f, iexit = %.6f, iprint = %.6f\n',time,iint,iext,iprint);           

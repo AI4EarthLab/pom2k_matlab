@@ -1,5 +1,5 @@
     function [tf,t,tb]=cal_t(tb,t,dt,dt_3d,u,v,aam,w,etb,etf,wtsurf,tsurf,nbct,swrad,kh)
-    global kb dum_3d dvm_3d dti2 tprni h_3d im jm dz_3d dzz_3d kbm1 umol kbm2 dz gs h ee gg;
+    global kb dum_3d dvm_3d dti2 tprni h_3d im jm dz_3d dzz_3d kbm1 umol kbm2 dz gs h tbe tbw tbn tbs;
     %Explicit solution
     tf=((h_3d+repmat(etb,1,1,kb)).*tb - dti2 .* (DXF( AXB(dt_3d).*AXB(t).*u-AXB(aam).*AXB(h_3d)*tprni.*DXB(tb).*dum_3d ) ...
         + DYF( AYB(dt_3d).*AYB(t).*v-AYB(aam).*AYB(h_3d)*tprni.*DYB(tb).*dvm_3d )-DZF( AZB(t).*w ))) ./((h_3d+repmat(etf,1,1,kb))) ;
@@ -12,7 +12,7 @@
     rad=create_field(zeros(im,jm,kb),gs,7);
     a = create_field(zeros(im,jm,kb),gs,7);
     c = create_field(zeros(im,jm,kb),gs,7);
-    dh = h+etf;
+    dh = h+etf;     ee=zeros(im,jm,kb);     gg=zeros(im,jm,kb);
     dh_3d=repmat(dh,1,1,kb);
 
     a(:,:,1:kbm2)=-dti2*(kh(:,:,2:kbm1)+umol);
@@ -44,6 +44,7 @@
         tf(:,:,k)=ee(:,:,k).*tf(:,:,k+1)+gg(:,:,k);
     end
 
-    [tf] = bcond4_t(tf, u, v, w, t, dt);
+%     [tf] = bcond4_t(tf,u,v,w,t,dt,tbe,tbw,tbn,tbs);
+    [tf] = bcond4(tf,u,v,w,t,dt,tbe,tbw,tbn,tbs);
     [t,~,tb,~]=smoth_update(tf,0,t,0,tb,0);
     return
