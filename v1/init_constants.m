@@ -1,7 +1,7 @@
-im=7; jm=5; kb=6;
+% im=7; jm=5; kb=6;
 % im=21; jm=21; kb=6;
 % im=11; jm=9; kb=6;
-% im=65; jm=49; kb=21;
+im=65; jm=49; kb=21;
 imm1=im-1; imm2=im-2; jmm1=jm-1; jmm2=jm-2; kbm1=kb-1; kbm2=kb-2;
 
 alpha          =0.0;dte            =0.0;dti            =0.0;dti2           =0.0;
@@ -86,7 +86,7 @@ isplit=30;
 time_start='2000-01-01 00:00:00 +00:00';
 
 
-days=0.1625;       % run duration in days
+days=0.0625;       % run duration in days
 % days=1.5;       % run duration in days
 
 prtd1=0.0125;     % Initial print interval (days)
@@ -199,6 +199,20 @@ ko = zeros(100);
 
 % gridtype is based on Arakawa grid system;
 gridtype = 'C';
+
+%surface forcing scheme 
+nsbdy=1;     
+%   surfforcing_flag      type       
+%         1             seamount     
+%         2             box 
+%         3             reading from file with constant value
+%         4             reading from file with time-varing
+
+npg=1;
+%  npg      pressure gradient scheme
+%  1       Second order scheme, as originally provide in POM
+%  2       Fourth order scheme using the McCalpin method (Berntsen and Oey, Ocean Dynamics, 2010)
+
 %     End of input of constants
 %***********************************************************************
 

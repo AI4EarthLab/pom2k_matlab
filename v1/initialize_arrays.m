@@ -37,4 +37,4 @@ tbe=zeros(jm,kb)     ;tbn=zeros(im,kb)     ;tbs=zeros(im,kb)     ;tbw=zeros(jm,k
 uabe=zeros(1,jm)     ;uabw=zeros(1,jm)     ;ube=zeros(jm,kb)     ;ubw=zeros(jm,kb)     ;
 vabn=zeros(1,im)     ;vabs=zeros(1,im)     ;vbn=zeros(im,kb)     ;vbs=zeros(im,kb)     ;
 
-d_3d=zeros(im,jm,kb) ;dt_3d=zeros(im,jm,kb);
+d_3d=zeros(im,jm,kb) ;dt_3d=zeros(im,jm,kb);time0=0.0            ;time=0.0             ;

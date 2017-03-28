@@ -60,6 +60,11 @@ classdef Field
             pos = get_valid_pos(obj1, obj2);
             r = Field(double(obj1) ./ double(obj2), grid, pos);
         end
+ 
+        %overload 'any'
+        function r = any(a, b)
+            r = any(a.data,b);
+        end        
         
         function r = mrdivide(a, b)
             check_grid_match(a, b);

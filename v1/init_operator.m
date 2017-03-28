@@ -1,5 +1,5 @@
-function init_operator()
-global im jm kb imm1 jmm1 kbm1 OP
+function OP=init_operator()
+global im jm kb imm1 jmm1 kbm1;
 %       OP = Operator();
 % Computing the basic averaging and differencing operators to smplify
 % code.

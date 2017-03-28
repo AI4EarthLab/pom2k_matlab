@@ -1,6 +1,6 @@
-function init_grid()
-global gs dx_3d dy_3d dz_3d 
-
+function gs=init_grid(gridtype)
+global im jm kb dx_3d dy_3d dz_3d;
+    gs = Grid([im,jm,kb], gridtype);
     gs.dx_map = containers.Map('KeyType', 'int32', 'ValueType', 'any');
     gs.dy_map = containers.Map('KeyType', 'int32', 'ValueType', 'any');
     gs.dz_map = containers.Map('KeyType', 'int32', 'ValueType', 'any');
