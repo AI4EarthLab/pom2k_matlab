@@ -1,7 +1,7 @@
-function[xmassflux,ymassflux,zwflux,ff] = smol_adif(xmassflux,ymassflux,zwflux,ff,sw,aru,arv,dt)
+function[xmassflux,ymassflux,zwflux,ff] = smol_adif(xmassflux,ymassflux,zwflux,ff,sw,dt)
 % **********************************************************************
 % *                                                                    *
-% * FUN%TION    :  %calculates the antidiffusive velocity used to       *
+% * FUN%TION    :  calculates the antidiffusive velocity used to       *
 % *                reduce the numerical diffusion associated with the  *
 % *                upstream differencing scheme.                       *
 % *                                                                    *
@@ -14,64 +14,30 @@ function[xmassflux,ymassflux,zwflux,ff] = smol_adif(xmassflux,ymassflux,zwflux,f
 % *                the shock switch option.                            *
 % *                                                                    *
 % **********************************************************************
-global im jm kb imm1 jmm1 kbm1 dti2 fsm_3d dzz;
+global kb dti2 fsm_3d dz_3d dx_3d dy_3d aru_3d arv_3d dzz_3d;
 	value_min=1.0e-9;   epsilon=1.0e-14;
 	ff=ff.*fsm_3d;      dt_3d=repmat(dt,1,1,kb);
-%
-%     Recalculate mass fluxes with antidiffusion velocity:
-%
-      for k=1:kbm1
-        for j=2:jmm1
-          for i=2:im
-            if(ff.data(i,j,k)<value_min || ff.data(i-1,j,k)<value_min)
-              xmassflux(i,j,k)=0.e0;
-            else
-              udx=abs(xmassflux(i,j,k));
-              u2dt=dti2*xmassflux(i,j,k).^2 * 2.e0 ./(aru(i,j)*(dt(i-1,j)+dt(i,j)));
-              mol=(ff(i,j,k)-ff(i-1,j,k))/(ff(i-1,j,k)+ff(i,j,k)+epsilon);
-              xmassflux(i,j,k)=(udx-u2dt)*mol*sw;
-              if(abs(udx.data)<abs(u2dt.data)) 
-                  xmassflux(i,j,k)=0.e0;
-              end 
-            end
-          end
-        end
-      end
 
-      for k=1:kbm1
-        for j=2:jm
-          for i=2:imm1
-            if(ff.data(i,j,k)<value_min|| ff.data(i,j-1,k)<value_min) 
-              ymassflux(i,j,k)=0.e0;
-            else
-             vdy=abs(ymassflux(i,j,k));
-             v2dt=dti2*ymassflux(i,j,k).^2 *2.e0 /(arv(i,j)*(dt(i,j-1)+dt(i,j)));
-             mol=(ff(i,j,k)-ff(i,j-1,k)) /(ff(i,j-1,k)+ff(i,j,k)+epsilon);
-             ymassflux(i,j,k)=(vdy-v2dt)*mol*sw;
-             if(abs(vdy.data)<abs(v2dt.data))
-				 ymassflux(i,j,k)=0.e0;
-             end
-            end
-          end
-        end
-      end
-%
-      for k=2:kbm1
-        for j=2:jmm1
-          for i=2:imm1
-            if(ff.data(i,j,k)<value_min|| ff.data(i,j,k-1)<value_min)
-              zwflux(i,j,k)=0.e0;
-            else
-              wdz=abs(zwflux(i,j,k));
-              w2dt=dti2*zwflux(i,j,k).^2/(dzz(k-1)*dt(i,j));
-              mol=(ff(i,j,k-1)-ff(i,j,k)) /(ff(i,j,k)+ff(i,j,k-1)+epsilon);
-              zwflux(i,j,k)=(wdz-w2dt)*mol*sw;
-              if(abs(wdz.data)<abs(w2dt.data))
-				zwflux(i,j,k)=0.e0;
-              end 
-            end 
-          end
-        end
-      end
+%     Recalculate mass fluxes with antidiffusion velocity:
+      xmassflux(double( or( ff<value_min, shift(ff,1,1)<value_min) ))=0.e0;
+      flagno= and(ff>=value_min, shift(ff,1,1)>=value_min);
+      udx=abs(xmassflux).*flagno;
+      u2dt=DIVISION(dti2.*xmassflux.^2 .*flagno,(aru_3d.*AXB(dt_3d)));
+      xmassflux=(udx-u2dt).*(DXB(ff).*AXB(dx_3d)./(2*AXB(ff)+epsilon)).*sw;
+      xmassflux(double( lt(abs(udx),abs(u2dt)) ))=0.e0;
+     
+      ymassflux(double(or( ff<value_min, shift(ff,1,2)<value_min)))=0.e0;
+      flagno= and(ff>=value_min, shift(ff,1,2)>=value_min);
+      vdy=abs(ymassflux).*flagno;
+      v2dt=dti2.*ymassflux.^2 ./(arv_3d.*AYB(dt_3d)).*flagno;
+      ymassflux=(vdy-v2dt).*(DYB(ff).*AYB(dy_3d)./(2*AYB(ff)+epsilon)).*sw;
+      ymassflux(double (lt(abs(vdy),abs(v2dt))))=0.e0;
       
+      zwflux(double (or( ff<value_min, shift(ff,1,3)<value_min)))=0.e0;
+      flagno= and(ff>=value_min, shift(ff,1,3)>=value_min);
+      wdz=abs(zwflux) .* flagno;
+      w2dt=DIVISION( dti2.*zwflux.^2 .* flagno , circshift(dzz_3d,1,3).*dt_3d );
+      zwflux=(wdz-w2dt).*( -DZB(ff).* AZB(dz_3d) ./(2.*AZB(ff)+epsilon) ).*sw;
+      zwflux(double (lt(abs(wdz),abs(w2dt))) )=0.e0;
+
 end

@@ -1,4 +1,4 @@
-function [vaf,advva] = cal_va(h,elb,el,elf,uab,vab,ady2d,dry2d,advva,d,ua,e_atmos,wvsurf,wvbot,iext,aam2d,va,ramp)
+function [vaf,advva] = external_va(h,elb,el,elf,uab,vab,ady2d,dry2d,advva,d,ua,e_atmos,wvsurf,wvbot,iext,aam2d,va,ramp)
 global dte cor grav alpha ispadv vabn vabs rfn rfs eln els 
 
     if(mod(iext,ispadv)==0)

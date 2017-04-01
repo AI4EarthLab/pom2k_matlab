@@ -1,4 +1,4 @@
-    function [uf,wubot] =cal_u(advx,dt_3d,e_atmos,drhox,ub,u,v,w,egf,egb,etf,etb,km,vb,wusurf,cbc)
+    function [uf,wubot] =internal_u(advx,dt_3d,e_atmos,drhox,ub,u,v,w,egf,egb,etf,etb,km,vb,wusurf,cbc)
     global im kb dti2 grav h_3d jm dz_3d dzz_3d kbm1 umol kbm2 dz dum_3d gs h cor ee gg;
     % Explicit solution
     uf=DIVISION( (AXB(repmat(etb,1,1,kb)+h_3d).*ub -dti2*( advx + drhox - AXB( repmat(cor,1,1,kb) .*dt_3d.*AYF(v) )...

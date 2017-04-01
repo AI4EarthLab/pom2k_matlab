@@ -7,7 +7,7 @@ switch flag
             satm=0.e0;          tatm=zeros(im,jm);
             tatm(:,:)=t(:,:,1)+tbias ;
             wtsurf=  wtsurf+vfluxf.*(tatm-t(:,:,1)-tbias);
-            wssurf=  vfluxf.*(satm-s(:,:,1)-sbias)  ;            
+            wssurf=  (satm-s(:,:,1)-sbias) .* vfluxf ;            
         else
             w(:,:,1)=vfluxf;
             return

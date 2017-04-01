@@ -1,4 +1,4 @@
-function [w]=vertvl (dt_3d,u,v,vfluxb,vfluxf,etf,etb)
+function [w]=internal_vertvl (dt_3d,u,v,vfluxb,vfluxf,etf,etb)
 
 global  im kb dz_3d dti2 fsm_3d;
 w=( repmat(0.5e0*(vfluxb+vfluxf),1,1,kb)+SUM2(dz_3d .* ( ( DXF(AXB(dt_3d).* u)+DYF(AYB(dt_3d).* v) ) ...

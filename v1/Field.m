@@ -95,28 +95,28 @@ classdef Field
         end
         
         function r = lt(a,b)           
-            check_grid_match(a, b);
+%             check_grid_match(a, b);
             grid = get_valid_grid(a, b);
             pos = get_valid_pos(a, b);
             r = Field(double(a) < double(b), grid, pos);
         end
  
         function r = gt(a,b)             
-            check_grid_match(a, b);
+%             check_grid_match(a, b);
             grid = get_valid_grid(a, b);
             pos = get_valid_pos(a, b);
             r = Field(double(a) > double(b), grid, pos);
         end
         
         function r = le(a,b)            
-            check_grid_match(a, b);
+%             check_grid_match(a, b);
             grid = get_valid_grid(a, b);
             pos = get_valid_pos(a, b);
             r = Field(double(a) <= double(b), grid, pos);
         end
         
         function r = ge(a,b)           
-            check_grid_match(a, b);
+%             check_grid_match(a, b);
             grid = get_valid_grid(a, b);
             pos = get_valid_pos(a, b);
             r = Field(double(a) >= double(b), grid, pos);
@@ -137,14 +137,14 @@ classdef Field
         end                     
         
         function r = and(a,b)          
-            check_grid_match(a, b);
+%             check_grid_match(a, b);
             grid = get_valid_grid(a, b);
             pos = get_valid_pos(a, b);
             r = Field(double(a) & double(b), grid, pos);
         end       
         
         function r = or(a,b)           
-            check_grid_match(a, b);
+%             check_grid_match(a, b);
             grid = get_valid_grid(a, b);
             pos = get_valid_pos(a, b);
             r = Field(double(a) | double(b), grid, pos);

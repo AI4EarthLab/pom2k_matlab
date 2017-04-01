@@ -1,8 +1,16 @@
-    function [tf,t,tb]=cal_t(tb,t,dt,dt_3d,u,v,aam,w,etb,etf,wtsurf,tsurf,nbct,swrad,kh)
-    global kb dum_3d dvm_3d dti2 tprni h_3d im jm dz_3d dzz_3d kbm1 umol kbm2 dz gs h tbe tbw tbn tbs;
+    function [tf,t,tb]=internal_t(tb,t,dt,dt_3d,u,v,aam,w,etb,etf,wtsurf,tsurf,nbct,swrad,kh,nadv,tclim)
+    global kb dum_3d dvm_3d dti2 tprni h_3d im jm dz_3d dzz_3d kbm1 umol kbm2 dz gs h tbe tbw tbn tbs nitera sw;
     %Explicit solution
-    tf=((h_3d+repmat(etb,1,1,kb)).*tb - dti2 .* (DXF( AXB(dt_3d).*AXB(t).*u-AXB(aam).*AXB(h_3d)*tprni.*DXB(tb).*dum_3d ) ...
+    if(nadv == 1)
+        tf=((h_3d+repmat(etb,1,1,kb)).*tb - dti2 .* (DXF( AXB(dt_3d).*AXB(t).*u-AXB(aam).*AXB(h_3d)*tprni.*DXB(tb).*dum_3d ) ...
         + DYF( AYB(dt_3d).*AYB(t).*v-AYB(aam).*AYB(h_3d)*tprni.*DYB(tb).*dvm_3d )-DZF( AZB(t).*w ))) ./((h_3d+repmat(etf,1,1,kb))) ;
+    elseif(nadv ==2)
+        tf=zeros(im,jm,kb);
+        [tf] = advt2(tb,t,tclim,tf,nitera,sw,etb,etf,w,dt,dt_3d,aam,tprni,h,dum_3d,dvm_3d,u,v);
+    else
+        disp "Invalid value for nadv£¬program terminated£¡£¡£¡";
+        return
+    end
     %-----------------------------------------------------------------
     %Implicit solution
     r=[0.58,0.62,0.67,0.77,0.78];

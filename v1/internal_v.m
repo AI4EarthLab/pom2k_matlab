@@ -1,4 +1,4 @@
-    function [vf,wvbot] = cal_v(advy,dt_3d,e_atmos,drhoy,vb,u,v,w,egf,egb,etf,etb,km,ub,wvsurf,cbc)
+    function [vf,wvbot] = internal_v(advy,dt_3d,e_atmos,drhoy,vb,u,v,w,egf,egb,etf,etb,km,ub,wvsurf,cbc)
     global kb dti2 grav h_3d im jm dz_3d dzz_3d kbm1 umol kbm2 dz dvm_3d gs h cor ee gg;
     % Explicit solution
     vf = ( AYB( repmat(etb,1,1,kb) +h_3d).*vb-dti2*( advy+drhoy+AYB( repmat(cor,1,1,kb) .*dt_3d.*AXF(u) )...

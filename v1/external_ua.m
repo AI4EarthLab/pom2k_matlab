@@ -1,4 +1,4 @@
-function [uaf,advua]=cal_ua(h,elb,el,elf,uab,vab,adx2d,drx2d,advua,d,va,e_atmos,wusurf,wubot,iext,aam2d,ua,ramp)
+function [uaf,advua]=external_ua(h,elb,el,elf,uab,vab,adx2d,drx2d,advua,d,va,e_atmos,wusurf,wubot,iext,aam2d,ua,ramp)
 global dte cor grav alpha ispadv uabe uabw rfe rfw ele elw
 
   if(mod(iext,ispadv)==0)

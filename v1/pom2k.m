@@ -11,7 +11,7 @@ gs=init_grid(gridtype);
 init_fields();
 
     [ua,va,el,et,etf,d,dt,w,d_3d,dt_3d,l,q2b,q2lb,kh,km,kq,aam,q2,q2l,t,s,u,v,rho,drhox,drhoy,drx2d,dry2d] ...
-          = update_initial(uab,vab,elb,etb,h,small,aam,aam_init,w,vfluxf,tb,sb,ub,vb,rmean,ramp);
+          = update_initial(uab,vab,elb,etb,h,q2b,small,aam,aam_init,w,vfluxf,tb,sb,ub,vb,rmean,ramp);
     
     [cbc] = bottom_friction(kappa,zz,h,z0b,cbcmin,cbcmax);                                                  
 
@@ -64,9 +64,9 @@ for iint=1:iend
 
             [q2f,q2,q2b,q2lf,q2l,q2lb,km,kq,kh]=internal_q(q2b,q2,q2lb,q2l,dt_3d,u,v,w,aam,etb,etf,rho,wusurf,wubot,wvsurf,wvbot,km,kq,kh,t,s);
 
-            [tf,t,tb]=internal_t(tb,t,dt,dt_3d,u,v,aam,w,etb,etf,wtsurf,tsurf,nbct,swrad,kh);
+            [tf,t,tb]=internal_t(tb,t,dt,dt_3d,u,v,aam,w,etb,etf,wtsurf,tsurf,nbct,swrad,kh,nadv,tclim);
             
-            [sf,s,sb]=internal_s(sb,s,dt,dt_3d,u,v,aam,w,etb,etf,wssurf,ssurf,nbcs,swrad,kh); 
+            [sf,s,sb]=internal_s(sb,s,dt,dt_3d,u,v,aam,w,etb,etf,wssurf,ssurf,nbcs,swrad,kh,nadv,sclim); 
             
             [rho]=dens(s,t,h_3d,fsm_3d);
             
