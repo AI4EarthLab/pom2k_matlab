@@ -1,5 +1,5 @@
 function [ua,va,el,et,etf,d,dt,w,d_3d,dt_3d,l,q2b,q2lb,kh,km,kq,aam,q2,q2l,t,s,u,v,rho,drhox,drhoy,drx2d,dry2d] ...
-          = update_initial(uab,vab,elb,etb,h,q2b,small,aam,aam_init,w,vfluxf,tb,sb,ub,vb,rmean,ramp)
+          = update_initial(uab,vab,elb,etb,h,q2b,small,aam,aam_init,w,vfluxf,tb,sb,ub,vb,rmean,ramp,npg)
 global kb dz_3d fsm_3d h_3d gs;
 ua=uab;     va=vab;     el=elb;     et=etb;     etf=et;
 d=h + el;   dt=h + et;
@@ -16,8 +16,16 @@ q2          =q2b;                       q2l         =q2lb;
 t           =tb;                        s           =sb;
 u           =ub;                        v           =vb;
 
-[rho]=dens(s,t,h_3d,fsm_3d);          
-[drhox,drhoy] = baropg(rho, rmean, dt_3d, ramp);
+[rho]=dens(s,t,h_3d,fsm_3d);
+
+    if(npg == 1)  
+        [drhox,drhoy]   = baropg(rho, rmean, dt_3d, ramp);
+    elseif(npg == 2)
+        [drhox,drhoy]   = baropg_mcc(rho,rmean,d_3d,dt_3d,ramp);
+    else
+        disp "Error: invalid value for npg";
+    end
+% [drhox,drhoy] = baropg(rho, rmean, dt_3d, ramp);
 
 drx2d=sum(drhox.*dz_3d, 3);
 dry2d=sum(drhoy.*dz_3d, 3);

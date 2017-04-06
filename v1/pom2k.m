@@ -11,7 +11,7 @@ gs=init_grid(gridtype);
 init_fields();
 
     [ua,va,el,et,etf,d,dt,w,d_3d,dt_3d,l,q2b,q2lb,kh,km,kq,aam,q2,q2l,t,s,u,v,rho,drhox,drhoy,drx2d,dry2d] ...
-          = update_initial(uab,vab,elb,etb,h,q2b,small,aam,aam_init,w,vfluxf,tb,sb,ub,vb,rmean,ramp);
+          = update_initial(uab,vab,elb,etb,h,q2b,small,aam,aam_init,w,vfluxf,tb,sb,ub,vb,rmean,ramp,npg);
     
     [cbc] = bottom_friction(kappa,zz,h,z0b,cbcmin,cbcmax);                                                  
 
@@ -29,7 +29,7 @@ for iint=1:iend
 %    lateral_bc                                                                                              
                                                                                                                     
 % set lateral viscosity                                                                                            
-    [advx,advy,drhox,drhoy,aam] = lateral_viscosity(npg,u,v,dt_3d,aam,aam_init,ub,vb,rho,rmean,ramp,horcon);
+    [advx,advy,drhox,drhoy,aam] = lateral_viscosity(npg,u,v,d_3d,dt_3d,aam,aam_init,ub,vb,rho,rmean,ramp,horcon);
                                                                                                                     
 % form vertical averages of 3-D fields for use in external (2-D) mode                                              
     [adx2d,ady2d,drx2d,dry2d,aam2d,advua,advva,egf,utf,vtf] = mode_interaction(advx,advy,drhox,drhoy,aam,uab,vab,ua,va,el,d);
