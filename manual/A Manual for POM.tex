@@ -356,13 +356,13 @@ The governing equations may now be written as(all * will be dropped for notation
 \\ 
 &&\frac{\partial VD}{\partial t}  +\frac{\partial UVD}{\partial x} +\frac{\partial V^2D}{\partial y} + \frac{\partial Vw}{\partial \sigma} +fVD+gD\frac{\partial \eta}{\partial y} = \frac{\partial}{\partial \sigma}\left( \frac{K_M}{D}\frac{\partial V}{\partial \sigma} \right) - \frac{gD^2}{\rho_0} \frac{\partial}{\partial y} \int_\sigma^0 \rho d \sigma + \frac{gD}{\rho_0}\frac{\partial D}{\partial y} \int_\sigma^0 \sigma \frac{\partial \rho}{\partial \sigma} d \sigma + DF_y  \label{eq:final3}\nonumber \\  
 \\  
-&&\frac{\partial TD}{\partial t}+\frac{\partial TUD}{\partial x}+\frac{\partial TVD}{\partial y}+\frac{\partial Tw}{\partial z} = \frac{\partial}{\partial z}  \left ( K_H \frac{\partial T}{\partial z} \right) +D F_T  \label{eq:final4}\\ 
+&&\frac{\partial TD}{\partial t}+\frac{\partial TUD}{\partial x}+\frac{\partial TVD}{\partial y}+\frac{\partial Tw}{\partial \sigma} = \frac{\partial}{\partial \sigma}  \left ( \frac{K_H}{D} \frac{\partial T}{\partial \sigma} \right) +D F_T  \label{eq:final4}\\ 
 \nonumber \\ 
-&&\frac{\partial SD}{\partial t}+\frac{\partial SUD}{\partial x}+\frac{\partial SVD}{\partial y}+\frac{\partial Sw}{\partial z} = \frac{\partial}{\partial z}  \left ( K_H \frac{\partial S}{\partial z} \right) +D F_S \label{eq:final5} \\ 
+&&\frac{\partial SD}{\partial t}+\frac{\partial SUD}{\partial x}+\frac{\partial SVD}{\partial y}+\frac{\partial Sw}{\partial \sigma} = \frac{\partial}{\partial \sigma}  \left ( \frac{K_H}{D} \frac{\partial S}{\partial \sigma} \right) +D F_S \label{eq:final5} \\ 
 \nonumber \\ 
-&&\frac{\partial q^2D}{\partial t} + \frac{\partial Uq^2D}{\partial x} +\frac{\partial Vq^2D}{\partial y} + \frac{\partial wq^2}{\partial z}  = \frac{\partial}{\partial z} \left( \frac{K_q}{D}  \frac{\partial q^2}{\partial z} \right)+\frac{2K_M}{D}\left[ \left( \frac{\partial U}{\partial Z}\right)^2 + \left( \frac{\partial V}{\partial Z}\right)^2 \right] + \frac{2g}{\rho_0}K_H\frac{\partial \rho}{\partial z} - \frac{2D q^3}{B_1 l} + D F_q  \label{eq:final6}\nonumber \\  
+&&\frac{\partial q^2D}{\partial t} + \frac{\partial Uq^2D}{\partial x} +\frac{\partial Vq^2D}{\partial y} + \frac{\partial wq^2}{\partial \sigma}  = \frac{\partial}{\partial \sigma} \left( \frac{K_q}{D}  \frac{\partial q^2}{\partial \sigma} \right)+\frac{2K_M}{D}\left[ \left( \frac{\partial U}{\partial \sigma}\right)^2 + \left( \frac{\partial V}{\partial \sigma}\right)^2 \right] + \frac{2g}{\rho_0}K_H\frac{\partial \rho}{\partial \sigma} - \frac{2D q^3}{B_1 l} + D F_q  \label{eq:final6}\nonumber \\  
 \\   
-&&\frac{\partial q^2 l D}{\partial t} + \frac{\partial U q^2 l D}{\partial x} +\frac{\partial V q^2 l D}{\partial y} + \frac{\partial w q^2 l}{\partial z}   = \frac{\partial}{\partial z} \left( \frac{K_q}{D} \frac{\partial q^2 l}{\partial z} \right)+ E_1  l \left\{ \frac{K_M}{D}\left[ \left( \frac{\partial U}{\partial Z}\right)^2 + \left( \frac{\partial V}{\partial Z}\right)^2 \right] + \frac{q E_3}{\rho_0}K_H\frac{\partial \rho}{\partial z} \right\} - \frac{D q^3}{B_1} \widetilde{W} + D F_l    \label{eq:final7}\nonumber \\ 
+&&\frac{\partial q^2 l D}{\partial t} + \frac{\partial U q^2 l D}{\partial x} +\frac{\partial V q^2 l D}{\partial y} + \frac{\partial w q^2 l}{\partial \sigma}   = \frac{\partial}{\partial \sigma} \left( \frac{K_q}{D} \frac{\partial q^2 l}{\partial \sigma} \right)+ E_1  l \left\{ \frac{K_M}{D}\left[ \left( \frac{\partial U}{\partial \sigma}\right)^2 + \left( \frac{\partial V}{\partial \sigma}\right)^2 \right] + \frac{q E_3}{\rho_0}K_H\frac{\partial \rho}{\partial \sigma} \right\} - \frac{D q^3}{B_1} \widetilde{W} + D F_l    \label{eq:final7}\nonumber \\ 
 \nonumber  \\ 
 \end{eqnarray}
 
@@ -390,7 +390,7 @@ q_y &=&  A_H \left[ \frac{\partial \phi D}{\partial y} - \frac{\partial}{\partia
 \end{eqnarray}
 where $\phi$ now represents $T$, $S$, $q^2$ and $q^2 l$.
 
-Since the time this paper was accepted for publication, Mellor and Blumberg [1985] have shown that the conventional model for horizontal diffusion is incorrect when bottom topographical slopes are large. A new formulation has been suggested which is simpler than the $DF_x$, $DF_y$ and $DF_\phi$ equations. They makes it possible to model realistically bottom boundary layers over sharply sloping bottoms. They are defined according to:
+Mellor and Blumberg [1985] have shown that the conventional model for horizontal diffusion is incorrect when bottom topographical slopes are large. A new formulation has been suggested which is simpler than the $DF_x$, $DF_y$ and $DF_\phi$ equations. They makes it possible to model realistically bottom boundary layers over sharply sloping bottoms. They are defined according to:
 \begin{eqnarray}
 DF_x &\equiv& \frac{\partial}{\partial x} (H\tau_{xx}) + \frac{\partial}{\partial y} (H\tau_{xy}) \\
 DF_y &\equiv& \frac{\partial}{\partial x} (H\tau_{yx}) + \frac{\partial}{\partial y} (H\tau_{yy}) \\
