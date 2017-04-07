@@ -26,7 +26,7 @@ for iint=1:iend
     [wusurf,wvsurf,wtsurf,wssurf,vfluxf,swrad,w] = surface_forcing(iint,time,iend,nsbdy,t,s,vfluxf,wusurf,wvsurf,wtsurf,wssurf,swrad,w);
 
 % set time dependent lateral boundary conditions                                                                   
-%    lateral_bc                                                                                              
+    [tbe,tbw,tbn,tbs,sbe,sbw,sbn,sbs,uabe,uabw,vabn,vabs] = lateral_bc(bc_flag,iint,time,iend,tbe,tbw,tbn,tbs,sbe,sbw,sbn,sbs,uabe,uabw,vabn,vabs);                                                                                            
                                                                                                                     
 % set lateral viscosity                                                                                            
     [advx,advy,drhox,drhoy,aam] = lateral_viscosity(npg,u,v,d_3d,dt_3d,aam,aam_init,ub,vb,rho,rmean,ramp,horcon);

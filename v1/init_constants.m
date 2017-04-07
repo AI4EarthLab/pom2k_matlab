@@ -225,6 +225,7 @@ wind_flag  = 0;         % reading time-dependent wind force(1) or not(0);
 heat_flag  = 0;         % reading time-dependent heat(1) or not(0)
 water_flag = 0;         % reading time-dependent salinity (1) or not(0)
 
+bc_flag =0;             % reading time-dependent lateral (1) or not(0)
 %     End of input of constants
 %***********************************************************************
 
