@@ -6,3 +6,4 @@ global small pi netcdf_file iproblem mode nadv nitera sw nread dte isplit days p
        ispadv smoth alpha dti dte2 dti2 iend iprint iswtch ispi isp2i;
 global OP gs gridtype cor cor_3d h h_3d aam_init uabe uabw rfe rfw ele elw vabn vabs rfn rfs eln els tbe      ...
        tbw tbn tbs sbe sbw sbn sbs;
+global problem wind_flag heat_flag water_flag in_path;   

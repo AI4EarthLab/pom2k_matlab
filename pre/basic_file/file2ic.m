@@ -1,4 +1,4 @@
-function[tb,sb,tclim,sclim,ub,vb,elb,etb,dt,rho,rmean,ssurf,tsurf,dt_3d] = file2ic(file2ic_name)
+function[tb,sb,tclim,sclim,wusurf,wvsurf,wtsurf,wssurf,uvel,vvel,swrad,vfluxf,e_atmos] = file2ic(file2ic_name)
 % **********************************************************************
 % *                                                                    *
 % * FUNCTION    :  Sets up my own problem.                             *
@@ -8,9 +8,9 @@ function[tb,sb,tclim,sclim,ub,vb,elb,etb,dt,rho,rmean,ssurf,tsurf,dt_3d] = file2
 % * while others are calculated here.                                  *
 % *                                                                    *
 % **********************************************************************
-global im jm kb dx dy h dx_3d dy_3d h_3d z zz dz dzz z_3d zz_3d dz_3d dzz_3d cor cor_3d ...
-       uabe uabw rfe rfw ele elw vabn vabs rfn rfs eln els tbe tbw tbn tbs sbe sbw sbn  ...
-       sbs ubw ube vbs vbn east_c north_c east_e north_e east_u north_u east_v north_v fsm_3d rot;
+global im jm kb pi slmax kbm1 zz tbias sbias jmm1 imm1 dx dy cor h      ...
+       east_c north_c east_e   ...
+       north_e east_u north_u east_v north_v rot fsm dum dvm;
 
 t=zeros(im,jm,kb)       ;   s=zeros(im,jm,kb)       ;   rmean=zeros(im,jm,kb);
 wusurf=zeros(im,jm)     ;   wvsurf=zeros(im,jm)     ;   tsurf=zeros(im,jm)   ;

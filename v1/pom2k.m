@@ -23,7 +23,7 @@ for iint=1:iend
     [time,ramp] = get_time(iint,time0,lramp,dti,cor);
     
 % set time dependent surface boundary conditions     
-    [wusurf,wvsurf,wtsurf,wssurf,vfluxf,w] = surface_forcing(iint,time,iend,nsbdy,t,s,vfluxf,wusurf,wvsurf,wtsurf,wssurf,w);
+    [wusurf,wvsurf,wtsurf,wssurf,vfluxf,swrad,w] = surface_forcing(iint,time,iend,nsbdy,t,s,vfluxf,wusurf,wvsurf,wtsurf,wssurf,swrad,w);
 
 % set time dependent lateral boundary conditions                                                                   
 %    lateral_bc                                                                                              

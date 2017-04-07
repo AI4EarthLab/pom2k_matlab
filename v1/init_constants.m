@@ -52,7 +52,7 @@ mode=3;
 %        2       Smolarkiewicz iterative upstream scheme, based on
 %                subroutines provided by Gianmaria Sannino and Vincenzo
 %                Artale
-nadv=2;
+nadv=1;
 
 %     Constants for Smolarkiewicz iterative upstream scheme.
 %
@@ -212,6 +212,18 @@ npg=1;
 %  npg      pressure gradient scheme
 %  1       Second order scheme, as originally provide in POM
 %  2       Fourth order scheme using the McCalpin method (Berntsen and Oey, Ocean Dynamics, 2010)
+
+% Problem name:
+problem='seamount';
+
+% Path of reading data,such as initial value,time-dependent surface forcing data
+in_path='./../pre/in/';
+
+%Flags of initial & boundary conditions:
+fclim_flag = 0;         % setting initial sclim and tclime(1) or not(0);
+wind_flag  = 0;         % reading time-dependent wind force(1) or not(0);
+heat_flag  = 0;         % reading time-dependent heat(1) or not(0)
+water_flag = 0;         % reading time-dependent salinity (1) or not(0)
 
 %     End of input of constants
 %***********************************************************************

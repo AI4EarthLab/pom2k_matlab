@@ -4,10 +4,10 @@ while (~strcmp(Problem_name,'seamount') &&~strcmp(Problem_name,'box') &&~strcmp(
     Problem_name=input('Input error!Try again:','s');
 end
 if(strcmp(Problem_name,'seamount'))
-    [tb,sb,tclim,sclim,ub,uab,elb,etb,dt,aam2d,rho,rmean,wusurf,wvsurf,dt_3d] = seamount(e_atmos,aam);
+    [tb,sb,tclim,sclim,wusurf,wvsurf,wtsurf,wssurf,uvel,vvel,swrad] = seamount(e_atmos);
 elseif(strcmp(Problem_name,'box'))
-    [tb,sb,tclim,sclim,ub,uab,elb,etb,aam2d,dt,dt_3d,rho,rmean,tatm,satm,vfluxf,e_atmos] = box(e_atmos,aam);
+    [tb,sb,tclim,sclim,wusurf,wvsurf,wtsurf,wssurf,uvel,vvel,swrad,vfluxf,e_atmos] = box(e_atmos);
 else
     file2ic_name=input('Please input the name of file2ic (For example:XX.dat):','s');
-    [tb,sb,tclim,sclim,ub,vb,elb,etb,dt,rho,rmean,ssurf,tsurf,dt_3d] = file2ic(file2ic_name);
+    [tb,sb,tclim,sclim,wusurf,wvsurf,wtsurf,wssurf,uvel,vvel,swrad,vfluxf,e_atmos] = file2ic(file2ic_name);
 end
