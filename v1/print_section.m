@@ -1,4 +1,4 @@
-function print_section(iint,vamax,time,iext,tb,sb,dt_3d,et,imax,jmax)
+function [vamax,imax,jmax]=print_section(iint,vamax,time,iext,tb,sb,dt_3d,et,imax,jmax)
 global kbm1 dz_3d dx dy dx_3d dy_3d fsm_3d fsm iswtch prtd2 dti vmaxl sbias iprint
 
     if(iint>=iswtch)

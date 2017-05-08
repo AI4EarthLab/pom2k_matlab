@@ -86,7 +86,7 @@ isplit=30;
 time_start='2000-01-01 00:00:00 +00:00';
 
 
-days=0.0625;       % run duration in days
+days=0.1625;       % run duration in days
 % days=1.5;       % run duration in days
 
 prtd1=0.0125;     % Initial print interval (days)

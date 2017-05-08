@@ -66,6 +66,15 @@ classdef Field
             r = any(a.data,b);
         end        
         
+        %overload 'exp'
+        function r = exp(a)
+            if(~isnumeric(a)) 
+                r = exp(a.data);
+            else
+                r=exp(a);
+            end
+        end                
+        
         function r = mrdivide(a, b)
             check_grid_match(a, b);
             grid = get_valid_grid(a, b);

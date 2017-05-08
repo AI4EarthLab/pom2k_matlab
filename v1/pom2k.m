@@ -33,10 +33,6 @@ for iint=1:iend
                                                                                                                     
 % form vertical averages of 3-D fields for use in external (2-D) mode                                              
     [adx2d,ady2d,drx2d,dry2d,aam2d,advua,advva,egf,utf,vtf] = mode_interaction(advx,advy,drhox,drhoy,aam,uab,vab,ua,va,el,d);
-
-%     [e_atmos,vfluxf,wtsurf,swrad,wssurf,advx,advy,drhox,drhoy,aam,adx2d,ady2d,drx2d,    ...
-%     dry2d,aam2d,advua,advva,w,egf,utf,vtf]= set_lateralboundary (e_atmos,vfluxf,wtsurf, ...
-%     swrad,wssurf,u,ub,v,vb,dt_3d,aam,rho,rmean,ramp,uab,vab,ua,va,d,t,s,w,el);
           
         for iext=1:isplit    % Begin external (2-D) mode
 
@@ -46,7 +42,7 @@ for iint=1:iend
             
             [vaf,advva] = external_va(h,elb,el,elf,uab,vab,ady2d,dry2d,advva,d,ua,e_atmos,wvsurf,wvbot,iext,aam2d,va,ramp);
 
-            [d,d_3d,ua,va,el,uab,vab,elb,egf,vtf,utf,etf,vamax,imax,jmax]=external_update(uaf,vaf,elf,ua,va,el,uab,...
+            [d,d_3d,ua,va,el,uab,vab,elb,egf,vtf,utf,etf,vamax,imax,jmax]=external_update(d,d_3d,uaf,vaf,elf,ua,va,el,uab,...
                                                                                           vab,elb,iext,egf,vtf,utf,etf);
         end
 
@@ -64,9 +60,9 @@ for iint=1:iend
 
             [q2f,q2,q2b,q2lf,q2l,q2lb,km,kq,kh]=internal_q(q2b,q2,q2lb,q2l,dt_3d,u,v,w,aam,etb,etf,rho,wusurf,wubot,wvsurf,wvbot,km,kq,kh,t,s);
 
-            [tf,t,tb]=internal_t(tb,t,dt,dt_3d,u,v,aam,w,etb,etf,wtsurf,tsurf,nbct,swrad,kh,nadv,tclim);
-            
-            [sf,s,sb]=internal_s(sb,s,dt,dt_3d,u,v,aam,w,etb,etf,wssurf,ssurf,nbcs,swrad,kh,nadv,sclim); 
+            [tf,t,tb]=internal_t(tb,t,dt,dt_3d,u,v,aam,w,etb,etf,wtsurf,tsurf,nbct,swrad,    kh,nadv,tclim,tbe,tbw,tbn,tbs);
+
+            [sf,s,sb]=internal_t(sb,s,dt,dt_3d,u,v,aam,w,etb,etf,wssurf,ssurf,nbcs,swrad*0.0,kh,nadv,sclim,sbe,sbw,sbn,sbs); 
             
             [rho]=dens(s,t,h_3d,fsm_3d);
             
@@ -81,7 +77,7 @@ for iint=1:iend
         [egb,etb,et,dt,utb,vtb,vfluxb,dt_3d]=internal_update(egf,et,etf,utf,vtf,vfluxf);
 
     end   
-        print_section(iint,vamax,time,iext,tb,sb,dt_3d,et,imax,jmax);
+        [vamax,imax,jmax]=print_section(iint,vamax,time,iext,tb,sb,dt_3d,et,imax,jmax);
     %-----------------------------------------------------------------------
     %  End of internal (3-D) mode
     %-----------------------------------------------------------------------  

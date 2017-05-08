@@ -1,4 +1,4 @@
-function [d,d_3d,ua,va,el,uab,vab,elb,egf,vtf,utf,etf,vamax,imax,jmax]=external_update(uaf,vaf,elf,ua,va,el,uab,vab,elb,iext,egf,vtf,utf,etf)
+function [d,d_3d,ua,va,el,uab,vab,elb,egf,vtf,utf,etf,vamax,imax,jmax]=external_update(d,d_3d,uaf,vaf,elf,ua,va,el,uab,vab,elb,iext,egf,vtf,utf,etf)
 global smoth isplit kb isp2i ispi h fsm vmaxl;
     
     if(iext==(isplit-2))
@@ -27,6 +27,4 @@ if(vamax<=vmaxl)
         vtf=vtf+2.0* va .* AYB(d) * isp2i;
     end
 end
-
-    return
     end

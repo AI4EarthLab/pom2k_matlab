@@ -1,5 +1,5 @@
-    function [tf,t,tb]=internal_t(tb,t,dt,dt_3d,u,v,aam,w,etb,etf,wtsurf,tsurf,nbct,swrad,kh,nadv,tclim)
-    global kb dum_3d dvm_3d dti2 tprni h_3d im jm dz_3d dzz_3d kbm1 umol kbm2 dz gs h tbe tbw tbn tbs nitera sw;
+    function [tf,t,tb]=internal_t(tb,t,dt,dt_3d,u,v,aam,w,etb,etf,wtsurf,tsurf,nbct,swrad,kh,nadv,tclim,tbe,tbw,tbn,tbs)
+    global kb dum_3d dvm_3d dti2 tprni h_3d im jm z_3d dz_3d dzz_3d kbm1 umol kbm2 dz gs h nitera sw ntp;
     %Explicit solution
     if(nadv == 1)
         tf=((h_3d+repmat(etb,1,1,kb)).*tb - dti2 .* (DXF( AXB(dt_3d).*AXB(t).*u-AXB(aam).*AXB(h_3d)*tprni.*DXB(tb).*dum_3d ) ...
