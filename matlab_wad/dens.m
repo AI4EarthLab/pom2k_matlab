@@ -1,5 +1,5 @@
-function [si,ti,rhoo]=dens(si,ti,rhoo,...
-    im,jm,kbm1,tbias,sbias,grav,rhoref,zz,h,fsm)
+function [si,ti,rhoo]=dens(si,ti,rhoo,pdens, ...
+    im,jm,kbm1,tbias,sbias,grav,rhoref,zz,h,fsm) 
 % **********************************************************************
 % *                                                                    *
 % * FUNCTION    :  Calculates (density-1000.)/rhoref.                  *
@@ -29,7 +29,13 @@ for k=1:kbm1
             tr3=tr2*tr;
             tr4=tr3*tr;
 %     Approximate pressure in units of bars:
-            p=grav*rhoref*(-zz(k)* h(i,j))*1.e-5;
+% WAD Zhaowei 2017/11/9
+% lyo:!wad:Keep "p" defined as in original pom w/o hhi (i.e. "h" defined
+%          wrt MSL), but set p=0 for cells where input "h" indicates
+%          "dry" (i.e. where h-hhi < 0); i.e. use "pdens":
+% 
+            p=pdens(i,j,k);
+%           p=grav*rhoref*(-zz(k)* h(i,j))*1.e-5;
             rhor=-0.157406e0+6.793952e-2*tr-9.095290e-3*tr2+1.001685e-4*tr3...
 				 -1.120083e-6*tr4+6.536332e-9*tr4*tr;
  

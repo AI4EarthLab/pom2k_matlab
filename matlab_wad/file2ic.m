@@ -1,12 +1,12 @@
-function[dx,dy,cor,...
+function[dx,dy,cor,pdens... 
     east_c,north_c,east_e,north_e,east_u,north_u,east_v,north_v,...
     h,art,aru,arv,fsm,dum,dvm,...
-    tb,sb,tclim,sclim,ub,uab,elb,etb,dt,...
+    tsurf,ssurf,tb,sb,tclim,sclim,ub,uab,elb,etb,dt,...
     aam2d,rho,rmean,rfe,rfw,rfn,rfs,...
-    uabw,uabe,ele,elw,tbe,tbw,sbe,sbw,tbn,tbs,sbn,sbs,rot,els,eln,vabs,vabn,ubw,ube,vbs,vbn] = file2ic(dx,dy,cor,...
+    uabw,uabe,ele,elw,tbe,tbw,sbe,sbw,tbn,tbs,sbn,sbs,rot,els,eln,vabs,vabn,ubw,ube,vbs,vbn] = file2ic(dx,dy,cor,pdens,hhi,...
     east_c,north_c,east_e,north_e,east_u,north_u,east_v,north_v,...
     h,art,aru,arv,fsm,dum,dvm,...
-    tb,sb,tclim,sclim,ub,uab,elb,etb,dt,...
+    tsurf,ssurf,tb,sb,tclim,sclim,ub,uab,elb,etb,dt,...
     aam2d,rho,rmean,rfe,rfw,rfn,rfs,...
     uabw,uabe,ele,elw,tbe,tbw,sbe,sbw,tbn,tbs,sbn,sbs,...
     e_atmos,aam,im,jm,kb,imm1,jmm1,kbm1,slmax,zz,tbias,sbias,grav,rhoref,rot,els,eln,vabs,vabn,ubw,ube,vbs,vbn)
@@ -140,6 +140,46 @@ for i=1:im
     end
 end
 
+%% WAD Zhaowei 2017/11/10 move code from lat 
+% lyo:_20080415:Move "calc. Coriolis etc" through "call areas_masks"
+%      from below (after call dens) to here; otherwise, fsm will not
+%      be defined but is used in subroutine dens. (This is a pom2k_bug).
+
+% --- calc. Curiolis Parameter
+%
+for j=1:jm
+    for i=1:im
+        cor(i,j)=2.*7.29E-5*sin(north_e(i,j)*rad);
+        aam2d(i,j)=aam(i,j,1);
+        elb(i,j)=0.;
+        etb(i,j)=0.;
+        dt(i,j)=h(i,j);
+    end
+end
+%
+for j=1:jm
+    for i=2:im-1
+        dx(i,j)=0.5*rad*re*sqrt(((east_e(i+1,j)-east_e(i-1,j))...
+            *cos(north_e(i,j)*rad))^2+(north_e(i+1,j)-north_e(i-1,j))^2);
+    end
+    dx(1,j)=dx(2,j);
+    dx(im,j)=dx(im-1,j);
+end
+%
+for i=1:im
+    for j=2:jm-1
+        dy(i,j)=0.5*rad*re*sqrt(((east_e(i,j+1)-east_e(i,j-1))...
+            *cos(north_e(i,j)*rad))^2+(north_e(i,j+1)-north_e(i,j-1))^2);
+    end
+    dy(i,1)=dy(i,2);
+    dy(i,jm)=dy(i,jm-1);
+end
+%
+%     Calculate areas and masks:
+%
+[art,aru,arv,fsm,dum,dvm]=areas_masks(art,aru,arv,fsm,dum,dvm,...
+    im,jm,dx,dy,h);
+%
 %
 % --- calc. surface & lateral BC from climatology
 %
@@ -192,46 +232,16 @@ tb = t;
 sb = s;
 ub = zeros(im,jm,kb);
 vb=zeros(im,jm,kb);
-%
+% % WAD Zhaowei 2017/11/9-----------------------------------------------!
+% lyo:!wad: Set up pdens before 1st call dens; used also in profq:      !
+  pdenst=grav*rhoref*max(h(:,:)-hhi,0.e0))*1.e-5;
+      do k=1:kbm1
+         pdens(:,:,k)=-zz(k)*pdenst ;
+      end
 
-[sb,tb,rho]=dens(si,ti,rhoo,...
+[sb,tb,rho]=dens(si,ti,rhoo,pdens, ...
     im,jm,kbm1,tbias,sbias,grav,rhoref,zz,h,fsm);
-%
-% --- calc. Curiolis Parameter
-%
-for j=1:jm
-    for i=1:im
-        cor(i,j)=2.*7.29E-5*sin(north_e(i,j)*rad);
-        aam2d(i,j)=aam(i,j,1);
-        elb(i,j)=0.;
-        etb(i,j)=0.;
-        dt(i,j)=h(i,j);
-    end
-end
-%
-for j=1:jm
-    for i=2:im-1
-        dx(i,j)=0.5*rad*re*sqrt(((east_e(i+1,j)-east_e(i-1,j))...
-            *cos(north_e(i,j)*rad))^2+(north_e(i+1,j)-north_e(i-1,j))^2);
-    end
-    dx(1,j)=dx(2,j);
-    dx(im,j)=dx(im-1,j);
-end
-%
-for i=1:im
-    for j=2:jm-1
-        dy(i,j)=0.5*rad*re*sqrt(((east_e(i,j+1)-east_e(i,j-1))...
-            *cos(north_e(i,j)*rad))^2+(north_e(i,j+1)-north_e(i,j-1))^2);
-    end
-    dy(i,1)=dy(i,2);
-    dy(i,jm)=dy(i,jm-1);
-end
-%
-%     Calculate areas and masks:
-%
-[art,aru,arv,fsm,dum,dvm]=areas_masks(art,aru,arv,fsm,dum,dvm,...
-    im,jm,dx,dy,h);
-%
+
 %
 % --- the following grids are needed only for netcdf plotting
 %
